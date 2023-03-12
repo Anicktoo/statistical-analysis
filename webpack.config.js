@@ -54,7 +54,10 @@ module.exports = {
     resolve: {
         extensions: ['.js', '.json'],
         alias: {
-            '@': path.resolve('src')
+            '@': path.resolve(__dirname, 'src'),
+            '@styles': path.resolve(__dirname, 'src', 'styles'),
+            '@img': path.resolve(__dirname, 'src', 'img'),
+            '@modules': path.resolve(__dirname, 'src', 'modules'),
         }
     },
     optimization: optimization(),

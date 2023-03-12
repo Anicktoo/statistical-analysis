@@ -1,0 +1,120 @@
+@import "./reset.scss";
+@import './colors.scss';
+@import './typography.scss';
+
+// Main
+
+$animation-timing: 200ms ease-in-out;
+$header-height: 74px;
+
+.page-header {
+    &__inner {
+        position: relative;
+        z-index: 1000;
+        height: $header-height;
+        background-color: $main-grey;
+        border-bottom: 1px solid $stroke-grey;
+        box-shadow: 0px 4px 10px $shadow;
+    }
+
+    &__burger-menu {
+        width: 58px;
+        height: 100%;
+    }
+}
+
+.burger-menu {
+    $bar-width: 30px;
+    $bar-height: 4px;
+    $burger-gap: 6px;
+    $height: ($bar-height*3)+($burger-gap*2);
+    $x-width: ($height * 1.41421356237);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: $burger-gap;
+        width: max-content;
+
+        &::after,
+        &::before,
+        input {
+            content: '';
+            width: $bar-width;
+            height: $bar-height;
+            background-color: $blue;
+            border-radius: 9999px;
+            transform-origin: left center;
+            transition: opacity $animation-timing, width $animation-timing, rotate $animation-timing;
+        }
+
+        input {
+            appearance: none;
+            padding: 0;
+            margin: 0;
+            outline: 0;
+            pointer-events: none;
+        }
+
+        &:has(input:checked)::before {
+            rotate: 45deg;
+            width: $x-width;
+            translate: 0 $bar-height / -2;
+        }
+
+        &:has(input:checked)::after {
+            rotate: -45deg;
+            width: $x-width;
+            translate: 0 $bar-height / 2;
+
+        }
+
+        input:checked {
+            opacity: 0;
+            width: 0;
+        }
+    }
+}
+
+.sidebar {
+    translate: -100%;
+    z-index: 100;
+    position: absolute;
+    top: $header-height;
+    left: 0;
+    width: max-content;
+    max-width: 20rem;
+    background-color: $main-grey;
+    height: calc(100vh - #{$header-height});
+    border-right: 1px solid $stroke-grey;
+    transition: translate $animation-timing;
+
+    &__inner {
+        display: flex;
+        flex-direction: column;
+        padding: 4px;
+        gap: 18px;
+    }
+}
+
+.page-header:has(.burger-menu__content input:checked)+.sidebar {
+    translate: 0;
+}
+
+
+.modules {
+
+    &__list {}
+
+    &__item {}
+
+    &__icon {}
+
+    &__description {}
+}
+
+.button {}
