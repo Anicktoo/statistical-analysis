@@ -8,6 +8,12 @@ body {
     line-height: 19px;
 }
 
+@mixin bold-text {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 19px;
+}
+
 h1 {
     font-weight: 700;
     font-size: 24px;
@@ -21,9 +27,7 @@ h2 {
 }
 
 b {
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 19px;
+    @include bold-text;
 }
 
 small {

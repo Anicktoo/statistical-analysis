@@ -13,7 +13,7 @@
         <div class="page-header__inner">
             <label class="page-header__burger-menu burger-menu">
                 <div class="burger-menu__content">
-                    <input type="checkbox">
+                    <input type="checkbox" id="burger-menu__input">
                 </div>
             </label>
             <div class="modules">
@@ -26,15 +26,280 @@
     </header>
     <aside class="sidebar">
         <div class="sidebar__inner">
-            <div>
-                <div>Lorem.</div>
-                <div>Sint.</div>
-                <div>Molestiae.</div>
-                <div>Tempore.</div>
-            </div>
+            <ul class="sidebar__list">
+                <li class="sidebar__item button">Новый проект</li>
+                <li class="sidebar__item button">Открыть проект</li>
+                <li class="sidebar__item button">Сохранить проект</li>
+                <li class="sidebar__item button">Импорт данных</li>
+                <li class="sidebar__item button">Экспорт результатов</li>
+            </ul>
         </div>
     </aside>
+    <div class="fade"></div>
+    <main class="page-body">
+        <section class="page-body__item data">
+            <div class="data__container">
+                <table class="data__table">
+                    <thead>
+                        <tr>
+                            <th id="dataSettingsBtn" class="button">
+                                <?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"
+                                    width="19px" height="19px">
+                                    <path
+                                        d="M47.16,21.221l-5.91-0.966c-0.346-1.186-0.819-2.326-1.411-3.405l3.45-4.917c0.279-0.397,0.231-0.938-0.112-1.282 l-3.889-3.887c-0.347-0.346-0.893-0.391-1.291-0.104l-4.843,3.481c-1.089-0.602-2.239-1.08-3.432-1.427l-1.031-5.886 C28.607,2.35,28.192,2,27.706,2h-5.5c-0.49,0-0.908,0.355-0.987,0.839l-0.956,5.854c-1.2,0.345-2.352,0.818-3.437,1.412l-4.83-3.45 c-0.399-0.285-0.942-0.239-1.289,0.106L6.82,10.648c-0.343,0.343-0.391,0.883-0.112,1.28l3.399,4.863 c-0.605,1.095-1.087,2.254-1.438,3.46l-5.831,0.971c-0.482,0.08-0.836,0.498-0.836,0.986v5.5c0,0.485,0.348,0.9,0.825,0.985 l5.831,1.034c0.349,1.203,0.831,2.362,1.438,3.46l-3.441,4.813c-0.284,0.397-0.239,0.942,0.106,1.289l3.888,3.891 c0.343,0.343,0.884,0.391,1.281,0.112l4.87-3.411c1.093,0.601,2.248,1.078,3.445,1.424l0.976,5.861C21.3,47.647,21.717,48,22.206,48 h5.5c0.485,0,0.9-0.348,0.984-0.825l1.045-5.89c1.199-0.353,2.348-0.833,3.43-1.435l4.905,3.441 c0.398,0.281,0.938,0.232,1.282-0.111l3.888-3.891c0.346-0.347,0.391-0.894,0.104-1.292l-3.498-4.857 c0.593-1.08,1.064-2.222,1.407-3.408l5.918-1.039c0.479-0.084,0.827-0.5,0.827-0.985v-5.5C47.999,21.718,47.644,21.3,47.16,21.221z M25,32c-3.866,0-7-3.134-7-7c0-3.866,3.134-7,7-7s7,3.134,7,7C32,28.866,28.866,32,25,32z" />
+                                </svg>
+                            </th>
+                            <th>Savings</th>
+                            <th>Savings</th>
+                            <th>Savings</th>
+                            <th>Savings</th>
+                            <th>Savings</th>
+                            <th>Savings</th>
+                            <th>Savings</th>
+                            <th>Savings</th>
+                            <th>Savings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>300$</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>$80</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>1100</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>2100</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>3100</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>4100</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>5100</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>6100</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>7100</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>8100</td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td>9100</td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td>10100</td>
+                        </tr>
+                        <tr>
+                            <td>13</td>
+                            <td>11100</td>
+                        </tr>
+                        <tr>
+                            <td>14</td>
+                            <td>12100</td>
+                        </tr>
+                        <tr>
+                            <td>15</td>
+                            <td>13100</td>
+                        </tr>
+                        <tr>
+                            <td>16</td>
+                            <td>14100</td>
+                        </tr>
+                        <tr>
+                            <td>17</td>
+                            <td>15100</td>
+                        </tr>
+                        <tr>
+                            <td>18</td>
+                            <td>16100</td>
+                        </tr>
+                        <tr>
+                            <td>19</td>
+                            <td>17100</td>
+                        </tr>
+                        <tr>
+                            <td>20</td>
+                            <td>18100</td>
+                        </tr>
+                        <tr>
+                            <td>21</td>
+                            <td>19100</td>
+                        </tr>
+                        <tr>
+                            <td>22</td>
+                            <td>20100</td>
+                        </tr>
+                        <tr>
+                            <td>23</td>
+                            <td>21100</td>
+                        </tr>
+                        <tr>
+                            <td>24</td>
+                            <td>22100</td>
+                        </tr>
+                        <tr>
+                            <td>25</td>
+                            <td>23100</td>
+                        </tr>
+                        <tr>
+                            <td>26</td>
+                            <td>24100</td>
+                        </tr>
+                        <tr>
+                            <td>27</td>
+                            <td>25100</td>
+                        </tr>
+                        <tr>
+                            <td>28</td>
+                            <td>26100</td>
+                        </tr>
+                        <tr>
+                            <td>29</td>
+                            <td>27100</td>
+                        </tr>
+                        <tr>
+                            <td>30</td>
+                            <td>28100</td>
+                        </tr>
+                        <tr>
+                            <td>31</td>
+                            <td>29100</td>
+                        </tr>
+                        <tr>
+                            <td>32</td>
+                            <td>30100</td>
+                        </tr>
+                        <tr>
+                            <td>33</td>
+                            <td>31100</td>
+                        </tr>
+                        <tr>
+                            <td>34</td>
+                            <td>32100</td>
+                        </tr>
+                        <tr>
+                            <td>35</td>
+                            <td>33100</td>
+                        </tr>
+                        <tr>
+                            <td>36</td>
+                            <td>34100</td>
+                        </tr>
+                        <tr>
+                            <td>37</td>
+                            <td>35100</td>
+                        </tr>
+                        <tr>
+                            <td>38</td>
+                            <td>36100</td>
+                        </tr>
+                        <tr>
+                            <td>39</td>
+                            <td>37100</td>
+                        </tr>
+                        <tr>
+                            <td>40</td>
+                            <td>38100</td>
+                        </tr>
+                        <tr>
+                            <td>41</td>
+                            <td>39100</td>
+                        </tr>
+                        <tr>
+                            <td>42</td>
+                            <td>40100</td>
+                        </tr>
+                        <tr>
+                            <td>43</td>
+                            <td>41100</td>
+                        </tr>
+                        <tr>
+                            <td>44</td>
+                            <td>42100</td>
+                        </tr>
+                        <tr>
+                            <td>45</td>
+                            <td>43100</td>
+                        </tr>
+                        <tr>
+                            <td>46</td>
+                            <td>44100</td>
+                        </tr>
+                        <tr>
+                            <td>47</td>
+                            <td>45100</td>
+                        </tr>
+                        <tr>
+                            <td>48</td>
+                            <td>46100</td>
+                        </tr>
+                        <tr>
+                            <td>49</td>
+                            <td>47100</td>
+                        </tr>
+                        <tr>
+                            <td>50</td>
+                            <td>48100</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <footer class="data__footer footer">
+                    <div class="footer__inner">
+                        <ol class="footer__list">
+                            <li class="footer__item button">
+                                <div class="footer__item-content">
+                                    Лист1
+                                </div>
+                            </li>
+                            <li class="footer__item button">
+                                <div class="footer__item-content">
+                                    Лист2
+                                </div>
+                            </li>
+                            <li class="footer__item footer__item_selected button">
+                                <div class="footer__item-content">
+                                    Лист3
+                                </div>
+                            </li>
 
+                        </ol>
+                        <div class="footer__add-sheet button">
+                            <!-- <div class="footer__item-content"> -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="20px" height="20px">
+                                <path
+                                    d="M 25 2 C 12.309295 2 2 12.309295 2 25 C 2 37.690705 12.309295 48 25 48 C 37.690705 48 48 37.690705 48 25 C 48 12.309295 37.690705 2 25 2 z M 25 4 C 36.609824 4 46 13.390176 46 25 C 46 36.609824 36.609824 46 25 46 C 13.390176 46 4 36.609824 4 25 C 4 13.390176 13.390176 4 25 4 z M 24 13 L 24 24 L 13 24 L 13 26 L 24 26 L 24 37 L 26 37 L 26 26 L 37 26 L 37 24 L 26 24 L 26 13 L 24 13 z" />
+                            </svg>
+                            <!-- </div> -->
+                        </div>
+                    </div>
+                </footer>
+            </div>
+
+        </section>
+        <section class="page-body__item calculations">
+
+        </section>
+    </main>
 </body>
 
 </html>

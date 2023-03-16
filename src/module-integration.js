@@ -21,10 +21,12 @@ export async function createModuleButtons() {
         const moduleImage = module.getImage();
         moduleListElement.innerHTML += `
         <li class="modules__item button">
-            <div class="modules__icon">
-                <img src="${moduleImage}" alt="${moduleName}">
+            <div class="modules__item-content">
+                <div class="modules__icon">
+                    <img src="${moduleImage}" alt="${moduleName}">
+                </div>
+                <span class="modules__description">${moduleName}</span>
             </div>
-            <span class="modules__description">${moduleName}</span>
         </li>`;
     }
 }
