@@ -20,7 +20,7 @@ export async function createModuleButtons() {
         const moduleName = module.getName();
         const moduleImage = module.getImage();
         moduleListElement.innerHTML += `
-        <li class="modules__item button">
+        <li title="Добавить новую гипотезу" class="modules__item button">
             <div class="modules__item-content">
                 <div class="modules__icon">
                     <img src="${moduleImage}" alt="${moduleName}">

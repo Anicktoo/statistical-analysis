@@ -11,7 +11,7 @@
 <body>
     <header class="page-header">
         <div class="page-header__inner">
-            <label title="Открыть главное меню" class="page-header__burger-menu burger-menu">
+            <label title="Открыть главное меню" class="page-header__burger-menu burger-menu button">
                 <div class="burger-menu__content">
                     <input type="checkbox" id="burger-menu__input">
                 </div>
@@ -27,11 +27,11 @@
     <aside class="sidebar">
         <div class="sidebar__inner">
             <ul class="sidebar__list">
-                <li class="sidebar__item button">Новый проект</li>
-                <li class="sidebar__item button">Открыть проект</li>
-                <li class="sidebar__item button">Сохранить проект</li>
-                <li class="sidebar__item button">Импорт данных</li>
-                <li class="sidebar__item button">Экспорт результатов</li>
+                <li class="sidebar__item main-button">Новый проект</li>
+                <li class="sidebar__item main-button">Открыть проект</li>
+                <li class="sidebar__item main-button">Сохранить проект</li>
+                <li class="sidebar__item main-button">Импорт данных</li>
+                <li class="sidebar__item main-button">Экспорт результатов</li>
             </ul>
         </div>
     </aside>
@@ -47,7 +47,7 @@
                 <div class="parameters__container">
                     <div class="parameters__item collapsible">
                         <input id="collapsible-input-1" type="checkbox" checked>
-                        <label class="collapsible__head" for="collapsible-input-1">
+                        <label class="collapsible__head button" for="collapsible-input-1">
                             <div class="parameters__head">
                                 <div class="parameters__title-container">
                                     <div class="collapsible__symbol"></div>
@@ -55,15 +55,15 @@
                                 </div>
                                 <div class="parameters__extra-container">
                                     <button title="Изменить название гипотезы"
-                                        class="parameters__extra-item parameters__edit-button"></button>
+                                        class="parameters__extra-item parameters__edit-button main-button"></button>
                                     <label title="Убрать гипотезу из вычислений"
-                                        class="parameters__extra-item parameters__hide-button">
+                                        class="parameters__extra-item parameters__hide-button main-button">
                                         <input type="checkbox">
                                     </label>
                                     <button title="Дублировать гипотезу"
-                                        class="parameters__extra-item parameters__duplicate-button"></button>
+                                        class="parameters__extra-item parameters__duplicate-button main-button"></button>
                                     <button title="Удалить гипотезу"
-                                        class="parameters__extra-item parameters__delete-button"></button>
+                                        class="parameters__extra-item parameters__delete-button main-button"></button>
                                 </div>
                             </div>
                         </label>
@@ -103,29 +103,29 @@
                             </th>
                             <th>
                                 <div class="data__column-header">
-                                    <div title="Сменить тип данных колонки"
-                                        class="data__var-icon data__var-icon_nominal"></div>
+                                    <div title="Сменить тип данных колонки" class="data__var-icon nominal-img button">
+                                    </div>
                                     <span class="data__var-name">Столбец1</span>
                                 </div>
                             </th>
                             <th>
                                 <div class="data__column-header">
-                                    <div title="Сменить тип данных колонки"
-                                        class="data__var-icon data__var-icon_continues"></div>
+                                    <div title="Сменить тип данных колонки" class="data__var-icon continues-img button">
+                                    </div>
                                     <span class="data__var-name">Столбец2</span>
                                 </div>
                             </th>
                             <th>
                                 <div class="data__column-header">
-                                    <div title="Сменить тип данных колонки" class="data__var-icon data__var-icon_rang">
+                                    <div title="Сменить тип данных колонки" class="data__var-icon rang-img button">
                                     </div>
                                     <span class="data__var-name">Столбец3</span>
                                 </div>
                             </th>
                             <th>
                                 <div class="data__column-header">
-                                    <div title="Сменить тип данных колонки"
-                                        class="data__var-icon data__var-icon_binary"></div>
+                                    <div title="Сменить тип данных колонки" class="data__var-icon binary-img button">
+                                    </div>
                                     <span class="data__var-name">Столбец4</span>
                                 </div>
                             </th>
@@ -366,9 +366,35 @@
                 </footer>
             </div>
         </section>
-
-
     </main>
+
+    <!-- Modal window - choose var type -->
+    <div class="modal-var-types">
+        <form>
+            <div class="modal-var-types__inner">
+                <label class="modal-var-types__btn main-button">
+                    <input type="radio">
+                    <div class="modal-var-types__img binary-img"></div>
+                    <span>Дихотомический</span>
+                </label>
+                <label class="modal-var-types__btn main-button">
+                    <input type="radio">
+                    <div class="modal-var-types__img continues-img"></div>
+                    <span>Количественный</span>
+                </label>
+                <label class="modal-var-types__btn main-button">
+                    <input type="radio">
+                    <div class="modal-var-types__img nominal-img"></div>
+                    <span>Номинальный</span>
+                </label>
+                <label class="modal-var-types__btn main-button">
+                    <input type="radio">
+                    <div class="modal-var-types__img rang-img"></div>
+                    <span>Ранговый</span>
+                </label>
+            </div>
+        </form>
+    </div>
 </body>
 
 </html>

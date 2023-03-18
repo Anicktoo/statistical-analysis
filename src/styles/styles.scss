@@ -2,7 +2,7 @@
 @import './colors.scss';
 @import './typography.scss';
 
-
+$type-icon-size: 18px;
 $animation-timing: 200ms ease-in-out;
 $fast-animation-timing: 100ms ease-in-out;
 $header-height: 74px;
@@ -31,9 +31,32 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     }
 }
 
+@mixin single-image($size) {
+    width: $size;
+    height: $size;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
 
 .button {
     cursor: pointer;
+}
+
+.main-button {
+    cursor: pointer;
+
+    &:hover {
+        background-color: $second-grey;
+    }
+
+    &:active {
+        background-color: $third-grey;
+    }
+
+    &_focused {
+        border: 1px solid $main-blue;
+    }
 }
 
 .page-header {
@@ -62,7 +85,6 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
 
     &__content {
         display: flex;
@@ -185,14 +207,6 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     &__item {
         padding: 8px 32px 8px 10px;
         border-radius: 10px;
-
-        &:hover {
-            background-color: $second-grey;
-        }
-
-        &:active {
-            background-color: $third-grey;
-        }
     }
 }
 
@@ -226,6 +240,22 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
         height: 100%;
         overflow: hidden;
     }
+}
+
+.nominal-img {
+    background-image: url("../img/table/scaleNominal.png");
+}
+
+.continues-img {
+    background-image: url("../img/table/scaleContinues.png");
+}
+
+.rang-img {
+    background-image: url("../img/table/scaleRang.png");
+}
+
+.binary-img {
+    background-image: url("../img/table/scaleBinary.png");
 }
 
 
@@ -286,30 +316,8 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     }
 
     &__var-icon {
-        $icon-size: 18px;
+        @include single-image($type-icon-size);
 
-        cursor: pointer;
-        width: $icon-size;
-        height: $icon-size;
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: contain;
-
-        &_nominal {
-            background-image: url("../img/table/scaleNominal.png");
-        }
-
-        &_continues {
-            background-image: url("../img/table/scaleContinues.png");
-        }
-
-        &_rang {
-            background-image: url("../img/table/scaleRang.png");
-        }
-
-        &_binary {
-            background-image: url("../img/table/scaleBinary.png");
-        }
     }
 
     &__var-name {}
@@ -324,6 +332,7 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
         border-top: 1px solid $stroke-grey;
     }
 }
+
 
 .footer {
     &__inner {
@@ -474,24 +483,10 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     }
 
     &__extra-item {
-        cursor: pointer;
-        display: block;
-        width: $extra-size;
-        height: $extra-size;
         border: none;
-        background-repeat: no-repeat;
+        @include single-image($extra-size);
         background-size: $extra-img-size;
-        background-position: center;
         border-radius: 999px;
-
-        &:hover {
-            background-color: $second-grey;
-        }
-
-        // &:hover::after {
-        //     content: attr(title);
-        // }
-
     }
 
     &__edit-button {
@@ -521,14 +516,11 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
             content: "";
             display: block;
             position: absolute;
-            width: 100%;
-            height: 100%;
             top: 0;
             left: 0;
             background: url("../img/extra/delete.png");
+            @include single-image(100%);
             background-size: $extra-img-size;
-            background-position: center;
-            background-repeat: no-repeat;
             transform: rotate(45deg);
         }
     }
@@ -538,7 +530,7 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     }
 
     &:has(&__hide-button > input:checked) &__content {
-        opacity: 0.1;
+        opacity: 0.2;
     }
 }
 
@@ -546,7 +538,6 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
 
     &__head {
         display: block;
-        cursor: pointer;
     }
 
     &__symbol {
@@ -576,10 +567,41 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     }
 }
 
-
 .results {
     flex-grow: 1;
     background-color: $white;
 
     &__container {}
+}
+
+.modal-var-types {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: $main-grey;
+    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
+
+    &__inner {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 5px 4px;
+    }
+
+    &__btn {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px 4px 4px;
+        border-radius: 5px;
+
+        input {
+            display: none;
+        }
+    }
+
+    &__img {
+        @include single-image($type-icon-size);
+    }
 }

@@ -100,3 +100,44 @@ function resizeBarCheckBounds() {
         calculationWindow.style.width = resizeBarWidth + 'px';
     }
 }
+
+
+const varIcons = [...document.querySelectorAll('.data__var-icon')];
+const modalWindowVarChoose = document.querySelector('.modal-var-types');
+const varTypesBtns = [...modalWindowVarChoose.querySelectorAll('.modal-var-types__btn')];
+let curVarIcon = undefined;
+
+varIcons.forEach(el => {
+    el.addEventListener('click', openModalChooseVarType);
+});
+
+varTypesBtns.forEach((el) => {
+    el.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const imgElement = el.querySelector('.modal-var-types__img');
+        const regex = /-img\b/;
+        const oldClass = findClassWithRegex([...curVarIcon.classList], regex);
+        const newClass = findClassWithRegex([...imgElement.classList], regex);
+        console.log(oldClass, newClass);
+        curVarIcon.classList.replace(oldClass, newClass);
+    });
+});
+
+function openModalChooseVarType(event) {
+    curVarIcon = event.target;
+    event.preventDefault();
+    event.stopPropagation();
+    modalWindowVarChoose.style.left = curVarIcon.getBoundingClientRect().right + 'px';
+    modalWindowVarChoose.style.top = curVarIcon.getBoundingClientRect().bottom + 'px';
+    modalWindowVarChoose.style.display = 'block';
+
+    window.addEventListener('click', () => {
+        modalWindowVarChoose.style.display = 'none';
+    }, { once: true });
+}
+
+function findClassWithRegex(classArray, regex) {
+    console.log(classArray);
+    return classArray.find(className => className.match(regex));
+}
