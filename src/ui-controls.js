@@ -48,3 +48,47 @@ function footerPositionChange() {
         dataFooter.style.position = 'sticky';
     }
 }
+
+// resize bars
+
+const calculationWindow = document.querySelector('.calculation-window');
+const resizeBars = calculationWindow.querySelectorAll('.resize-bar');
+const results = calculationWindow.querySelector('.results');
+const parameters = calculationWindow.querySelector('.parameters');
+
+[...resizeBars].forEach(el => {
+    el.addEventListener('mousedown', mousedown);
+});
+
+function mousedown(e) {
+
+    window.addEventListener('mousemove', mousemove);
+    window.addEventListener('mouseup', mouseup);
+
+    const startX = e.clientX;
+    const startWidth = calculationWindow.offsetWidth;
+
+
+    function mousemove(event) {
+        event.preventDefault();
+        calculationWindow.style.width = (startWidth - (event.clientX - startX)) + 'px';
+    }
+
+    function mouseup() {
+        const calculationWindowWidth = calculationWindow.offsetWidth;
+        const resizeBarWidth = resizeBars[0].offsetWidth;
+        const resultsWidth = resizeBarWidth + results.offsetWidth;
+        const parametersWidth = resizeBarWidth + parameters.offsetWidth;
+        const windowWidth = window.screen.width;
+
+        if (resultsWidth >= windowWidth) {
+            calculationWindow.style.width = parametersWidth + windowWidth + 'px';
+        }
+        else if (calculationWindowWidth < resizeBarWidth) {
+            calculationWindow.style.width = resizeBarWidth + 'px';
+        }
+        window.removeEventListener('mousemove', mousemove);
+        window.removeEventListener('mouseup', mouseup);
+    }
+    //.slice(0, -2)
+}

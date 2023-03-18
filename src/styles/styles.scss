@@ -5,6 +5,9 @@
 
 $animation-timing: 200ms ease-in-out;
 $header-height: 74px;
+$parameters-width: 600px;
+$calculations-width: calc(50% + #{$parameters-width} / 2);
+
 
 @mixin custom-scrollbar {
     &::-webkit-scrollbar {
@@ -17,7 +20,6 @@ $header-height: 74px;
 
     &::-webkit-scrollbar-track {
         // box-shadow: inset 0px 0px 1px $stroke-grey;
-
     }
 
     &::-webkit-scrollbar-thumb {
@@ -214,24 +216,32 @@ $header-height: 74px;
 }
 
 .page-body {
+    position: relative;
+    width: 100%;
     height: calc(100vh - #{$header-height});
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    overflow: hidden;
 
     &__item {
         height: 100%;
+        overflow: hidden;
     }
 }
 
-$calculations-width: 600px;
 
 .data {
-    width: calc(100% - #{$calculations-width});
-    height: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
 
     &__container {
         position: relative;
-        background-color: $main-grey;
         overflow: scroll;
+        width: 100%;
         height: 100%;
+        background-color: $main-grey;
         @include custom-scrollbar;
     }
 
@@ -346,11 +356,64 @@ $calculations-width: 600px;
     }
 }
 
-
-.calculations {
+.calculation-window {
+    flex-shrink: 0;
     width: $calculations-width;
-    position: absolute;
-    right: 0;
-    top: 0;
+    display: flex;
     background-color: aquamarine;
+
+    &__element {}
+}
+
+.resize-bar {
+    min-width: 22px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: w-resize;
+
+
+    border-left: 1px solid $stroke-grey;
+    border-right: 1px solid $stroke-grey;
+    background-color: $main-grey;
+
+    &__icon {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        div,
+        &::before,
+        &::after {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 9999px;
+            background-color: $third-grey;
+        }
+    }
+
+
+}
+
+.parameters {
+    min-width: $parameters-width;
+    background-color: $main-grey;
+
+    &__container {
+        overflow-y: scroll;
+        width: 100%;
+        height: 100%;
+        // height: max-content; choose this later
+
+        @include custom-scrollbar;
+    }
+}
+
+.results {
+    flex-grow: 1;
+    background-color: red;
+
+    &__container {}
 }
