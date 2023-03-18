@@ -4,7 +4,7 @@ const burgerMenu = document.querySelector('.burger-menu');
 const burgerMenuInput = burgerMenu.querySelector('#burger-menu__input');
 const fadeScreen = document.querySelector('.fade');
 
-burgerMenu.addEventListener('click', fadeCheck);
+burgerMenu.addEventListener('click', fadeCheckChange);
 fadeScreen.addEventListener('click', fadeScreenTriggerFadeOut);
 
 function fadeScreenTriggerFadeOut() {
@@ -12,7 +12,7 @@ function fadeScreenTriggerFadeOut() {
         fadeOut();
 }
 
-function fadeCheck() {
+function fadeCheckChange() {
     if (burgerMenuInput.checked)
         fadeOut();
     else
@@ -55,6 +55,7 @@ const calculationWindow = document.querySelector('.calculation-window');
 const resizeBars = calculationWindow.querySelectorAll('.resize-bar');
 const results = calculationWindow.querySelector('.results');
 const parameters = calculationWindow.querySelector('.parameters');
+const body = document.getElementsByTagName('body')[0];
 
 [...resizeBars].forEach(el => {
     el.addEventListener('mousedown', mousedown);
@@ -75,20 +76,27 @@ function mousedown(e) {
     }
 
     function mouseup() {
-        const calculationWindowWidth = calculationWindow.offsetWidth;
-        const resizeBarWidth = resizeBars[0].offsetWidth;
-        const resultsWidth = resizeBarWidth + results.offsetWidth;
-        const parametersWidth = resizeBarWidth + parameters.offsetWidth;
-        const windowWidth = window.screen.width;
+        resizeBarCheckBounds();
 
-        if (resultsWidth >= windowWidth) {
-            calculationWindow.style.width = parametersWidth + windowWidth + 'px';
-        }
-        else if (calculationWindowWidth < resizeBarWidth) {
-            calculationWindow.style.width = resizeBarWidth + 'px';
-        }
         window.removeEventListener('mousemove', mousemove);
         window.removeEventListener('mouseup', mouseup);
     }
-    //.slice(0, -2)
+}
+
+window.addEventListener('resize', resizeBarCheckBounds);
+
+function resizeBarCheckBounds() {
+    const calculationWindowWidth = calculationWindow.offsetWidth;
+    const resizeBarWidth = resizeBars[0].offsetWidth;
+    const resultsWidth = resizeBarWidth + results.offsetWidth;
+    const parametersWidth = resizeBarWidth + parameters.offsetWidth;
+    const bodyWidth = body.clientWidth;
+    const windowWidth = window.screen.width;
+
+    if (resultsWidth >= bodyWidth) {
+        calculationWindow.style.width = parametersWidth + bodyWidth + 'px';
+    }
+    else if (calculationWindowWidth < resizeBarWidth) {
+        calculationWindow.style.width = resizeBarWidth + 'px';
+    }
 }

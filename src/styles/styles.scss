@@ -4,6 +4,7 @@
 
 
 $animation-timing: 200ms ease-in-out;
+$fast-animation-timing: 100ms ease-in-out;
 $header-height: 74px;
 $parameters-width: 600px;
 $calculations-width: calc(50% + #{$parameters-width} / 2);
@@ -15,12 +16,9 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
         width: 12px;
         height: 12px;
         background-color: $second-grey;
-        // outline: 1px solid black;
     }
 
-    &::-webkit-scrollbar-track {
-        // box-shadow: inset 0px 0px 1px $stroke-grey;
-    }
+    &::-webkit-scrollbar-track {}
 
     &::-webkit-scrollbar-thumb {
         background-color: $white;
@@ -30,7 +28,6 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
 
     &::-webkit-scrollbar-corner {
         background-color: $main-grey;
-        // outline: 1px solid $third-grey;
     }
 }
 
@@ -250,6 +247,7 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
         border-spacing: 0px;
         border-collapse: collapse;
 
+
         th,
         td {
             border: 1px solid $third-grey;
@@ -258,6 +256,9 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
             overflow: hidden;
             width: max-content;
             padding: 4px 8px;
+            font-size: inherit;
+            font-weight: inherit;
+            font-style: inherit;
         }
 
         th:first-child,
@@ -274,7 +275,44 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
         #dataSettingsBtn {
             background-color: $white;
         }
+
+
+
     }
+
+    &__column-header {
+        display: flex;
+        gap: 4px;
+    }
+
+    &__var-icon {
+        $icon-size: 18px;
+
+        cursor: pointer;
+        width: $icon-size;
+        height: $icon-size;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+
+        &_nominal {
+            background-image: url("../img/table/scaleNominal.png");
+        }
+
+        &_continues {
+            background-image: url("../img/table/scaleContinues.png");
+        }
+
+        &_rang {
+            background-image: url("../img/table/scaleRang.png");
+        }
+
+        &_binary {
+            background-image: url("../img/table/scaleBinary.png");
+        }
+    }
+
+    &__var-name {}
 
     &__footer {
         position: sticky;
@@ -398,6 +436,8 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
 }
 
 .parameters {
+    $extra-img-size: 18px;
+    $extra-size: 24px;
     min-width: $parameters-width;
     background-color: $main-grey;
 
@@ -409,11 +449,137 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
 
         @include custom-scrollbar;
     }
+
+    &__item {
+        border-bottom: 1px solid $third-grey;
+    }
+
+    &__head {
+        padding: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__title-container {
+        display: flex;
+        align-items: center;
+        gap: 10px
+    }
+
+    &__title {}
+
+    &__extra-container {
+        display: flex;
+    }
+
+    &__extra-item {
+        cursor: pointer;
+        display: block;
+        width: $extra-size;
+        height: $extra-size;
+        border: none;
+        background-repeat: no-repeat;
+        background-size: $extra-img-size;
+        background-position: center;
+        border-radius: 999px;
+
+        &:hover {
+            background-color: $second-grey;
+        }
+
+        // &:hover::after {
+        //     content: attr(title);
+        // }
+
+    }
+
+    &__edit-button {
+        background-image: url("../img/extra/edit.png");
+    }
+
+    &__hide-button {
+        background-image: url("../img/extra/hide.png");
+
+        input {
+            display: none;
+        }
+
+        &:has(input:checked) {
+            background-image: url("../img/extra/unhide.png");
+        }
+    }
+
+    &__duplicate-button {
+        background-image: url("../img/extra/duplicate.png");
+    }
+
+    &__delete-button {
+        position: relative;
+
+        &::after {
+            content: "";
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: url("../img/extra/delete.png");
+            background-size: $extra-img-size;
+            background-position: center;
+            background-repeat: no-repeat;
+            transform: rotate(45deg);
+        }
+    }
+
+    &__content {
+        padding: 8px 16px 16px 16px;
+    }
+
+    &:has(&__hide-button > input:checked) &__content {
+        opacity: 0.1;
+    }
 }
+
+.collapsible {
+
+    &__head {
+        display: block;
+        cursor: pointer;
+    }
+
+    &__symbol {
+        width: 0;
+        height: 0;
+        border-top: 5px solid transparent;
+        border-left: 9px solid $black;
+        border-bottom: 5px solid transparent;
+        transition: rotate $fast-animation-timing;
+    }
+
+    &__content {
+        height: 1px;
+        overflow: hidden;
+    }
+
+    input {
+        display: none;
+    }
+
+    input:checked~&__content {
+        height: fit-content;
+    }
+
+    input:checked+&__head &__symbol {
+        rotate: 90deg;
+    }
+}
+
 
 .results {
     flex-grow: 1;
-    background-color: red;
+    background-color: $white;
 
     &__container {}
 }
