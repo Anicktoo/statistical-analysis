@@ -337,22 +337,21 @@
                 <footer class="data__footer footer">
                     <div class="footer__inner">
                         <ol class="footer__list">
-                            <li class="footer__item button">
-                                <div class="footer__item-content">
-                                    Лист1
-                                </div>
-                            </li>
-                            <li class="footer__item button">
-                                <div class="footer__item-content">
-                                    Лист2
-                                </div>
-                            </li>
                             <li class="footer__item footer__item_selected button">
                                 <div class="footer__item-content">
-                                    Лист3
+                                    <span class="footer__item-text">
+                                        Лист1
+                                    </span>
                                 </div>
                             </li>
-
+                            <li class="footer__item  button">
+                                <div class="footer__item-content">
+                                    <span class="footer__item-text">
+                                        <!-- Результаты 2020Результаты 2020Результаты 2020Результаты 2020 -->
+                                        Лист2
+                                    </span>
+                                </div>
+                            </li>
                         </ol>
                         <div title="Добавить новый лист" class="footer__add-sheet button">
                             <!-- <div class="footer__item-content"> -->
@@ -369,29 +368,81 @@
     </main>
 
     <!-- Modal window - choose var type -->
-    <div class="modal-var-types">
-        <form>
-            <div class="modal-var-types__inner">
-                <label class="modal-var-types__btn main-button">
-                    <input type="radio">
+    <div class="modal-var-types modal-window">
+        <form class="modal-var-types__form">
+            <ul class="modal-var-types__inner">
+                <li class="modal-var-types__btn main-button">
                     <div class="modal-var-types__img binary-img"></div>
                     <span>Дихотомический</span>
-                </label>
-                <label class="modal-var-types__btn main-button">
-                    <input type="radio">
+                </li>
+                <li class="modal-var-types__btn main-button">
                     <div class="modal-var-types__img continues-img"></div>
                     <span>Количественный</span>
-                </label>
-                <label class="modal-var-types__btn main-button">
-                    <input type="radio">
+                </li>
+                <li class="modal-var-types__btn main-button">
                     <div class="modal-var-types__img nominal-img"></div>
                     <span>Номинальный</span>
-                </label>
-                <label class="modal-var-types__btn main-button">
-                    <input type="radio">
+                </li>
+                <li class="modal-var-types__btn main-button">
                     <div class="modal-var-types__img rang-img"></div>
                     <span>Ранговый</span>
-                </label>
+                </li>
+            </ul>
+        </form>
+    </div>
+
+    <div class="modal-settings modal-window">
+        <form id="settings-form" class="modal-settings__form">
+            <label class="input-line modal-settings__item">
+                Номер строки, с которой начинается чтение данных
+                <input name="first-row" class="main-input" type="number" min="1" max="50" value="1" required>
+                <!-- max change-->
+            </label>
+            <label class="input-line modal-settings__item">
+                Кодировка данных
+                <div class="main-select">
+                    <select name="encoding" class="main-input">
+                        <option value="UTF-8" selected>UTF-8</option>
+                        <option value="Windows-1251">Windows-1251</option>
+                    </select>
+                </div>
+            </label>
+            <label class="input-line modal-settings__item">
+                Разделитель столбцов
+                <div class="main-select">
+                    <select name="col-delimiter" class="main-input">
+                        <option value="comma" selected>Запятая (,)</option>
+                        <option value="dot">Точка (.)</option>
+                    </select>
+                </div>
+            </label>
+            <label class="input-line modal-settings__item">
+                Разделитель дроби
+                <div class="main-select">
+                    <select name="encoding" class="main-input">
+                        <option value="comma">Запятая (,)</option>
+                        <option value="dot" selected>Точка (.)</option>
+                    </select>
+                </div>
+            </label>
+            <div class="option-block modal-settings__item">
+                Применить
+                <div class="option-block__sub">
+                    <label class="radio-line">
+                        <input class="main-radio" type="radio" name="apply-to" value="this" checked>
+                        <span class="radio-line__text">К текущему листу</span>
+                    </label>
+                    <label class="radio-line">
+                        <input class="main-radio" type="radio" name="apply-to" value="all">
+                        <span class="radio-line__text">Ко всем листам</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-settings__item">
+                <div class="modal-settings__btn-container">
+                    <button type="submit" value="submit" class="main-button">Применить</button>
+                    <button type="reset" value="cancel" class="main-button">Отмена</button>
+                </div>
             </div>
         </form>
     </div>

@@ -31,24 +31,6 @@ function fadeOut() {
     fadeScreen.style.opacity = '0';
 }
 
-// data footer resize
-
-const dataContainer = document.querySelector('.data__container');
-const dataFooter = dataContainer.querySelector('.data__footer');
-const dataTable = dataContainer.querySelector('.data__table');
-
-window.addEventListener('resize', footerPositionChange);
-window.addEventListener('DOMContentLoaded', footerPositionChange);
-
-function footerPositionChange() {
-    if (dataContainer.offsetHeight > dataTable.offsetHeight) {
-        dataFooter.style.position = 'absolute';
-    }
-    else {
-        dataFooter.style.position = 'sticky';
-    }
-}
-
 // resize bars
 
 const calculationWindow = document.querySelector('.calculation-window');
@@ -91,7 +73,6 @@ function resizeBarCheckBounds() {
     const resultsWidth = resizeBarWidth + results.offsetWidth;
     const parametersWidth = resizeBarWidth + parameters.offsetWidth;
     const bodyWidth = body.clientWidth;
-    const windowWidth = window.screen.width;
 
     if (resultsWidth >= bodyWidth) {
         calculationWindow.style.width = parametersWidth + bodyWidth + 'px';
@@ -101,6 +82,29 @@ function resizeBarCheckBounds() {
     }
 }
 
+// data footer resize
+
+const dataContainer = document.querySelector('.data__container');
+const dataFooter = dataContainer.querySelector('.data__footer');
+const dataTable = dataContainer.querySelector('.data__table');
+
+window.addEventListener('resize', footerPositionChange);
+window.addEventListener('DOMContentLoaded', footerPositionChange);
+
+// function footerSizeChange() {
+//     dataFooter.style.width = body.clientWidth - calculationWindow.offsetWidth + 'px';
+// }
+
+function footerPositionChange() {
+    if (dataContainer.offsetHeight > dataTable.offsetHeight) {
+        dataFooter.style.position = 'absolute';
+    }
+    else {
+        dataFooter.style.position = 'sticky';
+    }
+}
+
+// choose Var Type Modal Window
 
 const varIcons = [...document.querySelectorAll('.data__var-icon')];
 const modalWindowVarChoose = document.querySelector('.modal-var-types');
@@ -112,17 +116,19 @@ varIcons.forEach(el => {
 });
 
 varTypesBtns.forEach((el) => {
-    el.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        const imgElement = el.querySelector('.modal-var-types__img');
-        const regex = /-img\b/;
-        const oldClass = findClassWithRegex([...curVarIcon.classList], regex);
-        const newClass = findClassWithRegex([...imgElement.classList], regex);
-        console.log(oldClass, newClass);
-        curVarIcon.classList.replace(oldClass, newClass);
-    });
+    el.addEventListener('click', chooseNewVarType);
 });
+
+function chooseNewVarType(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const imgElement = event.currentTarget.querySelector('.modal-var-types__img');
+    const regex = /-img\b/;
+    const oldClass = findClassWithRegex([...curVarIcon.classList], regex);
+    const newClass = findClassWithRegex([...imgElement.classList], regex);
+    curVarIcon.classList.replace(oldClass, newClass);
+    makeElementDispalyNone(modalWindowVarChoose);
+}
 
 function openModalChooseVarType(event) {
     curVarIcon = event.target;
@@ -132,12 +138,13 @@ function openModalChooseVarType(event) {
     modalWindowVarChoose.style.top = curVarIcon.getBoundingClientRect().bottom + 'px';
     modalWindowVarChoose.style.display = 'block';
 
-    window.addEventListener('click', () => {
-        modalWindowVarChoose.style.display = 'none';
-    }, { once: true });
+    window.addEventListener('click', () => makeElementDispalyNone(modalWindowVarChoose), { once: true });
+}
+
+function makeElementDispalyNone(el) {
+    el.style.display = 'none';
 }
 
 function findClassWithRegex(classArray, regex) {
-    console.log(classArray);
     return classArray.find(className => className.match(regex));
 }

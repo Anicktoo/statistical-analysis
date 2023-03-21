@@ -31,6 +31,19 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     }
 }
 
+$triangle-height: 10px;
+$triangle-height-half: $triangle-height / 2;
+$triangle-width: 9px;
+
+@mixin collapse-triangle {
+    width: 0;
+    height: 0;
+    border-top: $triangle-height-half solid transparent;
+    border-left: $triangle-width solid $black;
+    border-bottom: $triangle-height-half solid transparent;
+    transition: rotate $fast-animation-timing;
+}
+
 @mixin single-image($size) {
     width: $size;
     height: $size;
@@ -45,6 +58,8 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
 
 .main-button {
     cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 10px;
 
     &:hover {
         background-color: $second-grey;
@@ -122,7 +137,6 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
             rotate: -45deg;
             width: $x-width;
             translate: 0 $bar-height / 2;
-
         }
 
         input:checked {
@@ -133,6 +147,7 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
 }
 
 .modules {
+    min-width: 0;
 
     &__list {
         display: flex;
@@ -142,6 +157,7 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     &__item {
         display: flex;
         align-items: center;
+        overflow: hidden;
 
         &::after {
             content: "";
@@ -164,10 +180,7 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        width: max-content;
         padding: 7px 12px;
-
-
     }
 
     &__icon {
@@ -178,7 +191,9 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
         }
     }
 
-    &__description {}
+    &__description {
+        white-space: nowrap;
+    }
 }
 
 .sidebar {
@@ -205,8 +220,7 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     }
 
     &__item {
-        padding: 8px 32px 8px 10px;
-        border-radius: 10px;
+        padding-right: 32px;
     }
 }
 
@@ -277,7 +291,6 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
         border-spacing: 0px;
         border-collapse: collapse;
 
-
         th,
         td {
             border: 1px solid $third-grey;
@@ -305,9 +318,6 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
         #dataSettingsBtn {
             background-color: $white;
         }
-
-
-
     }
 
     &__column-header {
@@ -335,20 +345,31 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
 
 
 .footer {
+
+
     &__inner {
         display: flex;
-        margin-left: 78px;
+        min-width: 0;
+
+        &::before {
+            content: "";
+            flex-shrink: 10;
+            width: 78px;
+        }
     }
 
     &__list {
         display: flex;
-        width: max-content;
+        flex-shrink: 1;
+        min-width: 0;
     }
 
     &__item {
         display: flex;
         align-items: center;
         margin: -1px -1px;
+        width: max-content;
+        min-width: 0;
 
         &:first-child::before,
         &::after {
@@ -364,9 +385,10 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
             background-color: $white;
             border-left: 1px solid $stroke-grey;
             border-right: 1px solid $stroke-grey;
+            min-width: 0;
             @include bold-text;
 
-            &:before {
+            &:first-child::before {
                 all: unset;
             }
 
@@ -376,6 +398,7 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
                 left: 0;
                 content: "";
                 width: 100%;
+                min-width: 0;
                 height: 3px;
                 background-color: $main-blue;
             }
@@ -389,7 +412,23 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     }
 
     &__item-content {
-        padding: 4px 18px;
+        display: flex;
+        width: max-content;
+        min-width: 0;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        overflow: hidden;
+
+        &::before,
+        &::after {
+            flex: 0, 1, auto;
+            content: "";
+            width: 16px;
+        }
+    }
+
+    &__item-text {
+        white-space: nowrap;
     }
 
     &__add-sheet {
@@ -407,7 +446,6 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     flex-shrink: 0;
     width: $calculations-width;
     display: flex;
-    background-color: aquamarine;
 
     &__element {}
 }
@@ -529,7 +567,8 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
         padding: 8px 16px 16px 16px;
     }
 
-    &:has(&__hide-button > input:checked) &__content {
+    &:has(&__hide-button > input:checked) &__content,
+    &:has(&__hide-button > input:checked) &__title-container {
         opacity: 0.2;
     }
 }
@@ -541,12 +580,7 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     }
 
     &__symbol {
-        width: 0;
-        height: 0;
-        border-top: 5px solid transparent;
-        border-left: 9px solid $black;
-        border-bottom: 5px solid transparent;
-        transition: rotate $fast-animation-timing;
+        @include collapse-triangle();
     }
 
     &__content {
@@ -574,19 +608,24 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     &__container {}
 }
 
-.modal-var-types {
+.modal-window {
     display: none;
     position: absolute;
     top: 0;
     left: 0;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.modal-var-types {
     background-color: $main-grey;
-    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
+
+    &__form {}
 
     &__inner {
         display: flex;
         flex-direction: column;
         gap: 4px;
-        padding: 5px 4px;
+        padding: 5px 4px !important;
     }
 
     &__btn {
@@ -595,13 +634,126 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
         gap: 4px;
         padding: 4px 10px 4px 4px;
         border-radius: 5px;
-
-        input {
-            display: none;
-        }
     }
 
     &__img {
         @include single-image($type-icon-size);
+    }
+}
+
+.modal-settings {
+    display: block;
+    position: absolute;
+    top: 100px;
+    left: 10px;
+    width: max-content;
+    background-color: $white;
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+
+    }
+
+    &__item {
+        width: max-content;
+    }
+
+    &__btn-container {
+        display: flex;
+        gap: 16px;
+    }
+}
+
+
+
+$default-input-padding: 11px;
+$right-select-padding: $default-input-padding * 2+$triangle-height;
+
+.main-input {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    text-align: center;
+    border: 1px solid $second-grey;
+    border-radius: 5px;
+    padding: 1px;
+    width: fit-content;
+
+    &:focus-visible {
+        box-sizing: border-box;
+        border: 1px solid $focus-blue;
+        outline: 1px solid $focus-blue;
+    }
+}
+
+.main-select {
+    position: relative;
+
+    select {
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        padding: 0 $right-select-padding 0 $default-input-padding;
+
+    }
+
+
+    &::after {
+        content: "";
+        pointer-events: none;
+        position: absolute;
+        top: 50%;
+        right: $default-input-padding;
+        translate: 0 $triangle-width / -2;
+        @include collapse-triangle();
+        rotate: 90deg;
+    }
+}
+
+.main-radio {
+    display: grid;
+    place-content: center;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1em;
+    height: 1em;
+    border: 2px solid $second-grey;
+    border-radius: 50%;
+    // transform: translateY(0.05em);
+
+    &:checked {
+        border: 2px solid $main-blue;
+    }
+
+}
+
+.input-line {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    &__text {}
+}
+
+.radio-line {
+    display: flex;
+    gap: 7px;
+
+    &__text {}
+}
+
+.option-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__sub {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-left: 16px;
     }
 }
