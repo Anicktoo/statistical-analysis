@@ -6,7 +6,6 @@ const csvUploadBtn = document.getElementById('csvUpload');
 const settingsForm = document.getElementById('settings-form');
 // const applyBtn = settingsForm.querySelector('#settings-apply-btn');
 
-
 const sheets = [];
 let shownSheet = 0;
 let lastSheet = -1;
@@ -43,25 +42,6 @@ settingsForm.addEventListener('submit', (event) => {
         sheets.forEach(sheet => sheet.setSettings(formData));
     }
 });
-// function readSingleFile(e) {
-//     const file = e.target.files[0];
-//     if (file) {
-//         const r = new FileReader();
-//         r.onload = function (e) {
-//             const sheet = sheets[shownSheet];
-//             const data = e.target.result;
-//             if (sheet.isEmpty()) {
-//                 sheets[shownSheet].importData(data);
-//             }
-//             else {
-//                 addDataSheet(data);
-//             }
-//         }
-//         r.readAsArrayBuffer(file);
-//     } else {
-//         alert("Failed to load file");
-//     }
-// }
 
 export function addEmptySheet() {
     addSheet();

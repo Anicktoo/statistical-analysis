@@ -1,9 +1,17 @@
 import data from '@data/data-manipulation';
+
+export function updateDynamicUI() {
+    varIconsListeners();
+    dataSettingsListener();
+    footerChange();
+}
+
 // fade screen appear
 
 const burgerMenu = document.querySelector('.burger-menu');
 const burgerMenuInput = burgerMenu.querySelector('#burger-menu__input');
 const fadeScreen = document.querySelector('.fade');
+
 
 burgerMenu.addEventListener('click', fadeCheckChange);
 fadeScreen.addEventListener('click', fadeScreenTriggerFadeOut);
@@ -85,19 +93,16 @@ function resizeBarCheckBounds() {
 
 // data footer resize
 
-const dataContainer = document.querySelector('.data__container');
-const dataFooter = dataContainer.querySelector('.data__footer');
+window.addEventListener('resize', footerChange);
+window.addEventListener('DOMContentLoaded', footerChange);
 
-window.addEventListener('resize', footerPositionChange);
-window.addEventListener('DOMContentLoaded', footerPositionChange);
-
-// function footerSizeChange() {
-//     dataFooter.style.width = body.clientWidth - calculationWindow.offsetWidth + 'px';
-// }
-
-function footerPositionChange() {
+export function footerChange() {
+    console.log("change");
+    const dataContainer = document.querySelector('.data__container');
+    const dataFooter = dataContainer.querySelector('.data__footer');
     const dataTable = dataContainer.querySelector('.data__table_shown');
-    if (dataContainer.offsetHeight > dataTable.offsetHeight) {
+    dataFooter.style.width = Math.max(dataContainer.offsetWidth, dataTable?.offsetWidth) + 'px';
+    if (dataContainer.offsetHeight > dataTable?.offsetHeight) {
         dataFooter.style.position = 'absolute';
     }
     else {
@@ -107,18 +112,21 @@ function footerPositionChange() {
 
 // choose Var Type Modal Window
 
-const varIcons = [...document.querySelectorAll('.data__var-icon')];
+let varIcons;
 const modalWindowVarChoose = document.querySelector('.modal-var-types');
 const varTypesBtns = [...modalWindowVarChoose.querySelectorAll('.modal-var-types__btn')];
 const varTypesFormData = new FormData(modalWindowVarChoose.querySelector('#var-type-form'));
 let curIcon = undefined;
 
-
-varIcons.forEach(el => {
-    el.addEventListener('click', (event) => {
-        openModal(event, modalWindowVarChoose);
+function varIconsListeners() {
+    varIcons = [...document.querySelectorAll('.data__var-icon')];
+    varIcons.forEach(el => {
+        el.addEventListener('click', (event) => {
+            openModal(event, modalWindowVarChoose);
+        });
     });
-});
+}
+
 
 varTypesBtns.forEach((el) => {
     el.addEventListener('click', chooseNewVarType);
@@ -157,12 +165,17 @@ function findClassWithRegex(classArray, regex) {
 //settings modal window 
 
 const modalSettings = document.querySelector('.modal-settings');
-const dataSettingsBtn = document.getElementById('dataSettingsBtn');
+let dataSettingsBtn;
+
+function dataSettingsListener() {
+    dataSettingsBtn = document.getElementById('dataSettingsBtn');
+
+    dataSettingsBtn.addEventListener('click', (event) => {
+        openModal(event, modalSettings);
+    });
+}
 
 modalSettings.addEventListener('click', (event) => {
     event.stopPropagation();
 });
 
-dataSettingsBtn.addEventListener('click', (event) => {
-    openModal(event, modalSettings);
-});

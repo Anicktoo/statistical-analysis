@@ -320,6 +320,10 @@ $triangle-width: 9px;
             background-color: $main-grey;
         }
 
+        td {
+            white-space: nowrap;
+        }
+
         #dataSettingsBtn {
             background-color: $white;
         }
@@ -336,10 +340,12 @@ $triangle-width: 9px;
 
     &__var-icon {
         @include single-image($type-icon-size);
-
+        width: 18px;
     }
 
-    &__var-name {}
+    &__var-name {
+        white-space: nowrap;
+    }
 
     &__footer {
         position: sticky;

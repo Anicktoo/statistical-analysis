@@ -32,6 +32,7 @@ export default class Settings {
         createOptions(this.#decimalDelimiter, Settings.#decimalDelimiterInput);
 
         function createOptions(settingName, settingElement) {
+            settingElement.innerHTML = '';
             for (let option of Object.entries(settingName.select)) {
                 settingElement.innerHTML += `<option value="${option[0]}" ${settingName.selected === option[0] ? 'selected' : ''}>${option[1]}</option>`;
             }
@@ -55,11 +56,10 @@ export default class Settings {
     }
 
     static setGlobalSettings(formData) {
-        this.#globalSettings['firstRow'].value = formData.get('first-row');
+        this.#globalSettings['first-row'].value = formData.get('first-row');
         this.#globalSettings['encoding'].selected = formData.get('encoding');
         this.#globalSettings['col-delimiter'].selected = formData.get('col-delimiter');
         this.#globalSettings['decimal-delimiter'].selected = formData.get('decimal-delimiter');
-        this.setSettings(formData);
     }
 
     // static setSettingsGlobally(formData) {
