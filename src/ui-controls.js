@@ -87,7 +87,6 @@ function resizeBarCheckBounds() {
 
 const dataContainer = document.querySelector('.data__container');
 const dataFooter = dataContainer.querySelector('.data__footer');
-const dataTable = dataContainer.querySelector('.data__table');
 
 window.addEventListener('resize', footerPositionChange);
 window.addEventListener('DOMContentLoaded', footerPositionChange);
@@ -97,6 +96,7 @@ window.addEventListener('DOMContentLoaded', footerPositionChange);
 // }
 
 function footerPositionChange() {
+    const dataTable = dataContainer.querySelector('.data__table_shown');
     if (dataContainer.offsetHeight > dataTable.offsetHeight) {
         dataFooter.style.position = 'absolute';
     }
@@ -112,6 +112,7 @@ const modalWindowVarChoose = document.querySelector('.modal-var-types');
 const varTypesBtns = [...modalWindowVarChoose.querySelectorAll('.modal-var-types__btn')];
 const varTypesFormData = new FormData(modalWindowVarChoose.querySelector('#var-type-form'));
 let curIcon = undefined;
+
 
 varIcons.forEach(el => {
     el.addEventListener('click', (event) => {

@@ -291,6 +291,7 @@ $triangle-width: 9px;
     }
 
     &__table {
+        display: none;
         background-color: $white;
         border-spacing: 0px;
         border-collapse: collapse;
@@ -321,6 +322,10 @@ $triangle-width: 9px;
 
         #dataSettingsBtn {
             background-color: $white;
+        }
+
+        &_shown {
+            display: table;
         }
     }
 

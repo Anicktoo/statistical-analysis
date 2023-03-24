@@ -1,37 +1,35 @@
+import * as initSettings from './initial-settings.json';
+
 export default class Settings {
     static #form = document.getElementById('settings-form');
     static #firstRowInput = Settings.#form.querySelector('#first-row-options');
     static #encodingInput = Settings.#form.querySelector('#encoding-options');
     static #colDelimiterInput = Settings.#form.querySelector('#col-delimiter-options');
-    static #decimalDelimeterInput = Settings.#form.querySelector('#decimal-delimeter-options');
+    static #decimalDelimiterInput = Settings.#form.querySelector('#decimal-delimiter-options');
 
+    static #globalSettings = initSettings.default;
     #firstRow;
     #encoding;
-    #colDelimeter;
-    #decimalDelimeter;
+    #colDelimiter;
+    #decimalDelimiter;
 
-    constructor(initailSettingsJson) {
-        if (initailSettingsJson) {
-            this.initWithJSON(initailSettingsJson);
-        }
+    constructor() {
+        this.init(Settings.#globalSettings);
     }
 
-    initWithJSON(json) {
-        const settings = json.default;
-        this.#firstRow = settings['firstRow'];
+    init(settings) {
+        this.#firstRow = settings['first-row'];
         this.#encoding = settings['encoding'];
-        this.#colDelimeter = settings['col-delimeter'];
-        this.#decimalDelimeter = settings['decimal-delimeter'];
+        this.#colDelimiter = settings['col-delimiter'];
+        this.#decimalDelimiter = settings['decimal-delimiter'];
     }
 
     createHTML() {
-        Settings.#firstRowInput.setAttribute('min', `${this.#firstRow.min}`);
-        Settings.#firstRowInput.setAttribute('max', `${this.#firstRow.max}`);
         Settings.#firstRowInput.setAttribute('value', `${this.#firstRow.value}`);
 
         createOptions(this.#encoding, Settings.#encodingInput);
-        createOptions(this.#colDelimeter, Settings.#colDelimiterInput);
-        createOptions(this.#decimalDelimeter, Settings.#decimalDelimeterInput);
+        createOptions(this.#colDelimiter, Settings.#colDelimiterInput);
+        createOptions(this.#decimalDelimiter, Settings.#decimalDelimiterInput);
 
         function createOptions(settingName, settingElement) {
             for (let option of Object.entries(settingName.select)) {
@@ -44,12 +42,27 @@ export default class Settings {
         return {
             firstRow: this.#firstRow,
             encoding: this.#encoding,
-            colDelimeter: this.#colDelimeter,
-            decimalDelimeter: this.#decimalDelimeter,
+            colDelimiter: this.#colDelimiter,
+            decimalDelimiter: this.#decimalDelimiter,
         };
     }
 
     setSettings(formData) {
-
+        this.#firstRow.value = formData.get('first-row');
+        this.#encoding.selected = formData.get('encoding');
+        this.#colDelimiter.selected = formData.get('col-delimiter');
+        this.#decimalDelimiter.selected = formData.get('decimal-delimiter');
     }
+
+    static setGlobalSettings(formData) {
+        this.#globalSettings['firstRow'].value = formData.get('first-row');
+        this.#globalSettings['encoding'].selected = formData.get('encoding');
+        this.#globalSettings['col-delimiter'].selected = formData.get('col-delimiter');
+        this.#globalSettings['decimal-delimiter'].selected = formData.get('decimal-delimiter');
+        this.setSettings(formData);
+    }
+
+    // static setSettingsGlobally(formData) {
+    //     Settings.#allSettings.forEach(settings => settings.setSettings(formData));
+    // }
 }

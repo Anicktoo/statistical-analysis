@@ -23,6 +23,7 @@ ol[class],
 li,
 figure,
 figcaption,
+fieldset,
 blockquote,
 dl,
 dd {
@@ -67,7 +68,8 @@ select {
     font: inherit;
 }
 
-button {
+button,
+fieldset {
     border: none;
 }
 
