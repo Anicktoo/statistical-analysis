@@ -1,0 +1,28 @@
+{
+    "firstRow": {
+        "min": "1",
+        "max": "1",
+        "value": "1"
+    },
+    "encoding": {
+        "select": {
+            "windows-1251": "Windows-1251",
+            "utf-8": "UTF-8"
+        },
+        "selected": "windows-1251"
+    },
+    "col-delimeter": {
+        "select": {
+            ",": "Запятая (,)",
+            ".": "Точка (.)"
+        },
+        "selected": ","
+    },
+    "decimal-delimeter": {
+        "select": {
+            ",": "Запятая (,)",
+            ".": "Точка (.)"
+        },
+        "selected": "."
+    }
+}

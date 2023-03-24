@@ -1,3 +1,4 @@
+import data from '@data/data-manipulation';
 // fade screen appear
 
 const burgerMenu = document.querySelector('.burger-menu');
@@ -109,10 +110,13 @@ function footerPositionChange() {
 const varIcons = [...document.querySelectorAll('.data__var-icon')];
 const modalWindowVarChoose = document.querySelector('.modal-var-types');
 const varTypesBtns = [...modalWindowVarChoose.querySelectorAll('.modal-var-types__btn')];
-let curVarIcon = undefined;
+const varTypesFormData = new FormData(modalWindowVarChoose.querySelector('#var-type-form'));
+let curIcon = undefined;
 
 varIcons.forEach(el => {
-    el.addEventListener('click', openModalChooseVarType);
+    el.addEventListener('click', (event) => {
+        openModal(event, modalWindowVarChoose);
+    });
 });
 
 varTypesBtns.forEach((el) => {
@@ -122,23 +126,23 @@ varTypesBtns.forEach((el) => {
 function chooseNewVarType(event) {
     event.preventDefault();
     event.stopPropagation();
+    varTypesFormData.get("var-type");
     const imgElement = event.currentTarget.querySelector('.modal-var-types__img');
     const regex = /-img\b/;
-    const oldClass = findClassWithRegex([...curVarIcon.classList], regex);
+    const oldClass = findClassWithRegex([...curIcon.classList], regex);
     const newClass = findClassWithRegex([...imgElement.classList], regex);
-    curVarIcon.classList.replace(oldClass, newClass);
+    curIcon.classList.replace(oldClass, newClass);
     makeElementDispalyNone(modalWindowVarChoose);
 }
 
-function openModalChooseVarType(event) {
-    curVarIcon = event.target;
+function openModal(event, modalWindow) {
+    curIcon = event.target;
     event.preventDefault();
     event.stopPropagation();
-    modalWindowVarChoose.style.left = curVarIcon.getBoundingClientRect().right + 'px';
-    modalWindowVarChoose.style.top = curVarIcon.getBoundingClientRect().bottom + 'px';
-    modalWindowVarChoose.style.display = 'block';
-
-    window.addEventListener('click', () => makeElementDispalyNone(modalWindowVarChoose), { once: true });
+    modalWindow.style.left = curIcon.getBoundingClientRect().right + 'px';
+    modalWindow.style.top = curIcon.getBoundingClientRect().bottom + 'px';
+    modalWindow.style.display = 'block';
+    window.addEventListener('click', () => makeElementDispalyNone(modalWindow), { once: true });
 }
 
 function makeElementDispalyNone(el) {
@@ -148,3 +152,16 @@ function makeElementDispalyNone(el) {
 function findClassWithRegex(classArray, regex) {
     return classArray.find(className => className.match(regex));
 }
+
+//settings modal window 
+
+const modalSettings = document.querySelector('.modal-settings');
+const dataSettingsBtn = document.getElementById('dataSettingsBtn');
+
+modalSettings.addEventListener('click', (event) => {
+    event.stopPropagation();
+});
+
+dataSettingsBtn.addEventListener('click', (event) => {
+    openModal(event, modalSettings);
+});

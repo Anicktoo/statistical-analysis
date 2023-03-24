@@ -26,13 +26,15 @@
     </header>
     <aside class="sidebar">
         <div class="sidebar__inner">
-            <ul class="sidebar__list">
-                <li class="sidebar__item main-button">Новый проект</li>
-                <li class="sidebar__item main-button">Открыть проект</li>
-                <li class="sidebar__item main-button">Сохранить проект</li>
-                <li class="sidebar__item main-button">Импорт данных</li>
-                <li class="sidebar__item main-button">Экспорт результатов</li>
-            </ul>
+            <div class="sidebar__list">
+                <label class="sidebar__item main-button">Новый проект</label>
+                <label class="sidebar__item main-button">Открыть проект</label>
+                <label class="sidebar__item main-button">Сохранить проект</label>
+                <label class="sidebar__item main-button">Импорт данных
+                    <input type="file" id="csvUpload" accept=".csv">
+                </label>
+                <label class="sidebar__item main-button">Экспорт результатов</label>
+            </div>
         </div>
     </aside>
     <div class="fade"></div>
@@ -344,14 +346,6 @@
                                     </span>
                                 </div>
                             </li>
-                            <li class="footer__item  button">
-                                <div class="footer__item-content">
-                                    <span class="footer__item-text">
-                                        <!-- Результаты 2020Результаты 2020Результаты 2020Результаты 2020 -->
-                                        Лист2
-                                    </span>
-                                </div>
-                            </li>
                         </ol>
                         <div title="Добавить новый лист" class="footer__add-sheet button">
                             <!-- <div class="footer__item-content"> -->
@@ -369,25 +363,27 @@
 
     <!-- Modal window - choose var type -->
     <div class="modal-var-types modal-window">
-        <form class="modal-var-types__form">
-            <ul class="modal-var-types__inner">
-                <li class="modal-var-types__btn main-button">
-                    <div class="modal-var-types__img binary-img"></div>
-                    <span>Дихотомический</span>
-                </li>
-                <li class="modal-var-types__btn main-button">
-                    <div class="modal-var-types__img continues-img"></div>
-                    <span>Количественный</span>
-                </li>
-                <li class="modal-var-types__btn main-button">
-                    <div class="modal-var-types__img nominal-img"></div>
-                    <span>Номинальный</span>
-                </li>
-                <li class="modal-var-types__btn main-button">
-                    <div class="modal-var-types__img rang-img"></div>
-                    <span>Ранговый</span>
-                </li>
-            </ul>
+        <form id="var-type-form" class="modal-var-types__form">
+            <label class="modal-var-types__btn main-button">
+                <input type="radio" name="var-type" value="binary">
+                <div class="modal-var-types__img binary-img"></div>
+                <span>Дихотомический</span>
+            </label>
+            <label class="modal-var-types__btn main-button">
+                <input type="radio" name="var-type" value="continues">
+                <div class="modal-var-types__img continues-img"></div>
+                <span>Количественный</span>
+            </label>
+            <label class="modal-var-types__btn main-button">
+                <input type="radio" name="var-type" value="nominal">
+                <div class="modal-var-types__img nominal-img"></div>
+                <span>Номинальный</span>
+            </label>
+            <label class="modal-var-types__btn main-button">
+                <input type="radio" name="var-type" value="rang">
+                <div class="modal-var-types__img rang-img"></div>
+                <span>Ранговый</span>
+            </label>
         </form>
     </div>
 
@@ -395,33 +391,27 @@
         <form id="settings-form" class="modal-settings__form">
             <label class="input-line modal-settings__item">
                 Номер строки, с которой начинается чтение данных
-                <input name="first-row" class="main-input" type="number" min="1" max="50" value="1" required>
-                <!-- max change-->
+                <input id="first-row-options" name="first-row" class="main-input" type="number" min="1" max="50"
+                    value="1" required>
             </label>
             <label class="input-line modal-settings__item">
                 Кодировка данных
                 <div class="main-select">
-                    <select name="encoding" class="main-input">
-                        <option value="UTF-8" selected>UTF-8</option>
-                        <option value="Windows-1251">Windows-1251</option>
+                    <select id="encoding-options" name="encoding" class="main-input">
                     </select>
                 </div>
             </label>
             <label class="input-line modal-settings__item">
                 Разделитель столбцов
                 <div class="main-select">
-                    <select name="col-delimiter" class="main-input">
-                        <option value="comma" selected>Запятая (,)</option>
-                        <option value="dot">Точка (.)</option>
+                    <select id="col-delimiter-options" name="col-delimiter" class="main-input">
                     </select>
                 </div>
             </label>
             <label class="input-line modal-settings__item">
                 Разделитель дроби
                 <div class="main-select">
-                    <select name="encoding" class="main-input">
-                        <option value="comma">Запятая (,)</option>
-                        <option value="dot" selected>Точка (.)</option>
+                    <select id="decimal-delimeter-options" name="decimal-delimeter" class="main-input">
                     </select>
                 </div>
             </label>
@@ -440,7 +430,7 @@
             </div>
             <div class="modal-settings__item">
                 <div class="modal-settings__btn-container">
-                    <button type="submit" value="submit" class="main-button">Применить</button>
+                    <button type="button" value="submit" class="main-button">Применить</button>
                     <button type="reset" value="cancel" class="main-button">Отмена</button>
                 </div>
             </div>

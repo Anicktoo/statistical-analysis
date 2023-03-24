@@ -221,6 +221,10 @@ $triangle-width: 9px;
 
     &__item {
         padding-right: 32px;
+
+        * {
+            display: none;
+        }
     }
 }
 
@@ -619,9 +623,7 @@ $triangle-width: 9px;
 .modal-var-types {
     background-color: $main-grey;
 
-    &__form {}
-
-    &__inner {
+    &__form {
         display: flex;
         flex-direction: column;
         gap: 4px;
@@ -634,6 +636,10 @@ $triangle-width: 9px;
         gap: 4px;
         padding: 4px 10px 4px 4px;
         border-radius: 5px;
+
+        input {
+            display: none;
+        }
     }
 
     &__img {
@@ -642,7 +648,7 @@ $triangle-width: 9px;
 }
 
 .modal-settings {
-    display: block;
+    display: none;
     position: absolute;
     top: 100px;
     left: 10px;
