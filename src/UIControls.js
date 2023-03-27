@@ -6,11 +6,17 @@ export default class UIControls {
     static burgerMenu;
     static burgerMenuInput
     static fadeScreen;
+    static menuBtns = [];
     static csvUploadBtn
     static settingsForm
     static dataContainer;
     static dataTable;
     static dataFooter;
+    static footerList;
+    static dataFooterElements = {
+        old: [],
+        new: []
+    };
     static calculationWindow;
     static parameters;
     static resizeBarsEl = [];
@@ -21,7 +27,10 @@ export default class UIControls {
     static varTypesForm;
     static curIcon;
     static modalSettings;
-    static dataSettingsBtn;
+    static dataSettingsBtns = {
+        old: [],
+        new: []
+    };
 
     static initConstUIControls() {
         UIControls.initConstElements();
@@ -31,7 +40,7 @@ export default class UIControls {
     }
 
     static initChangableUIControls() {
-        console.log('init');
+        console.log('initChangable');
         UIControls.initChangableElements();
         UIControls.initChangableListeners();
         UIControls.footerChange();
@@ -41,15 +50,17 @@ export default class UIControls {
         UIControls.body = document.getElementsByTagName('body')[0];
         UIControls.dataContainer = document.querySelector('.data__container');
         UIControls.dataFooter = UIControls.dataContainer.querySelector('.data__footer');
+        UIControls.footerList = UIControls.dataContainer.querySelector('.footer__list');
         UIControls.burgerMenu = document.querySelector('.burger-menu');
         UIControls.burgerMenuInput = UIControls.burgerMenu.querySelector('#burger-menu__input');
         UIControls.fadeScreen = document.querySelector('.fade');
+        UIControls.menuBtns = [...document.querySelectorAll('.sidebar__item')];
 
         UIControls.csvUploadBtn = document.getElementById('csvUpload');
         UIControls.settingsForm = document.getElementById('settings-form');
 
         UIControls.calculationWindow = document.querySelector('.calculation-window');
-        UIControls.resizeBarsEl = UIControls.calculationWindow.querySelectorAll('.resize-bar');
+        UIControls.resizeBarsEl = [...UIControls.calculationWindow.querySelectorAll('.resize-bar')];
         UIControls.results = UIControls.calculationWindow.querySelector('.results');
         UIControls.parameters = UIControls.calculationWindow.querySelector('.parameters');
 
@@ -58,40 +69,40 @@ export default class UIControls {
         UIControls.varTypesForm = UIControls.modalWindowVarChoose.querySelector('#var-type-form');
 
         UIControls.modalSettings = document.querySelector('.modal-settings');
+        UIControls.modalSettingsBtns = [...UIControls.modalSettings.querySelectorAll('.modal-settings__btn')];
     }
 
     static initConstListeners() {
         UIControls.addBurgerListener();
+        // UIControls.addMenuBtnsListeners();
         UIControls.addResizeBarsListeners();
         UIControls.addWindowResizeListeners();
         UIControls.addVarTypesBtnsListners();
         UIControls.addModalSettingsListener();
+        UIControls.addModalSettingsBtnsListeners();
         UIControls.csvUploadListeners();
     }
 
     static initChangableElements() {
         UIControls.dataTable = UIControls.dataContainer.querySelector('.data__table_shown');
-        UIControls.varIcons = [...document.querySelectorAll('.data__var-icon')];
-        UIControls.dataSettingsBtn = document.getElementById('dataSettingsBtn');
+        UIControls.dataFooterElements.new = [...UIControls.dataFooter.querySelectorAll('.footer__item_new')];
+        UIControls.varIcons = [...UIControls.dataContainer.querySelectorAll('.data__var-icon')];
+        UIControls.dataSettingsBtns.new = [...UIControls.dataContainer.querySelectorAll('.dataSettingsBtn_new')];
     }
 
     static initChangableListeners() {
         UIControls.addVarIconsListeners();
         UIControls.addDataSettingsListener();
+        UIControls.addFooterItemListeners();
     }
 
     static addBurgerListener() {
-        UIControls.burgerMenu.addEventListener('click', UIControls.fadeChange);
-        UIControls.fadeScreen.addEventListener('click', UIControls.fadeChange);
+        UIControls.burgerMenu.addEventListener('click', UIControls.toggleMenu);
+        UIControls.fadeScreen.addEventListener('click', UIControls.toggleMenu);
         // UIControls.fadeScreen.addEventListener('click', UIControls.fadeScreenTriggerFadeOut);
     }
 
-    // static fadeScreenTriggerFadeOut() {
-    //     if (UIControls.fadeScreen.style.opacity != 0)
-    //         fadeOut();
-    // }
-
-    static fadeChange() {
+    static toggleMenu() {
         if (UIControls.burgerMenuInput.checked)
             fadeOut();
         else
@@ -110,18 +121,25 @@ export default class UIControls {
         }
     }
 
+    // static addMenuBtnsListeners() {
+    //     UIControls.menuBtns.forEach(btn => {
+    //         btn.addEventListener('click', UIControls.toggleMenu);
+    //     });
+    // }
+
     static csvUploadListeners() {
         UIControls.csvUploadBtn.addEventListener('click', function () {
             this.value = null;
         });
 
         UIControls.csvUploadBtn.addEventListener('change', (event) => {
-            DataControls.readSingleFile(event)
+            DataControls.readSingleFile(event);
+            UIControls.toggleMenu();
         });
     }
 
     static addResizeBarsListeners() {
-        [...UIControls.resizeBarsEl].forEach(el => {
+        UIControls.resizeBarsEl.forEach(el => {
             el.addEventListener('mousedown', mousedown);
         });
 
@@ -187,6 +205,15 @@ export default class UIControls {
         }
     }
 
+    static addFooterItemListeners() {
+        UIControls.dataFooterElements.new.forEach(el => {
+            el.addEventListener('click', () => DataControls.selectSheet(el.id));
+            el.classList.remove('footer__item_new');
+            UIControls.dataFooterElements.old.push(el);
+        });
+        UIControls.dataFooterElements.new = [];
+    }
+
     static openModal(event, modalWindow) {
         UIControls.curIcon = event.target;
         event.preventDefault();
@@ -228,9 +255,14 @@ export default class UIControls {
     }
 
     static addDataSettingsListener() {
-        UIControls.dataSettingsBtn.addEventListener('click', (event) => {
-            UIControls.openModal(event, UIControls.modalSettings);
-        });
+        UIControls.dataSettingsBtns.new.forEach(el => {
+            el.addEventListener('click', (event) => {
+                UIControls.openModal(event, UIControls.modalSettings);
+            });
+            el.classList.remove('dataSettingsBtn_new');
+            UIControls.dataSettingsBtns.old.push(el);
+        })
+        UIControls.dataSettingsBtns.new = [];
     }
 
     static addModalSettingsListener() {
@@ -241,6 +273,12 @@ export default class UIControls {
         UIControls.settingsForm.addEventListener('submit', (event) => {
             DataControls.submitSettings(event, new FormData(UIControls.settingsForm));
         });
+    }
+
+    static addModalSettingsBtnsListeners() {
+        UIControls.modalSettingsBtns.forEach(btn => {
+            btn.addEventListener('click', () => UIControls.modalSettings.style.display = 'none');
+        })
     }
 }
 

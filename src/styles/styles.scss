@@ -344,7 +344,7 @@ $triangle-width: 9px;
 
     &__var-icon {
         @include single-image($type-icon-size);
-        width: 18px;
+        min-width: 18px;
     }
 
     &__var-name {

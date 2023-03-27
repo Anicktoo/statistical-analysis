@@ -136,13 +136,13 @@
                 <footer class="data__footer footer">
                     <div class="footer__inner">
                         <ol class="footer__list">
-                            <li class="footer__item footer__item_selected button">
+                            <!-- <li class="footer__item footer__item_selected button">
                                 <div class="footer__item-content">
                                     <span class="footer__item-text">
                                         Лист1
                                     </span>
                                 </div>
-                            </li>
+                            </li> -->
                         </ol>
                         <div title="Добавить новый лист" class="footer__add-sheet button">
                             <!-- <div class="footer__item-content"> -->
@@ -187,7 +187,9 @@
     <div class="modal-settings modal-window">
         <form id="settings-form">
             <fieldset class="modal-settings__form">
-                <label class="input-line modal-settings__item">
+                <label
+                    title="Выбрать строку, которая станет заголовком.&#013Все строки до нее будут отброшены.&#013Отсчет ведется от первой строки изначального файла"
+                    class="input-line modal-settings__item">
                     Номер строки, с которой начинается чтение данных
                     <input id="first-row-options" name="first-row" class="main-input" type="number" min="1" max="99999"
                         value="1" required>
@@ -216,11 +218,14 @@
                 <div class="option-block modal-settings__item">
                     Применить
                     <div class="option-block__sub">
-                        <label class="radio-line">
+                        <label title="Применить выбранные настройки только к выбранному&#013 в данный момент листу"
+                            class="radio-line">
                             <input class="main-radio" type="radio" name="apply-to" value="this" checked>
                             <span class="radio-line__text">К текущему листу</span>
                         </label>
-                        <label class="radio-line">
+                        <label
+                            title="Применить выбранные настройки ко всем листам в проекте,&#013а также к листам, которые будут добавлены в будущем"
+                            class="radio-line">
                             <input class="main-radio" type="radio" name="apply-to" value="all">
                             <span class="radio-line__text">К проекту</span>
                         </label>
@@ -228,8 +233,9 @@
                 </div>
                 <div class="modal-settings__item">
                     <div class="modal-settings__btn-container">
-                        <button id="settings-apply-btn" class="main-button" type="submit">Применить</button>
-                        <button class="main-button" type="reset">Отмена</button>
+                        <button id="settings-apply-btn" class="main-button modal-settings__btn"
+                            type="submit">Применить</button>
+                        <button class="main-button modal-settings__btn" type="reset">Отмена</button>
                     </div>
                 </div>
             </fieldset>

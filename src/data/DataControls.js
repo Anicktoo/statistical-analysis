@@ -5,7 +5,7 @@ import UIControls from "@/UIControls";
 export default class DataControls {
     static #sheets = [];
     static #currentSheet;
-    static #lastSheetIndex = -1;
+    // static #lastSheetIndex = -1;
 
     static readSingleFile(event) {
         const file = event.target.files[0];
@@ -40,14 +40,18 @@ export default class DataControls {
     }
 
     static addSheet(data) {
-        DataControls.#lastSheetIndex++;
+        const arrayLength = DataControls.#sheets.length;
         DataControls.#currentSheet?.hide();
-        DataControls.#sheets.push(new Sheet('Лист ' + (DataControls.#lastSheetIndex + 1), data));
-        DataControls.#currentSheet = DataControls.#sheets[DataControls.#lastSheetIndex];
-        console.log(DataControls.#sheets);
+        const newSheet = new Sheet('Лист ' + (arrayLength + 1), data, arrayLength)
+        DataControls.#sheets.push(newSheet);
+        DataControls.#currentSheet = newSheet;
     }
 
-    static selectSheet(sheet) {
+    static selectSheet(sheetId) {
+        const sheet = DataControls.#sheets[sheetId];
+        if (DataControls.#currentSheet == sheet)
+            return;
+
         DataControls.#currentSheet?.hide();
         DataControls.#currentSheet = sheet;
         sheet.show();
