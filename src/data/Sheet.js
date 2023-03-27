@@ -1,12 +1,9 @@
 import * as Papa from 'papaparse';
 import Settings from './Settings';
-import { updateDynamicUI } from '@/ui-controls';
+import UIControls from '@/UIControls';
 import Var from './Var';
 
 export default class Sheet {
-
-    static #container = document.querySelector('.data__container');
-    static #sheetCounter = 0;
     #name;
     #data;
     #settings = {
@@ -15,6 +12,7 @@ export default class Sheet {
     };
     #tableElement;
     #file;
+    static #sheetCounter = 0;
 
     constructor(name, file) {
         this.#name = name;
@@ -29,8 +27,39 @@ export default class Sheet {
         }
     }
 
+    importFile(file) {
+        this.#file = file;
+        this.#parseDataInFile(file);
+    }
+
+    setSettings(settingsFormData) {
+        this.#settings.obj.setSettings(settingsFormData);
+    }
+
+    applySettings() {
+        this.#settings.obj.createHTML();
+        this.#settings.props = this.#settings.obj.getSettings();
+        if (this.#file) {
+            this.#parseDataInFile();
+        }
+    }
+
+    isEmpty() {
+        return this.#data == undefined;
+    }
+
+    show() {
+        this.#settings.obj.createHTML();
+        this.#tableElement.classList.add('data__table_shown');
+        UIControls.initChangableUIControls();
+    }
+
+    hide() {
+        this.#tableElement.classList.remove('data__table_shown');
+    }
+
     #createTableElement() {
-        this.#tableElement = Sheet.#container.insertBefore(document.createElement('table'), Sheet.#container.firstChild);
+        this.#tableElement = UIControls.dataContainer.insertBefore(document.createElement('table'), UIControls.dataContainer.firstChild);
         this.#tableElement.classList.add('data__table');
         this.#tableElement.setAttribute('id', Sheet.#sheetCounter++);
     }
@@ -53,7 +82,7 @@ export default class Sheet {
             let headersArray = [];
             if (empty) {
                 for (let i = 0; i < cols; i++) {
-                    headersArray.push(createTh('Столбец' + (i + 1)));
+                    headersArray.push(createTh('Столбец ' + (i + 1)));
                 }
             }
             else {
@@ -130,20 +159,10 @@ export default class Sheet {
             this.#tableElement.innerHTML = createThead(false) + createTbody(false);
         }
 
-        updateDynamicUI();
-    }
-
-    isEmpty() {
-        return this.#data == undefined;
-    }
-
-    importFile(file) {
-        this.#file = file;
-        this.#parseDataInFile(file);
+        this.show();
     }
 
     #parseDataInFile() {
-        console.log(this.#settings.props);
         Papa.parse(this.#file, {
             encoding: this.#settings.props.encoding.selected,
             delimiter: this.#settings.props.colDelimiter.selected,
@@ -167,23 +186,5 @@ export default class Sheet {
                 this.#createHTML();
             }
         });
-    }
-
-    setSettings(settingsFormData) {
-        this.#settings.obj.setSettings(settingsFormData);
-        this.#settings.obj.createHTML();
-        this.#settings.props = this.#settings.obj.getSettings();
-        this.#parseDataInFile();
-    }
-
-    show() {
-        this.#settings.obj.createHTML();
-        this.#tableElement.classList.add('data__table_shown');
-        console.log("show change");
-        updateDynamicUI();
-    }
-
-    hide() {
-        this.#tableElement.classList.remove('data__table_shown');
     }
 }

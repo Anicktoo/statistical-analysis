@@ -14,14 +14,15 @@ export default class Settings {
     #decimalDelimiter;
 
     constructor() {
+        console.log("setGlobalSettings ", Settings.#globalSettings);
         this.init(Settings.#globalSettings);
     }
 
     init(settings) {
-        this.#firstRow = settings['first-row'];
-        this.#encoding = settings['encoding'];
-        this.#colDelimiter = settings['col-delimiter'];
-        this.#decimalDelimiter = settings['decimal-delimiter'];
+        this.#firstRow = Object.deepCopy(settings['first-row']);
+        this.#encoding = Object.deepCopy(settings['encoding']);
+        this.#colDelimiter = Object.deepCopy(settings['col-delimiter']);
+        this.#decimalDelimiter = Object.deepCopy(settings['decimal-delimiter']);
     }
 
     createHTML() {
@@ -56,13 +57,9 @@ export default class Settings {
     }
 
     static setGlobalSettings(formData) {
-        this.#globalSettings['first-row'].value = formData.get('first-row');
-        this.#globalSettings['encoding'].selected = formData.get('encoding');
-        this.#globalSettings['col-delimiter'].selected = formData.get('col-delimiter');
-        this.#globalSettings['decimal-delimiter'].selected = formData.get('decimal-delimiter');
+        Settings.#globalSettings['first-row'].value = formData.get('first-row');
+        Settings.#globalSettings['encoding'].selected = formData.get('encoding');
+        Settings.#globalSettings['col-delimiter'].selected = formData.get('col-delimiter');
+        Settings.#globalSettings['decimal-delimiter'].selected = formData.get('decimal-delimiter');
     }
-
-    // static setSettingsGlobally(formData) {
-    //     Settings.#allSettings.forEach(settings => settings.setSettings(formData));
-    // }
 }

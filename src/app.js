@@ -1,8 +1,10 @@
 import '@styles/styles.scss';
+import '@/utils/utils'
 import { createModuleButtons } from './module-integration';
-import { addEmptySheet } from '@data/data-manipulation';
-import { updateDynamicUI } from '@/ui-controls';
+import DataControls from '@data/DataControls';
+import UIControls from '@/UIControls';
 
+UIControls.initConstUIControls();
 createModuleButtons();
-addEmptySheet();
-updateDynamicUI();
+DataControls.addSheet();
+// UIControls.initChangableUIControls();
