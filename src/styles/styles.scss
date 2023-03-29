@@ -8,6 +8,11 @@ $fast-animation-timing: 100ms ease-in-out;
 $header-height: 74px;
 $parameters-width: 600px;
 $calculations-width: calc(50% + #{$parameters-width} / 2);
+$triangle-height: 10px;
+$triangle-height-half: $triangle-height / 2;
+$triangle-width: 9px;
+$default-input-padding: 11px;
+$right-select-padding: $default-input-padding * 2+$triangle-height;
 
 
 @mixin custom-scrollbar {
@@ -31,10 +36,6 @@ $calculations-width: calc(50% + #{$parameters-width} / 2);
     }
 }
 
-$triangle-height: 10px;
-$triangle-height-half: $triangle-height / 2;
-$triangle-width: 9px;
-
 @mixin collapse-triangle {
     width: 0;
     height: 0;
@@ -52,7 +53,7 @@ $triangle-width: 9px;
     background-size: contain;
 }
 
-.button {
+label {
     cursor: pointer;
 }
 
@@ -366,11 +367,9 @@ $triangle-width: 9px;
 .footer {
     &__inner {
         display: flex;
-        // min-width: 0;
 
         &::before {
             content: "";
-            // flex-shrink: 10;
             flex-shrink: 0;
             width: 78px;
         }
@@ -378,8 +377,6 @@ $triangle-width: 9px;
 
     &__list {
         display: flex;
-        // flex-shrink: 1;
-        // min-width: 0;
     }
 
     &__item {
@@ -387,7 +384,6 @@ $triangle-width: 9px;
         align-items: center;
         margin: -1px -1px;
         width: max-content;
-        // min-width: 0;
 
         &:first-child::before,
         &::after {
@@ -403,7 +399,6 @@ $triangle-width: 9px;
             background-color: $white;
             border-left: 1px solid $stroke-grey;
             border-right: 1px solid $stroke-grey;
-            // min-width: 0;
             @include bold-text;
 
             &:first-child::before {
@@ -431,15 +426,11 @@ $triangle-width: 9px;
 
     &__item-content {
         display: flex;
-        // width: max-content;
-        // min-width: 0;
         padding-top: 4px;
         padding-bottom: 4px;
-        // overflow: hidden;
 
         &::before,
         &::after {
-            // flex: 0, 1, auto;
             content: "";
             width: 16px;
         }
@@ -510,7 +501,6 @@ $triangle-width: 9px;
         overflow-y: scroll;
         width: 100%;
         height: 100%;
-        // height: max-content; choose this later
 
         @include custom-scrollbar;
     }
@@ -592,7 +582,6 @@ $triangle-width: 9px;
 }
 
 .collapsible {
-
     &__head {
         display: block;
     }
@@ -626,73 +615,10 @@ $triangle-width: 9px;
     &__container {}
 }
 
-.modal-window {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-}
 
-.modal-var-types {
-    background-color: $main-grey;
-
-    &__form {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        padding: 5px 4px !important;
-    }
-
-    &__btn {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        padding: 4px 10px 4px 4px;
-        border-radius: 5px;
-
-        input {
-            display: none;
-        }
-    }
-
-    &__img {
-        @include single-image($type-icon-size);
-    }
-}
-
-.modal-settings {
-    display: none;
-    position: absolute;
-    top: 100px;
-    left: 10px;
-    width: max-content;
-    background-color: $white;
-
-    &__form {
-        display: flex;
-        flex-direction: column;
-        padding: 16px;
-        gap: 16px;
-
-    }
-
-    &__item {
-        width: max-content;
-    }
-
-    &__btn-container {
-        display: flex;
-        gap: 16px;
-    }
-}
-
-
-
-$default-input-padding: 11px;
-$right-select-padding: $default-input-padding * 2+$triangle-height;
 
 .main-input {
+    cursor: pointer;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
@@ -707,9 +633,14 @@ $right-select-padding: $default-input-padding * 2+$triangle-height;
         border: 1px solid $focus-blue;
         outline: 1px solid $focus-blue;
     }
+
+    &_text {
+        cursor: auto;
+    }
 }
 
 .main-select {
+    cursor: pointer;
     position: relative;
 
     select {
@@ -717,9 +648,7 @@ $right-select-padding: $default-input-padding * 2+$triangle-height;
         -moz-appearance: none !important;
         appearance: none !important;
         padding: 0 $right-select-padding 0 $default-input-padding;
-
     }
-
 
     &::after {
         content: "";
@@ -734,6 +663,7 @@ $right-select-padding: $default-input-padding * 2+$triangle-height;
 }
 
 .main-radio {
+    cursor: pointer;
     display: grid;
     place-content: center;
     -webkit-appearance: none;
@@ -742,15 +672,15 @@ $right-select-padding: $default-input-padding * 2+$triangle-height;
     height: 1em;
     border: 2px solid $second-grey;
     border-radius: 50%;
-    // transform: translateY(0.05em);
+    background-color: $white;
 
     &:checked {
         border: 2px solid $main-blue;
     }
-
 }
 
 .input-line {
+    cursor: pointer;
     display: flex;
     align-items: center;
     gap: 15px;
@@ -759,6 +689,7 @@ $right-select-padding: $default-input-padding * 2+$triangle-height;
 }
 
 .radio-line {
+    cursor: pointer;
     display: flex;
     gap: 7px;
 
@@ -768,12 +699,178 @@ $right-select-padding: $default-input-padding * 2+$triangle-height;
 .option-block {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
 
     &__sub {
         display: flex;
         flex-direction: column;
         gap: 8px;
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        width: max-content;
+        gap: 8px;
         padding-left: 16px;
+    }
+}
+
+.level-controls {
+    display: flex;
+    flex-direction: column;
+
+    &__controller {
+        cursor: pointer;
+        padding: 4px;
+
+        &_up {
+            rotate: -90deg;
+        }
+
+        &_down {
+            rotate: 90deg;
+        }
+
+        &:hover {
+            opacity: 0.5;
+        }
+    }
+
+    &__symbol {
+        @include collapse-triangle();
+    }
+}
+
+.var-table {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+
+    &__header {}
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 4px;
+        gap: 2px;
+        width: 100%;
+        height: 100px;
+        min-height: 50px;
+        max-height: 50vh;
+        overflow-y: auto;
+        @include custom-scrollbar;
+
+        background-color: $white;
+        border: 1px solid $second-grey;
+        border-radius: 5px;
+        resize: vertical;
+
+    }
+
+    &__item {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 10px 2px 2px;
+        border-radius: 5px;
+        border: 1px solid transparent;
+        min-width: 100%;
+        max-width: max-content;
+
+        input {
+            display: none;
+        }
+
+        &:hover {
+            border: 1px solid $focus-blue;
+        }
+
+        &:has(input:checked) {
+            border: 1px solid $main-blue;
+        }
+    }
+}
+
+// MODAL WINDOWS //
+
+.modal-window {
+    display: none;
+    position: absolute;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.modal-var-types {
+    display: block;
+    top: 100px;
+    left: 200px;
+    background-color: $white;
+    // background-color: $main-grey;
+
+    &__fieldset {
+        padding: 16px;
+    }
+
+    &__btn {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px 4px 4px;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    &__rang-settings {
+        max-width: 300px;
+    }
+
+    &__rang-table {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+        height: 100%;
+    }
+
+    &__level-controls {}
+
+    &__img {
+        @include single-image($type-icon-size);
+    }
+
+
+}
+
+
+
+
+.modal-settings {
+    display: none;
+    position: absolute;
+    top: 100px;
+    left: 10px;
+    width: max-content;
+    background-color: $white;
+
+    &__fieldset {
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+
+    }
+
+    &__item {
+        width: max-content;
+    }
+
+    &__btn-container {
+        display: flex;
+        gap: 16px;
     }
 }

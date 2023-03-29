@@ -77,7 +77,7 @@ export default class UIControls {
         // UIControls.addMenuBtnsListeners();
         UIControls.addResizeBarsListeners();
         UIControls.addWindowResizeListeners();
-        UIControls.addVarTypesBtnsListners();
+        // UIControls.addVarTypesBtnsListners();
         UIControls.addModalSettingsListener();
         UIControls.addModalSettingsBtnsListeners();
         UIControls.csvUploadListeners();

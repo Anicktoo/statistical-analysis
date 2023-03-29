@@ -11,7 +11,7 @@
 <body>
     <header class="page-header">
         <div class="page-header__inner">
-            <label title="Открыть главное меню" class="page-header__burger-menu burger-menu button">
+            <label title="Открыть главное меню" class="page-header__burger-menu burger-menu">
                 <div class="burger-menu__content">
                     <input type="checkbox" id="burger-menu__input">
                 </div>
@@ -47,7 +47,7 @@
                 <div class="parameters__container">
                     <div class="parameters__item collapsible">
                         <input id="collapsible-input-1" type="checkbox" checked>
-                        <label class="collapsible__head button" for="collapsible-input-1">
+                        <label class="collapsible__head" for="collapsible-input-1">
                             <div class="parameters__head">
                                 <div class="parameters__title-container">
                                     <div class="collapsible__symbol"></div>
@@ -101,35 +101,97 @@
         </section>
     </main>
 
-    <!-- Modal window - choose var type -->
+    <!-- Modal window - var type -->
     <div class="modal-var-types modal-window">
         <form id="var-type-form" class="modal-var-types__form">
-            <label class="modal-var-types__btn main-button">
-                <input type="radio" name="var-type" value="binary">
-                <div class="modal-var-types__img binary-img"></div>
-                <span>Дихотомический</span>
-            </label>
-            <label class="modal-var-types__btn main-button">
-                <input type="radio" name="var-type" value="continues">
-                <div class="modal-var-types__img continues-img"></div>
-                <span>Количественный</span>
-            </label>
-            <label class="modal-var-types__btn main-button">
-                <input type="radio" name="var-type" value="nominal">
-                <div class="modal-var-types__img nominal-img"></div>
-                <span>Номинальный</span>
-            </label>
-            <label class="modal-var-types__btn main-button">
-                <input type="radio" name="var-type" value="rang">
-                <div class="modal-var-types__img rang-img"></div>
-                <span>Ранговый</span>
-            </label>
+            <fieldset class="modal-var-types__fieldset option-block">
+                <label class="input-line">
+                    Имя столбца
+                    <input type="text" class="main-input main-input_text" value="Hello">
+                </label>
+                <!-- <label class="input-line">
+                    Тип данных
+                    <div class="main-select">
+                        <select id="encoding-options" name="encoding" class="main-input">
+                            <option value="binary">Номинативный</option>
+                            <option value="binary">Ранговый</option>
+                            <option value="binary">Количественный</option>
+                            <option value="binary">Дихотомический</option>
+                        </select>
+                    </div>
+                </label> -->
+                <div class="option-block__sub">
+                    Тип данных
+                    <div class="option-block__list">
+                        <label class="modal-var-types__btn radio-line">
+                            <input class="main-radio" type="radio" name="var-type" value="binary">
+                            <div class="modal-var-types__img binary-img"></div>
+                            <span>Дихотомический</span>
+                        </label>
+                        <label class="modal-var-types__btn radio-line">
+                            <input class="main-radio" type="radio" name="var-type" value="continues">
+                            <div class="modal-var-types__img continues-img"></div>
+                            <span>Количественный</span>
+                        </label>
+                        <label class="modal-var-types__btn radio-line">
+                            <input class="main-radio" type="radio" name="var-type" value="nominal">
+                            <div class="modal-var-types__img nominal-img"></div>
+                            <span>Номинальный</span>
+                        </label>
+                        <label class="modal-var-types__btn radio-line">
+                            <input class="main-radio" type="radio" name="var-type" value="rang">
+                            <div class="modal-var-types__img rang-img"></div>
+                            <span>Ранговый</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-var-types__rang-settings">
+                    <div class="var-table">
+                        <div class="var-table__header">Уровни</div>
+                        <div class="modal-var-types__rang-table">
+                            <div class="var-table__body">
+                                <label class="var-table__item">
+                                    <input type="radio" name="var-type">
+                                    <span>A</span>
+                                </label>
+                                <label class="var-table__item">
+                                    <input type="radio" name="var-type">
+                                    <span>B</span>
+                                </label>
+                                <label class="var-table__item">
+                                    <input type="radio" name="var-type">
+                                    <span>C</span>
+                                </label>
+                                <label class="var-table__item">
+                                    <input type="radio" name="var-type">
+                                    <span>D</span>
+                                </label>
+                            </div>
+                            <div class="modal-var-types__level-controls level-controls">
+                                <div class="level-controls__controller level-controls__controller_up">
+                                    <div class="level-controls__symbol"></div>
+                                </div>
+                                <div class="level-controls__controller level-controls__controller_down">
+                                    <div class="level-controls__symbol"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-settings__btn-container">
+                    <button id="settings-apply-btn" class="main-button modal-settings__btn"
+                        type="submit">Применить</button>
+                    <button class="main-button modal-settings__btn" type="reset">Отмена</button>
+                </div>
+            </fieldset>
+            <!--  -->
         </form>
     </div>
 
+    <!-- Modal window - settings -->
     <div class="modal-settings modal-window">
         <form id="settings-form">
-            <fieldset class="modal-settings__form">
+            <fieldset class="modal-settings__fieldset">
                 <h2>Текущие настройки листа</h2>
                 <label title="Выбрать, сколько строк изначального файла будет отброшено"
                     class="input-line modal-settings__item">
@@ -158,21 +220,22 @@
                         </select>
                     </div>
                 </label>
-                <div class="option-block modal-settings__item">
-                    Применить
-                    <div class="option-block__sub">
-                        <label title="Применить выбранные настройки только к выбранному&#013 в данный момент листу"
-                            class="radio-line">
-                            <input class="main-radio" type="radio" name="apply-to" value="this" checked>
-                            <span class="radio-line__text">К текущему листу</span>
-                        </label>
-                        <label
-                            title="Применить выбранные настройки ко всем листам в проекте,&#013а также к листам, которые будут добавлены в будущем"
-                            class="radio-line">
-                            <input class="main-radio" type="radio" name="apply-to" value="all">
-                            <span class="radio-line__text">К проекту</span>
-                        </label>
-                    </div>
+                <div class="option-block__sub modal-settings__item">
+                    <span class="option-block__sub">Применить<span>
+                            <div class="option-block__list">
+                                <label
+                                    title="Применить выбранные настройки только к выбранному&#013 в данный момент листу"
+                                    class="radio-line">
+                                    <input class="main-radio" type="radio" name="apply-to" value="this" checked>
+                                    <span class="radio-line__text">К текущему листу</span>
+                                </label>
+                                <label
+                                    title="Применить выбранные настройки ко всем листам в проекте,&#013а также к листам, которые будут добавлены в будущем"
+                                    class="radio-line">
+                                    <input class="main-radio" type="radio" name="apply-to" value="all">
+                                    <span class="radio-line__text">К проекту</span>
+                                </label>
+                            </div>
                 </div>
                 <div class="modal-settings__item">
                     <div class="modal-settings__btn-container">
