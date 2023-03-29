@@ -6,8 +6,8 @@ import rangImg from '@img/table/scaleRang.png';
 export default class Var {
     static Binary = new Var('binary', binaryImg);
     static Nominal = new Var('nominal', nominalImg);
-    static Continues = new Var('continues', rangImg);
-    static Rang = new Var('rang', continuesImg);
+    static Continues = new Var('continues', continuesImg);
+    static Rang = new Var('rang', rangImg);
 
     #name;
     #img;

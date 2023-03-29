@@ -7,6 +7,7 @@ export default class Sheet {
     #name;
     #id;
     #data;
+    #dataVars = [];
     #settings = {
         obj: {},
         props: {}
@@ -15,7 +16,7 @@ export default class Sheet {
     #footerElement;
     #file;
     #needToApplySettings = false;
-    static #sheetCounter = 0;
+
 
     constructor(name, file, id) {
         this.#id = id;
@@ -24,12 +25,7 @@ export default class Sheet {
         this.#settings.props = this.#settings.obj.getSettings();;
         this.#createTableElement();
         this.#createFooterElement();
-        if (file) {
-            this.importFile(file);
-        }
-        else {
-            this.#createHTML();
-        }
+        this.importFile(file);
     }
 
     importFile(file) {
@@ -43,31 +39,20 @@ export default class Sheet {
         this.#settings.props = this.#settings.obj.getSettings();
     }
 
-    applySettings() {
+    applySettingsAndShow() {
         this.#needToApplySettings = false;
-        // this.#settings.obj.createHTML();
-        if (this.#file) {
-            this.#parseDataInFile();
-        }
-        else {
-            this.show();
-        }
+        this.#parseDataInFile();
     }
 
-    isEmpty() {
-        return this.#data == undefined;
+    readyToShow() {
+        return !this.#needToApplySettings;
     }
 
     show() {
-        if (this.#needToApplySettings) {
-            this.applySettings();
-        }
-        else {
-            this.#settings.obj.createHTML();
-            this.#tableElement.classList.add('data__table_shown');
-            this.#footerElement.classList.add('footer__item_selected');
-            UIControls.initChangableUIControls();
-        }
+        this.#settings.obj.createHTML();
+        this.#tableElement.classList.add('data__table_shown');
+        this.#footerElement.classList.add('footer__item_selected');
+        UIControls.footerChange();
     }
 
     hide() {
@@ -113,32 +98,24 @@ export default class Sheet {
     }
 
     #createHTML() {
-        let cols, rows;
-
-        const createThead = (empty) => {
-            const createTh = (name) => {
+        const createThead = () => {
+            const createTh = (name, index) => {
                 return `<th>
                     <div class="data__column-header">
-                        <div title="Сменить тип данных колонки" class="data__var-icon nominal-img button"></div>
+                        <div title="Сменить тип данных колонки" class="data__var-icon button">
+                            <img src="${this.#dataVars[index].getImg()}" alt="${this.#dataVars[index].getName()}">
+                        </div>
                         <span class="data__var-name">${name}</span>
                     </div>
                 </th>`;
             };
 
-            let headersArray = [];
-            if (empty) {
-                for (let i = 0; i < cols; i++) {
-                    headersArray.push(createTh('Столбец ' + (i + 1)));
-                }
-            }
-            else {
-                headersArray = this.#data[0].map(el => createTh(el));
-            }
-
+            const headersArray = this.#data[0].map((el, index) => createTh(el, index));
             return headersArray.reduce((ths, element) => ths + element);
+
         };
 
-        const createTbody = (empty) => {
+        const createTbody = () => {
             let curRow = 1;
 
             const createTr = (vals) => {
@@ -149,77 +126,103 @@ export default class Sheet {
                 </tr>`;
             };
 
-            let innerString = [];
-            if (empty) {
-                for (let i = 0; i < rows - 1; i++) {
-                    innerString.push([]);
-                    for (let j = 1; j < cols + 1; j++) {
-                        innerString[i].push('<td></td>');
-                    }
-                    innerString[i] = createTr(innerString[i]);
-                }
-                innerString = innerString.join('');
-            }
-            else {
-                innerString = this.#data.slice(1).map(row => createTr(row.map(val => `<td>${val}</td>`))).join('');
-            }
+            return this.#data.slice(1).map(row =>
+                createTr(row.map(val =>
+                    `<td class='${typeof val == 'number' ? 'number' : ''}'>${val}</td>`
+                ))).join('');
 
-            return innerString;
         };
 
-        const createInnerHtml = (empty, createBody) => {
+        const createInnerHtml = (createHeader, createBody) => {
             const head = this.#tableElement.querySelector('tr');
             const btn = head.querySelector('#dataSettingsBtn');
-            head.innerHTML = createThead(empty);
+            const body = this.#tableElement.querySelector('tbody');
+
+            head.innerHTML = createHeader ? createThead() : '';
             head.insertBefore(btn, head.firstElementChild);
-            if (createBody) {
-                const body = this.#tableElement.querySelector('tbody');
-                body.innerHTML = createTbody(empty)
-            }
+
+            body.innerHTML = createBody ? createTbody() : '';
         };
 
-        if (this.isEmpty()) {
-            cols = 9;
-            rows = 51;
-            createInnerHtml(true, true);
-        }
-        else {
-            rows = this.#data.length;
-            if (rows === 0) {
-                cols = 9;
-                createInnerHtml(true, false);
+
+        switch (this.#data.length) {
+            case 0: {
+                createInnerHtml(false, false);
+                break;
             }
-            else {
-                cols = this.#data[0].length;
-                createInnerHtml(false, true);
+            case 1: {
+                createInnerHtml(true, false);
+                break
+            }
+            default: {
+                createInnerHtml(true, true);
             }
         }
 
+        UIControls.initChangableUIControls();
         this.show();
     }
 
     #parseDataInFile() {
+        const del = this.#settings.props.decimalDelimiter.selected;
+        let regExpReadyDel = del;
+        if (RegExp.specialSymbols.includes(del)) {
+            regExpReadyDel = '\\' + del;
+        }
+        const regex = new RegExp(`^-?(?:\\d+(?:${regExpReadyDel}\\d+)?|\\d+(?:${regExpReadyDel}\\d+)?(?:e|E)(?:\\+|-)?\\d+)$`);
+
         Papa.parse(this.#file, {
             encoding: this.#settings.props.encoding.selected,
             delimiter: this.#settings.props.colDelimiter.selected,
             transform: (val, col) => {
-                const del = this.#settings.props.decimalDelimiter.selected;
-                const valTrimmed = val.trim();
-                if (del !== '.') {
-                    return valTrimmed.replace(del, '.');
+                let valTrimmed = val.trim();
+
+                if (regex.test(valTrimmed)) {
+                    return Number(valTrimmed.replace(del, '.'));
                 }
-                return valTrimmed;
+                else {
+                    return valTrimmed;
+                }
             },
-            dynamicTyping: true,
             skipEmptyLines: true,
             complete: (results) => {
-                const firstRow = this.#settings.props.firstRow.value;
-                if (firstRow != 1) {
-                    results.data = results.data.slice(firstRow - 1);
+                const skip = this.#settings.props.skip.value;
+                if (skip != 0) {
+                    results.data = results.data.slice(skip);
                 }
                 this.#data = results.data;
+                this.#initVars();
                 this.#createHTML();
             }
         });
+    }
+
+    #initVars() {
+        if (this.#data.length === 0)
+            return;
+
+        const len = this.#data[0].length;
+        const dataVars = this.#data[0].map((_, colIndex) => getColumnVar(this.#data.map(row => row[colIndex])));
+        this.#dataVars = dataVars;
+
+        function getColumnVar(column) {
+            const columnData = column.slice(1);
+
+            if (columnData.length === 0) {
+                return Var.Nominal; //Empty type maybe?
+            }
+
+            const uniqueValues = new Set(columnData);
+            if (uniqueValues.size === 2) {
+                return Var.Binary;
+            }
+
+            const notANumber = columnData.find(val => typeof val !== 'number');
+            if (notANumber) {
+                return Var.Nominal;
+            }
+
+            return Var.Continues;
+        }
     }
 }

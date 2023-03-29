@@ -2,13 +2,13 @@ import * as initSettings from './initial-settings.json';
 
 export default class Settings {
     static #form = document.getElementById('settings-form');
-    static #firstRowInput = Settings.#form.querySelector('#first-row-options');
+    static #skipInput = Settings.#form.querySelector('#skip-options');
     static #encodingInput = Settings.#form.querySelector('#encoding-options');
     static #colDelimiterInput = Settings.#form.querySelector('#col-delimiter-options');
     static #decimalDelimiterInput = Settings.#form.querySelector('#decimal-delimiter-options');
 
     static #globalSettings = initSettings.default;
-    #firstRow;
+    #skip;
     #encoding;
     #colDelimiter;
     #decimalDelimiter;
@@ -19,14 +19,15 @@ export default class Settings {
     }
 
     init(settings) {
-        this.#firstRow = Object.deepCopy(settings['first-row']);
+        this.#skip = Object.deepCopy(settings['skip']);
         this.#encoding = Object.deepCopy(settings['encoding']);
         this.#colDelimiter = Object.deepCopy(settings['col-delimiter']);
         this.#decimalDelimiter = Object.deepCopy(settings['decimal-delimiter']);
     }
 
     createHTML() {
-        Settings.#firstRowInput.setAttribute('value', `${this.#firstRow.value}`);
+        Settings.#skipInput.setAttribute('value', `${this.#skip.value}`);
+        Settings.#skipInput.value = this.#skip.value;
 
         createOptions(this.#encoding, Settings.#encodingInput);
         createOptions(this.#colDelimiter, Settings.#colDelimiterInput);
@@ -42,7 +43,7 @@ export default class Settings {
 
     getSettings() {
         return {
-            firstRow: this.#firstRow,
+            skip: this.#skip,
             encoding: this.#encoding,
             colDelimiter: this.#colDelimiter,
             decimalDelimiter: this.#decimalDelimiter,
@@ -50,14 +51,14 @@ export default class Settings {
     }
 
     setSettings(formData) {
-        this.#firstRow.value = formData.get('first-row');
+        this.#skip.value = formData.get('skip');
         this.#encoding.selected = formData.get('encoding');
         this.#colDelimiter.selected = formData.get('col-delimiter');
         this.#decimalDelimiter.selected = formData.get('decimal-delimiter');
     }
 
     static setGlobalSettings(formData) {
-        Settings.#globalSettings['first-row'].value = formData.get('first-row');
+        Settings.#globalSettings['skip'].value = formData.get('skip');
         Settings.#globalSettings['encoding'].selected = formData.get('encoding');
         Settings.#globalSettings['col-delimiter'].selected = formData.get('col-delimiter');
         Settings.#globalSettings['decimal-delimiter'].selected = formData.get('decimal-delimiter');

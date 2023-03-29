@@ -10,12 +10,7 @@ export default class DataControls {
     static readSingleFile(event) {
         const file = event.target.files[0];
         if (file) {
-            if (DataControls.#currentSheet.isEmpty()) {
-                DataControls.#currentSheet.importFile(file);
-            }
-            else {
-                DataControls.addSheet(file);
-            }
+            DataControls.addSheet(file);
         } else {
             alert("Failed to load file");
         }
@@ -34,15 +29,14 @@ export default class DataControls {
             Settings.setGlobalSettings(formData);
             DataControls.#sheets.forEach(sheet => sheet.setSettings(formData));
         }
-
-        if (!curSheet.isEmpty())
-            curSheet.applySettings();
+        curSheet.applySettingsAndShow();
     }
 
-    static addSheet(data) {
+    static addSheet(file) {
         const arrayLength = DataControls.#sheets.length;
         DataControls.#currentSheet?.hide();
-        const newSheet = new Sheet('Лист ' + (arrayLength + 1), data, arrayLength)
+        const name = file.name.split('.').slice(0, -1).join('');
+        const newSheet = new Sheet(name, file, arrayLength)
         DataControls.#sheets.push(newSheet);
         DataControls.#currentSheet = newSheet;
     }
@@ -54,7 +48,12 @@ export default class DataControls {
 
         DataControls.#currentSheet?.hide();
         DataControls.#currentSheet = sheet;
-        sheet.show();
+        if (sheet.readyToShow()) {
+            sheet.show();
+        }
+        else {
+            sheet.applySettingsAndShow();
+        }
     }
 }
 

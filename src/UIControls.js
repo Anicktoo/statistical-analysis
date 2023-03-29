@@ -43,7 +43,7 @@ export default class UIControls {
         console.log('initChangable');
         UIControls.initChangableElements();
         UIControls.initChangableListeners();
-        UIControls.footerChange();
+        // UIControls.footerChange();
     }
 
     static initConstElements() {
@@ -84,7 +84,7 @@ export default class UIControls {
     }
 
     static initChangableElements() {
-        UIControls.dataTable = UIControls.dataContainer.querySelector('.data__table_shown');
+        // UIControls.dataTable = UIControls.dataContainer.querySelector('.data__table_shown'); //???????????
         UIControls.dataFooterElements.new = [...UIControls.dataFooter.querySelectorAll('.footer__item_new')];
         UIControls.varIcons = [...UIControls.dataContainer.querySelectorAll('.data__var-icon')];
         UIControls.dataSettingsBtns.new = [...UIControls.dataContainer.querySelectorAll('.dataSettingsBtn_new')];
@@ -158,44 +158,45 @@ export default class UIControls {
             }
 
             function mouseup() {
-                resizeBarCheckBounds();
+                UIControls.resizeBarCheckBounds();
                 UIControls.footerChange();
 
                 window.removeEventListener('mousemove', mousemove);
                 window.removeEventListener('mouseup', mouseup);
             }
         }
-
-        window.addEventListener('resize', resizeBarCheckBounds);
-
-        function resizeBarCheckBounds() {
-            const calculationWindowWidth = UIControls.calculationWindow.offsetWidth;
-            const resizeBarWidth = UIControls.resizeBarsEl[0].offsetWidth;
-            const resultsWidth = resizeBarWidth + UIControls.results.offsetWidth;
-            const parametersWidth = resizeBarWidth + UIControls.parameters.offsetWidth;
-            const bodyWidth = UIControls.body.clientWidth;
-
-            if (resultsWidth >= bodyWidth) {
-                UIControls.calculationWindow.style.width = parametersWidth + bodyWidth + 'px';
-            }
-            else if (calculationWindowWidth < resizeBarWidth) {
-                UIControls.calculationWindow.style.width = resizeBarWidth + 'px';
-            }
-        }
     }
 
     static addWindowResizeListeners() {
-        window.addEventListener('resize', UIControls.footerChange);
         window.addEventListener('DOMContentLoaded', UIControls.footerChange);
+        window.addEventListener('resize', UIControls.footerChange);
+        window.addEventListener('resize', UIControls.resizeBarCheckBounds);
+    }
+
+    static resizeBarCheckBounds() {
+        const calculationWindowWidth = UIControls.calculationWindow.offsetWidth;
+        const resizeBarWidth = UIControls.resizeBarsEl[0].offsetWidth;
+        const resultsWidth = resizeBarWidth + UIControls.results.offsetWidth;
+        const parametersWidth = resizeBarWidth + UIControls.parameters.offsetWidth;
+        const bodyWidth = UIControls.body.clientWidth;
+
+        if (resultsWidth >= bodyWidth) {
+            UIControls.calculationWindow.style.width = parametersWidth + bodyWidth + 'px';
+        }
+        else if (calculationWindowWidth < resizeBarWidth) {
+            UIControls.calculationWindow.style.width = resizeBarWidth + 'px';
+        }
     }
 
     static footerChange() {
-        const dataTable = UIControls.dataTable;
+        const dataTable = UIControls.dataContainer.querySelector('.data__table_shown');
         const dataContainer = UIControls.dataContainer;
         const dataFooter = UIControls.dataFooter;
 
-        UIControls.dataTable = UIControls.dataContainer.querySelector('.data__table_shown');
-
+        if (!dataTable) {
+            dataFooter.style.width = 0;
+            return;
+        }
         dataFooter.style.width = dataContainer.offsetWidth > dataTable.offsetWidth ? '100%' : dataTable.offsetWidth + 'px';
         if (dataContainer.offsetHeight > dataTable.offsetHeight) {
             dataFooter.style.position = 'absolute';
