@@ -32,6 +32,15 @@ export default class DataControls {
         curSheet.applySettingsAndShow();
     }
 
+    static createVarSettings(varId) {
+        DataControls.#currentSheet.createVarSettings(varId);
+    }
+
+    static setVarSettings(event, formData, newOrder) {
+        event.preventDefault();
+        DataControls.#currentSheet.setVarSettings(formData, newOrder);
+    }
+
     static addSheet(file) {
         const arrayLength = DataControls.#sheets.length;
         DataControls.#currentSheet?.hide();

@@ -39,8 +39,8 @@
     <main class="page-body">
         <section class="page-body__item calculation-window">
             <div class="calculation-window__element resize-bar">
-                <div class="resize-bar__icon">
-                    <div class="resize-bar__element"></div>
+                <div class="resize-bar__icon draggable-icon">
+                    <div class="draggable-icon__element"></div>
                 </div>
             </div>
             <section class="calculation-window__element parameters">
@@ -79,8 +79,8 @@
                 </div>
             </section>
             <div class="calculation-window__element resize-bar">
-                <div class="resize-bar__icon">
-                    <div class="resize-bar__element"></div>
+                <div class="resize-bar__icon draggable-icon">
+                    <div class="draggable-icon__element"></div>
                 </div>
             </div>
             <section class="calculation-window__element results">
@@ -103,79 +103,182 @@
 
     <!-- Modal window - var type -->
     <div class="modal-var-types modal-window">
+        <div class="modal-window__header">
+            <div class="modal-window__header-icon draggable-icon">
+                <div class="draggable-icon__element"></div>
+            </div>
+        </div>
         <form id="var-type-form" class="modal-var-types__form">
             <fieldset class="modal-var-types__fieldset option-block">
-                <label class="input-line">
+                <h2>Настройки столбца</h2>
+                <label class="input-line modal-var-types__name-line">
                     Имя столбца
-                    <input type="text" class="main-input main-input_text" value="Hello">
+                    <input type="text" id="modal-var-types__name" class="main-input main-input_text" name="var-name">
                 </label>
-                <!-- <label class="input-line">
-                    Тип данных
-                    <div class="main-select">
-                        <select id="encoding-options" name="encoding" class="main-input">
-                            <option value="binary">Номинативный</option>
-                            <option value="binary">Ранговый</option>
-                            <option value="binary">Количественный</option>
-                            <option value="binary">Дихотомический</option>
-                        </select>
-                    </div>
-                </label> -->
-                <div class="option-block__sub">
+                <div class="option-block__sub modal-var-types__var-choose">
                     Тип данных
                     <div class="option-block__list">
-                        <label class="modal-var-types__btn radio-line">
-                            <input class="main-radio" type="radio" name="var-type" value="binary">
+                        <label class="modal-var-types__item modal-var-types__binary-container radio-line">
+                            <input class="main-radio modal-var-types__binary modal-var-types__item-input" type="radio"
+                                name="var-type" value="binary">
                             <div class="modal-var-types__img binary-img"></div>
                             <span>Дихотомический</span>
                         </label>
-                        <label class="modal-var-types__btn radio-line">
-                            <input class="main-radio" type="radio" name="var-type" value="continues">
-                            <div class="modal-var-types__img continues-img"></div>
-                            <span>Количественный</span>
-                        </label>
-                        <label class="modal-var-types__btn radio-line">
-                            <input class="main-radio" type="radio" name="var-type" value="nominal">
+                        <label class="modal-var-types__item modal-var-types__nominal-container radio-line">
+                            <input class="main-radio modal-var-types__nominal modal-var-types__item-input" type="radio"
+                                name="var-type" value="nominal">
                             <div class="modal-var-types__img nominal-img"></div>
                             <span>Номинальный</span>
                         </label>
-                        <label class="modal-var-types__btn radio-line">
-                            <input class="main-radio" type="radio" name="var-type" value="rang">
+                        <label class="modal-var-types__item modal-var-types__rang-container radio-line">
+                            <input class="main-radio modal-var-types__rang modal-var-types__item-input" type="radio"
+                                name="var-type" value="rang">
                             <div class="modal-var-types__img rang-img"></div>
                             <span>Ранговый</span>
+                        </label>
+                        <label class="modal-var-types__item modal-var-types__continues-container radio-line">
+                            <input class="main-radio modal-var-types__continues modal-var-types__item-input"
+                                type="radio" name="var-type" value="continues">
+                            <div class="modal-var-types__img continues-img"></div>
+                            <span>Количественный</span>
                         </label>
                     </div>
                 </div>
                 <div class="modal-var-types__rang-settings">
-                    <div class="var-table">
-                        <div class="var-table__header">Уровни</div>
-                        <div class="modal-var-types__rang-table">
-                            <div class="var-table__body">
+                    <div class="modal-var-types__rang-settings-inner">
+                        <div class="var-table modal-var-types__rang-table">
+                            <div class="var-table__header">Уровни</div>
+                            <div class="var-table__body modal-var-types__rang-table-body"></div>
+                        </div>
+                        <div class="modal-var-types__level-controls">
+                            <div class="switch-button switch-button_up">
+                                <div class="switch-button__symbol"></div>
+                            </div>
+                            <div class="switch-button switch-button_down">
+                                <div class="switch-button__symbol"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-var-types__binary-settings">
+                    <div class="modal-var-types__binary-settings-inner">
+                        <div class="var-table modal-var-types__binary-table">
+                            <div class="var-table__header">Группа 1</div>
+                            <div class="var-table__body modal-var-types__binary-table-body">
                                 <label class="var-table__item">
-                                    <input type="radio" name="var-type">
-                                    <span>A</span>
+                                    <input type="radio" name="data_value">
+                                    <span>Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
                                 </label>
                                 <label class="var-table__item">
-                                    <input type="radio" name="var-type">
+                                    <input type="radio" name="data_value">
                                     <span>B</span>
                                 </label>
                                 <label class="var-table__item">
-                                    <input type="radio" name="var-type">
+                                    <input type="radio" name="data_value">
                                     <span>C</span>
                                 </label>
                                 <label class="var-table__item">
-                                    <input type="radio" name="var-type">
+                                    <input type="radio" name="data_value">
+                                    <span>D</span>
+                                </label>
+                                <label class="var-table__item">
+                                    <input type="radio" name="data_value">
+                                    <span>D</span>
+                                </label>
+                                <label class="var-table__item">
+                                    <input type="radio" name="data_value">
                                     <span>D</span>
                                 </label>
                             </div>
-                            <div class="modal-var-types__level-controls level-controls">
-                                <div class="level-controls__controller level-controls__controller_up">
-                                    <div class="level-controls__symbol"></div>
-                                </div>
-                                <div class="level-controls__controller level-controls__controller_down">
-                                    <div class="level-controls__symbol"></div>
-                                </div>
+                        </div>
+                        <div class="modal-var-types__switch-container">
+                            <div class="switch-button switch-button_right">
+                                <div class="switch-button__symbol"></div>
                             </div>
                         </div>
+                        <div class="var-table modal-var-types__binary-table">
+                            <div class="var-table__header">Группа 2</div>
+                            <div class="var-table__body var-table modal-var-types__binary-table-body">
+                                <label class="var-table__item">
+                                    <input type="radio" name="data_value">
+                                    <span>Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
+                                </label>
+                                <label class="var-table__item">
+                                    <input type="radio" name="data_value">
+                                    <span>B</span>
+                                </label>
+                                <label class="var-table__item">
+                                    <input type="radio" name="data_value">
+                                    <span>C</span>
+                                </label>
+                                <label class="var-table__item">
+                                    <input type="radio" name="data_value">
+                                    <span>D</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-var-types__btn-container">
+                    <button id="var-types-apply-btn" class="main-button modal-var-types__btn"
+                        type="submit">Применить</button>
+                    <button class="main-button modal-var-types__btn" type="reset">Отмена</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+    <!-- Modal window - settings -->
+    <div class="modal-settings modal-window">
+        <div class="modal-window__header">
+            <div class="modal-window__header-icon draggable-icon">
+                <div class="draggable-icon__element"></div>
+            </div>
+        </div>
+        <form id="settings-form" class="modal-settings__form">
+            <fieldset class="modal-settings__fieldset option-block">
+                <h2>Настройки листа</h2>
+                <label title="Выбрать, сколько строк изначального файла будет отброшено"
+                    class="input-line modal-settings__item">
+                    Пропустить строк
+                    <input id="skip-options" name="skip" class="main-input" type="number" min="0" max="99999" value="0"
+                        required>
+                </label>
+                <label class="input-line">
+                    Кодировка данных
+                    <div class="main-select">
+                        <select id="encoding-options" name="encoding" class="main-input">
+                        </select>
+                    </div>
+                </label>
+                <label class="input-line">
+                    Разделитель столбцов
+                    <div class="main-select">
+                        <select id="col-delimiter-options" name="col-delimiter" class="main-input">
+                        </select>
+                    </div>
+                </label>
+                <label class="input-line">
+                    Разделитель дроби
+                    <div class="main-select">
+                        <select id="decimal-delimiter-options" name="decimal-delimiter" class="main-input">
+                        </select>
+                    </div>
+                </label>
+                <div class="option-block__sub">
+                    <span class="option-block__sub">Применить</span>
+                    <div class="option-block__list">
+                        <label title="Применить выбранные настройки только к выбранному&#013 в данный момент листу"
+                            class="radio-line">
+                            <input class="main-radio" type="radio" name="apply-to" value="this" checked>
+                            <span class="radio-line__text">К текущему листу</span>
+                        </label>
+                        <label
+                            title="Применить выбранные настройки ко всем листам в проекте,&#013а также к листам, которые будут добавлены в будущем"
+                            class="radio-line">
+                            <input class="main-radio" type="radio" name="apply-to" value="all">
+                            <span class="radio-line__text">К проекту</span>
+                        </label>
                     </div>
                 </div>
                 <div class="modal-settings__btn-container">
@@ -183,67 +286,7 @@
                         type="submit">Применить</button>
                     <button class="main-button modal-settings__btn" type="reset">Отмена</button>
                 </div>
-            </fieldset>
-            <!--  -->
-        </form>
-    </div>
 
-    <!-- Modal window - settings -->
-    <div class="modal-settings modal-window">
-        <form id="settings-form">
-            <fieldset class="modal-settings__fieldset">
-                <h2>Текущие настройки листа</h2>
-                <label title="Выбрать, сколько строк изначального файла будет отброшено"
-                    class="input-line modal-settings__item">
-                    Пропустить строк
-                    <input id="skip-options" name="skip" class="main-input" type="number" min="0" max="99999" value="0"
-                        required>
-                </label>
-                <label class="input-line modal-settings__item">
-                    Кодировка данных
-                    <div class="main-select">
-                        <select id="encoding-options" name="encoding" class="main-input">
-                        </select>
-                    </div>
-                </label>
-                <label class="input-line modal-settings__item">
-                    Разделитель столбцов
-                    <div class="main-select">
-                        <select id="col-delimiter-options" name="col-delimiter" class="main-input">
-                        </select>
-                    </div>
-                </label>
-                <label class="input-line modal-settings__item">
-                    Разделитель дроби
-                    <div class="main-select">
-                        <select id="decimal-delimiter-options" name="decimal-delimiter" class="main-input">
-                        </select>
-                    </div>
-                </label>
-                <div class="option-block__sub modal-settings__item">
-                    <span class="option-block__sub">Применить<span>
-                            <div class="option-block__list">
-                                <label
-                                    title="Применить выбранные настройки только к выбранному&#013 в данный момент листу"
-                                    class="radio-line">
-                                    <input class="main-radio" type="radio" name="apply-to" value="this" checked>
-                                    <span class="radio-line__text">К текущему листу</span>
-                                </label>
-                                <label
-                                    title="Применить выбранные настройки ко всем листам в проекте,&#013а также к листам, которые будут добавлены в будущем"
-                                    class="radio-line">
-                                    <input class="main-radio" type="radio" name="apply-to" value="all">
-                                    <span class="radio-line__text">К проекту</span>
-                                </label>
-                            </div>
-                </div>
-                <div class="modal-settings__item">
-                    <div class="modal-settings__btn-container">
-                        <button id="settings-apply-btn" class="main-button modal-settings__btn"
-                            type="submit">Применить</button>
-                        <button class="main-button modal-settings__btn" type="reset">Отмена</button>
-                    </div>
-                </div>
             </fieldset>
         </form>
     </div>

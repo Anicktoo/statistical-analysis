@@ -16,6 +16,7 @@ export default class Sheet {
     #footerElement;
     #file;
     #needToApplySettings = false;
+    #openedVar;
 
 
     constructor(name, file, id) {
@@ -42,6 +43,20 @@ export default class Sheet {
     applySettingsAndShow() {
         this.#needToApplySettings = false;
         this.#parseDataInFile();
+    }
+
+    createVarSettings(varID) {
+        const changedVar = this.#dataVars[Number(varID.split('_')[1])]
+        // if (this.#openedVar === changedVar) {
+        //     console.log('Worked');
+        //     return;
+        // }
+        changedVar.createHTML();
+        this.#openedVar = changedVar;
+    }
+
+    setVarSettings(formData, order) {
+        this.#openedVar.setSettings(formData, order);
     }
 
     readyToShow() {
@@ -72,7 +87,7 @@ export default class Sheet {
         this.#tableElement.innerHTML = `
         <thead>
             <tr>
-                <th title="Настройки импортированных данных" id="dataSettingsBtn" class="button dataSettingsBtn_new">
+                <th title="Настройки импортированных данных" id="dataSettingsBtn" class="dataSettingsBtn_new">
                     <?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"
                         width="19px" height="19px">
                         <path
@@ -87,7 +102,7 @@ export default class Sheet {
 
     #createFooterElement() {
         this.#footerElement = UIControls.footerList.appendChild(document.createElement('li'));
-        this.#footerElement.classList.add('footer__item', 'footer__item_selected', 'footer__item_new', 'button');
+        this.#footerElement.classList.add('footer__item', 'footer__item_selected', 'footer__item_new');
         this.#footerElement.setAttribute('id', this.#id);
         this.#footerElement.innerHTML = `
         <div class="footer__item-content">
@@ -102,7 +117,7 @@ export default class Sheet {
             const createTh = (name, index) => {
                 return `<th>
                     <div class="data__column-header">
-                        <div title="Сменить тип данных колонки" class="data__var-icon button">
+                        <div title="Сменить тип данных колонки" id=${this.#dataVars[index].getID()} class="data__var-icon data__var-icon_new">
                             <img src="${this.#dataVars[index].getImg()}" alt="${this.#dataVars[index].getName()}">
                         </div>
                         <span class="data__var-name">${name}</span>
@@ -201,28 +216,32 @@ export default class Sheet {
         if (this.#data.length === 0)
             return;
 
-        const len = this.#data[0].length;
+        let i = 0;
+        const idName = () => 'var' + this.#id + '_' + (i++);
         const dataVars = this.#data[0].map((_, colIndex) => getColumnVar(this.#data.map(row => row[colIndex])));
         this.#dataVars = dataVars;
 
+        console.log(this.#dataVars);
+
         function getColumnVar(column) {
             const columnData = column.slice(1);
+            const uniqueValues = new Set(columnData);
+            const notANumber = columnData.find(val => typeof val !== 'number');
+
+            const newVar = (type) => new Var(type, idName(), uniqueValues, column[0], (notANumber == undefined));
 
             if (columnData.length === 0) {
-                return Var.Nominal; //Empty type maybe?
+                return newVar(Var.Nominal);
             }
 
-            const uniqueValues = new Set(columnData);
             if (uniqueValues.size === 2) {
-                return Var.Binary;
+                return newVar(Var.Binary);
             }
 
-            const notANumber = columnData.find(val => typeof val !== 'number');
             if (notANumber) {
-                return Var.Nominal;
+                return newVar(Var.Nominal);
             }
-
-            return Var.Continues;
+            return newVar(Var.Continues);
         }
     }
 }
