@@ -55,8 +55,8 @@ export default class Sheet {
         this.#openedVar = changedVar;
     }
 
-    setVarSettings(formData, order) {
-        this.#openedVar.setSettings(formData, order);
+    setVarSettings(formData, order, twoTables) {
+        this.#openedVar.setSettings(formData, order, twoTables);
     }
 
     readyToShow() {

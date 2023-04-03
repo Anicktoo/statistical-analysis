@@ -8,9 +8,10 @@ $fast-animation-timing: 100ms ease-in-out;
 $header-height: 74px;
 $parameters-width: 600px;
 $calculations-width: calc(50% + #{$parameters-width} / 2);
-$triangle-size: 10px;
+$triangle-width: 9px;
+$triangle-height: 10px;
 $default-input-padding: 11px;
-$right-select-padding: $default-input-padding * 2+$triangle-size;
+$right-select-padding: $default-input-padding * 2+$triangle-width;
 $hideOpacity: 0.3;
 
 @mixin custom-scrollbar {
@@ -48,10 +49,8 @@ $hideOpacity: 0.3;
 }
 
 @mixin triangle {
-    $width: 9px;
-    $height: 9px;
     background-image: url("@img/triangle.png");
-    @include single-image($width, $height);
+    @include single-image($triangle-width, $triangle-height);
 }
 
 @mixin disabled {
@@ -671,7 +670,7 @@ label {
         position: absolute;
         top: 50%;
         right: $default-input-padding;
-        translate: 0 $triangle-size / -2;
+        translate: 0 $triangle-width / -2;
         @include triangle();
         rotate: 180deg;
     }
@@ -787,6 +786,7 @@ label {
 }
 
 .var-table {
+    $inner-gap-width: 2px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -802,7 +802,7 @@ label {
         flex-direction: column;
         align-items: flex-start;
         padding: 4px;
-        gap: 2px;
+        gap: $inner-gap-width;
         overflow: auto;
         background-color: $white;
         border: 1px solid $second-grey;
@@ -834,6 +834,11 @@ label {
             border: 1px solid $main-blue;
         }
     }
+
+    &__anchor {
+        max-height: 0px;
+        margin-bottom: -$inner-gap-width;
+    }
 }
 
 // MODAL WINDOWS //
@@ -860,7 +865,7 @@ label {
 }
 
 .modal-var-types {
-    // display: block;
+    display: none;
     $modal-width: 400px;
     $padding-width: 16px;
     top: 100px;
@@ -927,15 +932,13 @@ label {
         gap: 4px;
         flex: 1 1;
         max-width: 100%;
-        resize: both;
-
     }
 
     &__rang-table-body {
         width: 100%;
-        // min-height: 16vh;
+        min-height: 16vh;
         // max-height: 16vh;
-        min-height: 100px;
+        // resize: vertical;
         height: 100%;
     }
 
@@ -966,21 +969,37 @@ label {
     }
 
     &__binary-table {
+        $gap: 4px;
         display: flex;
-        gap: 4px;
+        gap: $gap;
         flex: 1 1;
         max-width: 100%;
+        // height: 100%;
+        // min-height: calc(16vh + #{$gap} + #{$line-height});
+        order: 3;
+
+        &:first-child {
+            order: 1;
+        }
+
+        &:nth-child(2):has(input:checked)~.modal-var-types__switch-container>.switch-button {
+            rotate: 180deg;
+        }
     }
 
     &__binary-table-body {
         width: 100%;
-        min-height: 16vh;
-        max-height: 16vh;
+        // min-height: 16vh;
+        // max-height: 100vh;
+        flex: 2 0 16vh;
+        // resize: vertical;
+
     }
 
     &__switch-container {
         display: flex;
         align-items: center;
+        order: 2;
     }
 
     &__btn-container {

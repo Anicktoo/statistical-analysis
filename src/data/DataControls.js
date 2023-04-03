@@ -36,9 +36,8 @@ export default class DataControls {
         DataControls.#currentSheet.createVarSettings(varId);
     }
 
-    static setVarSettings(event, formData, newOrder) {
-        event.preventDefault();
-        DataControls.#currentSheet.setVarSettings(formData, newOrder);
+    static setVarSettings(formData, newOrder, twoTables) {
+        DataControls.#currentSheet.setVarSettings(formData, newOrder, twoTables);
     }
 
     static addSheet(file) {

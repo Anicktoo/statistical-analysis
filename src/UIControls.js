@@ -29,10 +29,13 @@ export default class UIControls {
     static varTypesBtns = [];
     static varTypesForm;
     static rangTable;
+    static binSettings;
+    static binTables;
     static varTypesLevelControls = {
         up: undefined,
         down: undefined
     };
+    static varTypesSwitchBtn;
     static modalVarTypeBtns;
     static curIcon;
     static modalSettings;
@@ -73,10 +76,13 @@ export default class UIControls {
 
         UIControls.modalVarType = document.querySelector('.modal-var-types');
         UIControls.varTypesForm = UIControls.modalVarType.querySelector('#var-type-form');
+        UIControls.rangTable = UIControls.modalVarType.querySelector('.modal-var-types__rang-table-body');
+        UIControls.binSettings = UIControls.modalVarType.querySelector('.modal-var-types__binary-settings');
+        UIControls.binTables = [...UIControls.modalVarType.querySelectorAll('.modal-var-types__binary-table-body')];
         UIControls.varTypesLevelControls.up = UIControls.modalVarType.querySelector('.switch-button_up');
         UIControls.varTypesLevelControls.down = UIControls.modalVarType.querySelector('.switch-button_down');
         UIControls.modalVarTypeBtns = [...UIControls.modalVarType.querySelectorAll('.modal-var-types__btn')];
-
+        UIControls.varTypesSwitchBtn = UIControls.binSettings.querySelector('.switch-button');
         UIControls.modalSettings = document.querySelector('.modal-settings');
         UIControls.modalSettingsBtns = [...UIControls.modalSettings.querySelectorAll('.modal-settings__btn')];
     }
@@ -214,18 +220,22 @@ export default class UIControls {
     }
 
     static addModalVarChooseListener() {
-        UIControls.rangTable = document.querySelector('.modal-var-types__rang-table-body');
-
         UIControls.modalVarType.addEventListener('click', (event) => {
             event.stopPropagation();
         });
 
-        UIControls.varTypesLevelControls.up.addEventListener('click', () => { move(false) });
-        UIControls.varTypesLevelControls.down.addEventListener('click', () => { move(true) });
+        UIControls.varTypesLevelControls.up.addEventListener('click', () => { moveLabel(false) });
+        UIControls.varTypesLevelControls.down.addEventListener('click', () => { moveLabel(true) });
+        UIControls.varTypesSwitchBtn.addEventListener('click', switchLabel);
 
         UIControls.varTypesForm.addEventListener('submit', (event) => {
-            const newOrder = [...UIControls.rangTable.querySelectorAll('.var-table__item')].map(el => el.dataset.order);
-            DataControls.setVarSettings(event, new FormData(UIControls.varTypesForm), newOrder);
+            event.preventDefault();
+            const newOrder = [...UIControls.rangTable.querySelectorAll('.var-table__item')].map(el => Number(el.dataset.order));
+            const twoTables = {
+                group0: [...UIControls.binTables[0].querySelectorAll('.var-table__item')].map(el => el.dataset.anchor),
+                group1: [...UIControls.binTables[1].querySelectorAll('.var-table__item')].map(el => el.dataset.anchor)
+            };
+            DataControls.setVarSettings(new FormData(UIControls.varTypesForm), newOrder, twoTables);
         });
 
         UIControls.modalVarTypeBtns.forEach(btn => {
@@ -237,10 +247,27 @@ export default class UIControls {
         });
 
 
-        function move(isDown) {
+        function switchLabel() {
+            const curLabel = UIControls.binSettings.querySelector('input[type="radio"]:checked').parentElement;
+            const curTableBody = curLabel.parentElement;
+
+            curTableBody.removeChild(curLabel);
+
+            const insertChild = (toTable) => {
+                toTable.insertBefore(curLabel, toTable.querySelector('.var-table__anchor_' + curLabel.dataset.anchor));
+            }
+
+            if (curTableBody.isSameNode(UIControls.binTables[0])) {
+                insertChild(UIControls.binTables[1]);
+            }
+            else {
+                insertChild(UIControls.binTables[0]);
+            }
+
+        }
+        function moveLabel(isDown) {
             const rangTable = UIControls.rangTable;
             const curLabel = rangTable.querySelector('input[type="radio"]:checked').parentElement;
-            console.log(curLabel);
             if (!curLabel)
                 return;
 
@@ -335,28 +362,23 @@ export default class UIControls {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
         e = e || window.event;
         e.preventDefault();
-        // get the mouse cursor position at startup:
         pos3 = e.clientX;
         pos4 = e.clientY;
         document.onmouseup = closeDragElement;
-        // call a function whenever the cursor moves:
         document.onmousemove = elementDrag;
 
         function elementDrag(e) {
             e = e || window.event;
             e.preventDefault();
-            // calculate the new cursor position:
             pos1 = pos3 - e.clientX;
             pos2 = pos4 - e.clientY;
             pos3 = e.clientX;
             pos4 = e.clientY;
-            // set the element's new position:
             elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
             elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
         }
 
         function closeDragElement() {
-            // stop moving when mouse button is released:
             document.onmouseup = null;
             document.onmousemove = null;
         }
