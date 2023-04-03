@@ -99,7 +99,7 @@ export default function startTest() {
     })();
     //12
     (function () {
-        gr = [0, 0];
+        gr = [0];
         twoTables.group1 = [];
         twoTables.group0 = [];
         for (let i = 0; i <= 31; i++) {
@@ -119,7 +119,7 @@ export default function startTest() {
     })();
     //14
     (function () {
-        gr = [0, 0];
+        gr = [0];
         twoTables.group1 = [];
         twoTables.group0 = [];
         for (let i = 0; i <= 31; i++) {
@@ -155,7 +155,7 @@ export default function startTest() {
     })();
     //17
     (function () {
-        gr = [0, 0];
+        gr = [0];
         twoTables.group1 = [];
         twoTables.group0 = [];
         for (let i = 0; i < 14; i++) {
@@ -168,7 +168,7 @@ export default function startTest() {
     })();
     //18
     (function () {
-        gr = [0, 0];
+        gr = [0];
         twoTables.group1 = [];
         twoTables.group0 = [];
         for (let i = 0; i < 14; i++) {
@@ -181,7 +181,7 @@ export default function startTest() {
     })();
     //19
     (function () {
-        gr = [0, 0];
+        gr = [0];
         twoTables.group1 = [];
         twoTables.group0 = [];
         for (let i = 0; i < 30; i++) {
@@ -194,7 +194,7 @@ export default function startTest() {
     })();
     //20
     (function () {
-        gr = [0, 0];
+        gr = [0];
         twoTables.group1 = [];
         twoTables.group0 = [];
         for (let i = 0; i < 30; i++) {
@@ -207,7 +207,7 @@ export default function startTest() {
     })();
     //21
     (function () {
-        gr = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        gr = [0, 0, 0, 0, 0, 0, 0, 0];
         twoTables.group1 = [];
         twoTables.group0 = [];
         for (let i = 0; i < 31; i++) {
@@ -220,7 +220,7 @@ export default function startTest() {
     })();
     //22
     (function () {
-        gr = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        gr = [0, 0, 0, 0, 0, 0, 0, 0];
         twoTables.group1 = [];
         twoTables.group0 = [];
         for (let i = 0; i < 31; i++) {
@@ -233,7 +233,7 @@ export default function startTest() {
     })();
     //23
     (function () {
-        gr = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        gr = [0, 0, 0, 0, 0, 0, 0, 0];
         twoTables.group1 = [];
         twoTables.group0 = [];
         for (let i = 0; i < 31; i++) {
@@ -247,7 +247,7 @@ export default function startTest() {
     })();
     //24
     (function () {
-        gr = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        gr = [0, 0, 0, 0, 0, 0, 0, 0];
         twoTables.group1 = [];
         twoTables.group0 = [];
         for (let i = 0; i < 31; i++) {
@@ -291,7 +291,7 @@ export default function startTest() {
     })();
     //27
     (function () {
-        gr = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        gr = [0, 0, 0, 0, 0, 0, 0, 0];
         twoTables.group1 = [];
         twoTables.group0 = [];
         for (let i = 0; i < 33; i++) {
@@ -306,7 +306,7 @@ export default function startTest() {
     })();
     //28
     (function () {
-        gr = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        gr = [0, 0, 0, 0, 0, 0, 0, 0];
         twoTables.group1 = [];
         twoTables.group0 = [];
         for (let i = 0; i < 33; i++) {
@@ -327,47 +327,32 @@ function check(n) {
     let curItem = 0;
     let curBit = twoTables.group1[curItem];
     let nextBit = twoTables.group1[curItem];
-    // let last = twoTables.group0[twoTables.group0.length - 1];
     let shift = curBit;
     let number;
     for (let i = 0; i < gr.length; i++) {
-        number = 0;
+        number = 0x0;
 
-        while (nextBit < 31 * (i + 1)) {
+        while (nextBit < 32 * (i + 1)) {
             number <<= shift;
-            number |= 1;
+            number |= 0x1;
             curBit = twoTables.group1[curItem];
-            nextBit = twoTables.group1[curItem + 1]
-            curItem++;
+            nextBit = twoTables.group1[++curItem]
             shift = nextBit - curBit;
         }
 
-        // if (nextBit) {
-        number <<= (30 - (curBit % 31));
-        // }
-        // else {
-        //     let lastInNumber = i === gr.length - 1 ? last : 30;
-        //     if (last / i - curBit > 0) {
-        //         number <<= last - curBit;
-        //     }
-        // }
+        number <<= (31 - (curBit % 32));
         gr[gr.length - i - 1] = number;
     }
-
-    // gr.forEach(el => {
-    //     console.log(el, el.toString(2));
-    // })
 
     let str = [];
     let str2 = [];
     let counter = 0;
     let fin = twoTables.group0.length + twoTables.group1.length - 1;
     for (let q = gr.length - 1; q >= 0; q--) {
-        // let shift = q === 0 ? fin - counter : 30;
-        let shift = 30;
+        let shift = 31;
         let binNumber = (0x1 << shift);
 
-        for (let i = 0; i < 31; i++) {
+        for (let i = 0; i < 32; i++) {
 
             if ((gr[q] & binNumber) === 0x0) {
                 str.push(counter);
@@ -381,8 +366,6 @@ function check(n) {
                 break;
         }
     }
-    // console.log('gr0', str);
-    // console.log('gr1', str2);
 
     console.log(`TEST ${n}: `, JSON.stringify(str) === JSON.stringify(twoTables.group0) &&
         JSON.stringify(str2) === JSON.stringify(twoTables.group1));

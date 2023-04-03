@@ -28,7 +28,7 @@ export default class Var {
     #img;
     #set = [];
     #order = [];
-    #grouping;
+    #binaryGroups;
     #onlyNumbers;
 
     constructor(type, id, set, name, onlyNumbers) {
@@ -42,9 +42,9 @@ export default class Var {
         for (let i = 0; i < set.size; i++) {
             this.#order[i] = i;
         }
-        this.#grouping = new Array(Math.ceil(set.size / 31)).fill(0);
+        this.#binaryGroups = new Array(Math.ceil(set.size / 32)).fill(0);
         if (this.#typeName === 'binary')
-            this.#grouping[0] = 1;
+            this.#binaryGroups[0] = (0x1 << 30);
     }
 
     setSettings(formData, order, twoTables) {
@@ -54,60 +54,35 @@ export default class Var {
         varHeader.nextElementSibling.textContent = this.#name;
 
         this.#typeName = formData.get('var-type');
-        console.log(Object.entries(Var));
-
         this.#img = Object.entries(Var).find(item => item[1]['name'] === this.#typeName)[1]['img'];
         varHeader.querySelector('img').setAttribute('src', this.#img);
 
         this.#order = order;
 
         if (!twoTables.group1[0]) {
-            this.#grouping.fill(0);
+            this.#binaryGroups.fill(0);
             return;
         }
 
-        let curBit = 0;
-        let nextBit = 0;
-        let shift = 0;
         let curItem = 0;
-        let number = 0;
-        for (let i = 0; i < this.#grouping.length; i++) {
+        let curBit = twoTables.group1[curItem];
+        let nextBit = twoTables.group1[curItem];
+        let shift = curBit;
+        let number;
+        for (let i = 0; i < this.#binaryGroups.length; i++) {
+            number = 0x0;
 
-            curBit = twoTables.group1[curItem];
-            // nextBit = twoTables.group1[curItem + 1];
-            shift = curBit;
-            number = 0;
-
-            while (curBit >= 32 * (i + 1)) {
+            while (nextBit < 32 * (i + 1)) {
                 number <<= shift;
-                number |= 1;
-                curItem++;
+                number |= 0x1;
                 curBit = twoTables.group1[curItem];
-                nextBit = twoTables.group1[curItem + 1]
+                nextBit = twoTables.group1[++curItem]
                 shift = nextBit - curBit;
             }
+
+            number <<= (31 - (curBit % 32));
+            this.#binaryGroups[this.#binaryGroups.length - i - 1] = number;
         }
-
-
-        // let curBit = 0;
-        // let nextBit = 0;
-        // let shift = 0;
-        // let curItem = 0;
-        // let number = 0;
-        // for (let i = 0; i < this.#grouping.length; i++) {
-        //     number = 0;
-        //     while (curBit) {
-        //         number |= 1;
-        //         curBit = twoTables.group1[curItem];
-        //         nextBit = twoTables.group1[curItem + 1];
-        //         if (nextBit >= 64 * (i + 1)) {
-        //             break;
-        //         }
-        //         curItem++;
-        //         shift = nextBit - curBit;
-        //         number <<= shift;
-        //     }
-        // }
     }
     createHTML() {
         const modal = UIControls.modalVarType;
@@ -142,38 +117,35 @@ export default class Var {
         }
         rangBody.innerHTML = str;
 
-        str = '';
+        let str1 = '';
         let str2 = '';
-        let counter = this.#set.length - 1;
+        let counter = 0;
+        let fin = this.#set.length - 1;
         const getLabel = (counter, value) => {
             return `<label class="var-table__item" data-anchor=${counter}>
                         <input type="radio" name="data_value">
                         <span>${value}</span>
                     </label>`};
         const getAnchor = (counter) => `<div class='var-table__anchor var-table__anchor_${counter}'></div>`;
-
-        for (let q = this.#grouping.length - 1; q >= 0; q--) {
-            let binNumber = this.#grouping[q];
+        for (let q = this.#binaryGroups.length - 1; q >= 0; q--) {
+            let shift = 31;
+            let binNumber = (0x1 << shift);
 
             for (let i = 0; i < 32; i++) {
-
-                str = getAnchor(counter) + str;
-                str2 = getAnchor(counter) + str2;
-
-                if ((binNumber & 1) === 0) {
-                    str = getLabel(counter, this.#set[counter]) + str;
+                if ((this.#binaryGroups[q] & binNumber) === 0x0) {
+                    str1 += getLabel(counter, this.#set[counter]) + getAnchor(counter);
                 } else {
-                    str2 = getLabel(counter, this.#set[counter]) + str2;
+                    str2 += getLabel(counter, this.#set[counter]) + getAnchor(counter);
                 }
 
-                counter--;
+                counter++;
                 binNumber = binNumber >>> 1;
-                if (counter < 0)
+                if (counter > fin)
                     break;
             }
         }
 
-        binBodies[0].innerHTML = str;
+        binBodies[0].innerHTML = str1;
         binBodies[1].innerHTML = str2;
 
     }
