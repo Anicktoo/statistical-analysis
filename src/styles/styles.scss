@@ -169,6 +169,7 @@ label {
     }
 
     &__item {
+        cursor: pointer;
         display: flex;
         align-items: center;
         overflow: hidden;
@@ -609,7 +610,7 @@ label {
         overflow: hidden;
     }
 
-    input {
+    &>input {
         display: none;
     }
 
@@ -640,6 +641,7 @@ label {
     border: 1px solid $second-grey;
     border-radius: 5px;
     padding: 1px;
+    // min-width: 24px;
     width: max-content;
 
     &:focus-visible {
@@ -649,6 +651,10 @@ label {
     }
 
     &_text {
+        cursor: auto;
+    }
+
+    &_number {
         cursor: auto;
     }
 }
@@ -694,13 +700,19 @@ label {
 }
 
 .input-line {
+    $gap: 15px;
+    $postGap: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: $gap;
     width: max-content;
 
     &__text {}
+
+    &__post {
+        margin-left: $postGap - $gap;
+    }
 }
 
 .radio-line {
@@ -937,7 +949,7 @@ label {
     &__rang-table-body {
         width: 100%;
         min-height: 16vh;
-        // max-height: 16vh;
+        max-height: 16vh;
         // resize: vertical;
         height: 100%;
     }

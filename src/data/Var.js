@@ -37,7 +37,11 @@ export default class Var {
         this.#id = id;
         this.#name = name;
         this.#onlyNumbers = onlyNumbers;
-        this.#set = [...set].sort();
+        let sortFunction = this.#typeName !== 'continues' ?
+            undefined : function (a, b) {
+                return a - b;
+            };
+        this.#set = [...set].sort(sortFunction);
         this.#order = new Array(set.size);
         for (let i = 0; i < set.size; i++) {
             this.#order[i] = i;
