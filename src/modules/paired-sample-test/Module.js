@@ -3,18 +3,29 @@ import AbstractModule from '@modules/AbstractModule';
 
 export default class Module extends AbstractModule {
 
-    static _name = 'Сравнение парных выборок';
-    static _image = img;
+    static #name = 'Сравнение парных выборок';
+    static #image = img;
+
+    #alpha;
 
     // constructor() {
 
     // }
 
     static getName() {
-        return this._name;
+        return this.#name;
     }
 
     static getImage() {
-        return this._image;
+        return this.#image;
+    }
+
+    setSettings() {
+    }
+
+    getN() {
+    }
+
+    getStatPower() {
     }
 }

@@ -46,8 +46,8 @@
             <section class="calculation-window__element parameters">
                 <div class="parameters__container">
                     <div class="parameters__item collapsible">
-                        <input id="collapsible-input-1" type="checkbox" checked>
-                        <label class="collapsible__head" for="collapsible-input-1">
+                        <label class="collapsible__head">
+                            <input class="collapsible__input" type="checkbox" checked>
                             <div class="parameters__head">
                                 <div class="parameters__title-container">
                                     <div class="collapsible__symbol"></div>
@@ -90,7 +90,135 @@
                                         </div>
                                     </label>
                                 </form>
-                                <!-- <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis, minima?</p> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="parameters__item collapsible">
+                        <label class="collapsible__head">
+                            <input class="collapsible__input" type="checkbox" checked>
+                            <div class="parameters__head">
+                                <div class="parameters__title-container">
+                                    <div class="collapsible__symbol"></div>
+                                    <h2 class="parameters__title">Гипотеза 1</h2>
+                                </div>
+                                <div class="parameters__extra-container">
+                                    <button title="Изменить название гипотезы"
+                                        class="parameters__extra-item parameters__edit-button main-button"></button>
+                                    <label title="Убрать гипотезу из вычислений"
+                                        class="parameters__extra-item parameters__hide-button main-button">
+                                        <input type="checkbox">
+                                    </label>
+                                    <button title="Дублировать гипотезу"
+                                        class="parameters__extra-item parameters__duplicate-button main-button"></button>
+                                    <button title="Удалить гипотезу"
+                                        class="parameters__extra-item parameters__delete-button main-button"></button>
+                                </div>
+                            </div>
+                        </label>
+                        <div class="collapsible__content">
+                            <div class="parameters__content">
+                                <form class="option-block">
+                                    <p>Метод проверки: Сравнение парных выборок</p>
+                                    <div class="option-block__sub">
+                                        <label class="radio-line">
+                                            <input class="main-checkbox" type="checkbox">
+                                            <span>Сделать основной гипотезой</span>
+                                        </label>
+                                        <div class="option-block__list">
+                                            <label class="input-line">
+                                                Планируемая мощность
+                                                <input type="number" class="main-input main-input_number" name=""
+                                                    value="95" step="0.1" min="0" max="100">
+                                                <span class="input-line__post">%</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="option-block__sub">
+                                        Тип ввода
+                                        <div class="option-block__list">
+                                            <label class="radio-line">
+                                                <input class="main-radio" type="radio" name="input-type" value="data"
+                                                    checked>
+                                                <span>Вычисление по данным</span>
+                                            </label>
+                                            <label class="radio-line">
+                                                <input class="main-radio" type="radio" name="input-type" value="manual">
+                                                <span>Ввести величину эффекта</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="option-block__tables pair-tables">
+                                        <div class="var-table">
+                                            <div class="var-table__header">
+                                                <div class="main-select">
+                                                    <select class="main-input pair-tables__sheet-select" name=""
+                                                        id=""></select>
+                                                </div>
+                                            </div>
+                                            <div class="var-table__body pair-tables__body"></div>
+                                        </div>
+                                        <div class="pair-tables__switch-container">
+                                            <div class="switch-button switch-button_right">
+                                                <div class="switch-button__symbol"></div>
+                                            </div>
+                                        </div>
+                                        <div class="var-table">
+                                            <div class="var-table__header">Парные переменные</div>
+                                            <div class="var-table__body pair-tables__body">
+                                                <div class="pair-tables__item">
+                                                    <div class="var-table__item">Привет</div>
+                                                    <div class="var-table__item">Мир!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="option-block__two-column">
+                                        <div class="option-block">
+                                            <div class="option-block__sub">
+                                                Тест
+                                                <div class="option-block__list">
+                                                    <label class="radio-line">
+                                                        <input class="main-radio" type="radio" name="test-type"
+                                                            value="student" checked>
+                                                        <span>Стьюдента</span>
+                                                    </label>
+                                                    <label class="radio-line">
+                                                        <input class="main-radio" type="radio" name="test-type"
+                                                            value="wilcoxon ">
+                                                        <span>Уилкоксона</span>
+                                                    </label>
+                                                    <label class="radio-line">
+                                                        <input class="main-radio" type="radio" name="test-type"
+                                                            value="sign">
+                                                        <span>Тест знаков</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="option-block">
+                                            <div class="option-block__sub">
+                                                Проверка альтернативной гипотезы
+                                                <div class="option-block__list">
+                                                    <label class="radio-line">
+                                                        <input class="main-radio" type="radio" name="hyp-check"
+                                                            value="both" checked>
+                                                        <span>Двусторонняя (M1 ≠ M2)</span>
+                                                    </label>
+                                                    <label class="radio-line">
+                                                        <input class="main-radio" type="radio" name="hyp-check"
+                                                            value="right ">
+                                                        <span>Правосторонняя (M2 &#62; M1)</span>
+                                                    </label>
+                                                    <label class="radio-line">
+                                                        <input class="main-radio" type="radio" name="hyp-check"
+                                                            value="left">
+                                                        <span>Левосторонняя (M2 &#60; M1)</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -103,6 +231,67 @@
             </div>
             <section class="calculation-window__element results">
                 <div class="results__container">
+                    <div class="results__block">
+                        <h1 id="results-name">Результаты</h1>
+                        <div class="results__block-inner">
+                            <p>FWER: <span class="results-FWER">5.0</span> %</p>
+                            <p>Количество проверяемых гипотез: <span class="results-number">0</span></p>
+                            <p>Уровень значимости α: <span class="results-importance">-</span></p>
+                            <p>Основная гипотеза: <span class="results-main-hyp">-</span></p>
+                            <p>Требуемый размер выборки: <span class="results-sample-size">-</span></p>
+                        </div>
+                    </div>
+                    <div class="results__block">
+                        <h2>Гипотеза 1</h2>
+                        <div class="results__block-inner">
+                            <p>Основная гипотеза</p>
+                            <p>Планируемая мощность: 95%</p>
+                            <p>Сравнение парных выборок</p>
+                            <p>Тест Стьюдента</p>
+                            <table class="results__table">
+                                <caption><small>Правосторонняя проверка альтернативной гипотезы (M2 > M1)</small>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            M1
+                                        </th>
+                                        <th>
+                                            M2
+                                        </th>
+                                        <th>
+                                            t
+                                        </th>
+                                        <th>
+                                            df
+                                        </th>
+                                        <th>
+                                            p
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            Столбец1
+                                        </td>
+                                        <td>
+                                            Столбец2
+                                        </td>
+                                        <td>
+                                            4.232
+                                        </td>
+                                        <td>
+                                            3
+                                        </td>
+                                        <td>
+                                            0.02
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </section>
         </section>

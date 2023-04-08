@@ -3,18 +3,29 @@ import AbstractModule from '@modules/AbstractModule';
 
 export default class Module extends AbstractModule {
 
-    static _name = 'Проверка корреляции';
-    static _image = img;
+    static #name = 'Проверка корреляции';
+    static #image = img;
+
+    #alpha;
 
     // constructor() {
     //     // const module = await import(condition ? './module1.js' : './module2.js');
     // }
 
     static getName() {
-        return this._name;
+        return this.#name;
     }
 
     static getImage() {
-        return this._image;
+        return this.#image;
+    }
+
+    setSettings() {
+    }
+
+    getN() {
+    }
+
+    getStatPower() {
     }
 }

@@ -1,7 +1,10 @@
 import AbstractModule from '@modules/AbstractModule';
+import UIControls from './UIControls';
 
 const MODULE_FOLDERS = ['paired-sample-test', 'independent-sample-test', 'correlation-test'];
-
+const resultsEl = UIControls.resultsEl;
+const hypotheses = [];
+let mainHyp = null;
 
 export async function createModuleButtons() {
 
@@ -29,4 +32,16 @@ export async function createModuleButtons() {
             </div>
         </li>`;
     }
+}
+
+export async function setSettings(formId, formData) {
+
+}
+
+function processData() {
+
+}
+
+function updateResults() {
+
 }
