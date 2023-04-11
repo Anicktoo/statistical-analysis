@@ -190,6 +190,10 @@ label {
         &:hover>* {
             transform: scale(1.05);
         }
+
+        &:active>* {
+            transform: none;
+        }
     }
 
     &__item-content {
@@ -304,7 +308,7 @@ label {
         width: 100%;
         height: 100%;
         background-color: $main-grey;
-        @include custom-scrollbar;
+        // @include custom-scrollbar;
     }
 
     &__table {
@@ -519,7 +523,7 @@ label {
         width: 100%;
         height: 100%;
 
-        @include custom-scrollbar;
+        // @include custom-scrollbar;
     }
 
     &__item {
@@ -631,6 +635,7 @@ label {
 }
 
 .results {
+    position: relative;
     flex-grow: 1;
     min-width: 0;
     background-color: $white;
@@ -639,7 +644,7 @@ label {
         display: flex;
         flex-direction: column;
         overflow: auto;
-        @include custom-scrollbar();
+        // @include custom-scrollbar();
         height: 100%;
         gap: 56px;
         padding: 10px 24px 24px 24px;
@@ -688,7 +693,31 @@ label {
     }
 }
 
+.loader {
+    display: none;
+    position: absolute;
+    z-index: 2;
+    top: 20px;
+    left: 45%;
+    border: 10px solid $second-grey;
+    /* Light grey */
+    border-top: 10px solid $main-blue;
+    /* Blue */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1.1s linear infinite;
+}
 
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
 
 .main-input {
     cursor: pointer;
@@ -799,6 +828,8 @@ label {
     cursor: pointer;
     display: flex;
     gap: 7px;
+    width: max-content;
+
 
     &__text {}
 
@@ -816,6 +847,10 @@ label {
         display: flex;
         flex-direction: column;
         gap: 8px;
+
+        &>.radio-line:has(input:not(:checked))~.option-block__list {
+            @include disabled();
+        }
     }
 
     &__list {
@@ -918,7 +953,7 @@ label {
         background-color: $white;
         border: 1px solid $second-grey;
         border-radius: 5px;
-        @include custom-scrollbar;
+        // @include custom-scrollbar;
 
     }
 
@@ -932,6 +967,7 @@ label {
         border: 1px solid transparent;
         min-width: 100%;
         max-width: max-content;
+        white-space: nowrap;
 
         input {
             display: none;
@@ -949,6 +985,10 @@ label {
     &__anchor {
         max-height: 0px;
         margin-bottom: -$inner-gap-width;
+    }
+
+    &__img {
+        @include single-image($type-icon-size, $type-icon-size)
     }
 }
 

@@ -26,6 +26,6 @@ export default class Module extends AbstractModule {
     getN() {
     }
 
-    getStatPower() {
+    setStatPower() {
     }
 }

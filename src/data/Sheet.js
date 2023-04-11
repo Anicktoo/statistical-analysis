@@ -1,6 +1,7 @@
 import * as Papa from 'papaparse';
 import Settings from './Settings';
 import UIControls from '@/UIControls';
+import { optionListAdd, displayVarsBySheetId } from '@/module-integration';
 import Var from './Var';
 
 export default class Sheet {
@@ -31,7 +32,7 @@ export default class Sheet {
 
     importFile(file) {
         this.#file = file;
-        this.#parseDataInFile(file);
+        this.#parseDataInFile(true);
     }
 
     setSettings(settingsFormData) {
@@ -42,7 +43,7 @@ export default class Sheet {
 
     applySettingsAndShow() {
         this.#needToApplySettings = false;
-        this.#parseDataInFile();
+        this.#parseDataInFile(false);
     }
 
     createVarSettings(varID) {
@@ -57,6 +58,7 @@ export default class Sheet {
 
     setVarSettings(formData, order, twoTables) {
         this.#openedVar.setSettings(formData, order, twoTables);
+        displayVarsBySheetId(this.#id);
     }
 
     readyToShow() {
@@ -68,6 +70,7 @@ export default class Sheet {
         this.#tableElement.classList.add('data__table_shown');
         this.#footerElement.classList.add('footer__item_selected');
         UIControls.footerChange();
+
     }
 
     hide() {
@@ -178,7 +181,7 @@ export default class Sheet {
         this.show();
     }
 
-    #parseDataInFile() {
+    #parseDataInFile(isNewFile) {
         const del = this.#settings.props.decimalDelimiter.selected;
         let regExpReadyDel = del;
         if (RegExp.specialSymbols.includes(del)) {
@@ -208,6 +211,15 @@ export default class Sheet {
                 this.#data = results.data;
                 this.#initVars();
                 this.#createHTML();
+                if (isNewFile) {
+                    optionListAdd({
+                        name: this.#name,
+                        id: this.#id
+                    });
+                }
+                if (this.#id === 0 || !isNewFile) {
+                    displayVarsBySheetId(this.#id);
+                }
             }
         });
     }
@@ -243,5 +255,17 @@ export default class Sheet {
             }
             return newVar(Var.Continues);
         }
+    }
+
+    getName() {
+        return this.#name;
+    }
+
+    getID() {
+        return this.#id;
+    }
+
+    getVars() {
+        return this.#dataVars;
     }
 }

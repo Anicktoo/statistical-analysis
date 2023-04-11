@@ -3,3 +3,7 @@ Object.deepCopy = function (from) {
 }
 
 RegExp.specialSymbols = ['[', ']', '\\', '^', '$', '.', '|', '?', '*', '+', '(', ')'];
+
+window.timeout = function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+};

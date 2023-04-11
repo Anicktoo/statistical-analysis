@@ -1,7 +1,10 @@
 export default class AbstractModule {
 
+    #form;
+
     constructor() {
-        throw new Error("Can't create an instance of an abstract class");
+        if (AbstractModule === new.target)
+            throw new Error("Can't create an instance of an abstract class");
     }
 
     static getName() {
@@ -9,6 +12,10 @@ export default class AbstractModule {
     }
 
     static getImage() {
+        throw new Error('This method must be implemented');
+    }
+
+    static createHTML() {
         throw new Error('This method must be implemented');
     }
 
@@ -20,8 +27,19 @@ export default class AbstractModule {
         throw new Error('This method must be implemented');
     }
 
-    getStatPower() {
+    setStatPower() {
         throw new Error('This method must be implemented');
+    }
+
+    static addSheetOptions(listOfSheets, select) {
+        const options = [];
+        for (let el of listOfSheets) {
+            const option = document.createElement('option');
+            option.setAttribute('value', el.id);
+            option.textContent = el.name;
+            options.push(option);
+        }
+        select.append(...options);
     }
 }
 

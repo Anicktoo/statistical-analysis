@@ -1,5 +1,6 @@
-import Sheet from "@data/Sheet";
+import Sheet from '@data/Sheet';
 import Settings from '@data/Settings';
+import { optionListAdd } from '@/module-integration';
 import UIControls from "@/UIControls";
 
 export default class DataControls {
@@ -47,6 +48,7 @@ export default class DataControls {
         const newSheet = new Sheet(name, file, arrayLength)
         DataControls.#sheets.push(newSheet);
         DataControls.#currentSheet = newSheet;
+
     }
 
     static selectSheet(sheetId) {
@@ -62,6 +64,22 @@ export default class DataControls {
         else {
             sheet.applySettingsAndShow();
         }
+    }
+
+    static getListOfSheets() {
+        return this.#sheets.map((el, index) => {
+            return {
+                name: el.getName(),
+                id: el.getID()
+            };
+        })
+    }
+
+    static getVarsBySheetId(id) {
+        if (DataControls.#sheets[id]) {
+            return DataControls.#sheets[id].getVars();
+        }
+        return null;
     }
 }
 

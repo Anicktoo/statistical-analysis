@@ -165,4 +165,8 @@ export default class Var {
     getImg() {
         return this.#img;
     }
+
+    getTypeName() {
+        return this.#typeName;
+    }
 }

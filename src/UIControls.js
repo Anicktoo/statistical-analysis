@@ -1,8 +1,11 @@
-import DataControls from "@data/DataControls";
+import DataControls from '@data/DataControls';
+import { addHypothesis, setSettings, displayVars } from '@/module-integration'
 
 export default class UIControls {
 
     static body;
+    static moduleListElement;
+    static modulesItems = [];
     static burgerMenu;
     static burgerMenuInput
     static fadeScreen;
@@ -19,8 +22,12 @@ export default class UIControls {
     };
     static calculationWindow;
     static parameters;
+    static parametersContainer;
+    static parametersMainForm;
     static resizeBarsEl = [];
     static results;
+    static resultsContainer;
+    static resultsLoader;
     static modalVarType;
     static varIcons = {
         old: [],
@@ -58,6 +65,8 @@ export default class UIControls {
 
     static initConstElements() {
         UIControls.body = document.getElementsByTagName('body')[0];
+        UIControls.moduleListElement = document.querySelector('.modules__list');
+
         UIControls.dataContainer = document.querySelector('.data__container');
         UIControls.dataFooter = UIControls.dataContainer.querySelector('.data__footer');
         UIControls.footerList = UIControls.dataContainer.querySelector('.footer__list');
@@ -72,7 +81,12 @@ export default class UIControls {
         UIControls.calculationWindow = document.querySelector('.calculation-window');
         UIControls.resizeBarsEl = [...UIControls.calculationWindow.querySelectorAll('.resize-bar')];
         UIControls.results = UIControls.calculationWindow.querySelector('.results');
+        UIControls.resultsLoader = UIControls.results.querySelector('.loader');
+        UIControls.resultsContainer = UIControls.results.querySelector('.results__container');
+
         UIControls.parameters = UIControls.calculationWindow.querySelector('.parameters');
+        UIControls.parametersContainer = UIControls.parameters.querySelector('.parameters__container');
+        UIControls.parametersMainForm = UIControls.parameters.querySelector('#module-option-form_main');
 
         UIControls.modalVarType = document.querySelector('.modal-var-types');
         UIControls.varTypesForm = UIControls.modalVarType.querySelector('#var-type-form');
@@ -95,6 +109,7 @@ export default class UIControls {
         UIControls.addModalSettingsListener();
         UIControls.addModalVarChooseListener();
         UIControls.addCsvUploadListeners();
+        UIControls.addModuleFormListeners('main', UIControls.parametersMainForm);
     }
 
     static initChangableElements() {
@@ -285,6 +300,33 @@ export default class UIControls {
         }
     }
 
+    // MODULE LISTENERS //
+
+    static addModuleBtnsListeners() {
+        const modulesItems = [...document.querySelectorAll('.modules__item')];
+        UIControls.modulesItems = modulesItems;
+        modulesItems.forEach(el => {
+            const id = el.dataset.moduleId;
+            el.addEventListener('click', () => {
+                addHypothesis(id);
+            });
+        });
+    }
+
+    static addModuleFormListeners(id, element) {
+        const elementFormMain = element.querySelector('.module-option-form');
+        const triggers = [...element.querySelectorAll('.form-change-trigger')];
+        triggers.forEach(el => el.addEventListener('change', () => {
+            setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
+        }));
+
+        const elementFormSheets = element.querySelector('.sheet-form');
+        elementFormSheets?.addEventListener('change', () => {
+            // setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
+            displayVars(id, elementFormSheets);
+        });
+    }
+
     // COMMON FUNCTIONS //
 
     static resizeBarCheckBounds() {
@@ -382,6 +424,16 @@ export default class UIControls {
             document.onmouseup = null;
             document.onmousemove = null;
         }
+    }
+
+    static resultsLoadingShow() {
+        UIControls.resultsContainer.style.opacity = '0.1';
+        UIControls.resultsLoader.style.display = 'block';
+    }
+
+    static resultsLoadingHide() {
+        UIControls.resultsContainer.style.opacity = '1';
+        UIControls.resultsLoader.style.display = 'none';
     }
 
 }
