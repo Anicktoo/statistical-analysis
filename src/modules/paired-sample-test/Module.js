@@ -1,4 +1,6 @@
+import './styles/style.scss';
 import UIControls from '@/UIControls';
+import { setSettings } from '@/module-integration';
 import DataControls from '@data/DataControls';
 import img from './img/modulePair.png';
 import AbstractModule from '@modules/AbstractModule';
@@ -8,6 +10,10 @@ export default class Module extends AbstractModule {
     static #name = 'Сравнение парных выборок';
     static #image = img;
     #id;
+    #data = {
+        first: undefined,
+        second: undefined
+    }
     #power;
     #element
     #form;
@@ -33,7 +39,43 @@ export default class Module extends AbstractModule {
         return this.#image;
     }
 
+    addListeners(element) {
+        const tables = element.querySelector('.paired-sample__tables');
+        const switchBtn = tables.querySelector('.switch-button');
+        const firstTable = tables.querySelector('.paired-sample__table-body');
+        const secondTableItem = tables.querySelector('.target-table-data');
 
+        const insertChild = (item, toTable) => {
+            const nextChild = toTable.querySelector('.var-table__anchor_' + item.dataset.varId);
+            if (nextChild) {
+                toTable.insertBefore(item, nextChild);
+            }
+        }
+
+        switchBtn.addEventListener('click', () => {
+            const checkedInput = tables.querySelector('input:checked');
+            if (!checkedInput)
+                return;
+            const checkedItem = checkedInput.parentElement;
+            const parentOfItem = checkedItem.parentElement;
+
+            if (parentOfItem.isSameNode(secondTableItem)) {
+                parentOfItem.removeChild(checkedItem);
+                insertChild(checkedItem, firstTable);
+            }
+            else {
+                if (secondTableItem.children.length === 2) {
+                    // const removed = secondTableItem.removeChild(secondTableItem.firstElementChild);
+                    // insertChild(removed, firstTable);
+                    return;
+                }
+                parentOfItem.removeChild(checkedItem);
+                secondTableItem.appendChild(checkedItem);
+            }
+
+            setSettings(this.#id, this.#form, secondTableItem);
+        });
+    }
 
     createHTML() {
         const name = 'Гипотеза ' + (this.#id + 1);
@@ -43,7 +85,7 @@ export default class Module extends AbstractModule {
         const newHyp = document.createElement('div');
         const newRes = document.createElement('div');
         const newOption = document.createElement('option');
-        newHyp.classList.add('parameters__item', 'collapsible');
+        newHyp.classList.add('parameters__item', 'collapsible', 'paired-sample');
         newRes.classList.add('results__block');
         newOption.setAttribute('value', this.#id);
         const htmlParam = `
@@ -87,35 +129,29 @@ export default class Module extends AbstractModule {
                             </label>
                         </div>
                     </div>
-                    <div class="option-block__tables pair-tables">
+                    <div class="option-block__tables paired-sample__tables">
                         <div class="var-table">
                             <div class="var-table__header">
                                 <form id="sheet-form-${this.#id}" class="sheet-form">
                                     <div class="main-select">
-                                       <select class="main-input pair-tables__sheet-select sheet-select" name="sheet-select"></select>
+                                       <select class="main-input paired-sample__sheet-select sheet-select" name="sheet-select"></select>
                                     </div>
                                 </form>
                             </div>
-                            <div class="var-table__body pair-tables__body"></div>
+                            <div class="var-table__body paired-sample__table-body"></div>
                         </div>
-                        <div class="pair-tables__switch-container">
+                        <div class="paired-sample__switch-container">
                             <div class="switch-button switch-button_right">
                                 <div class="switch-button__symbol"></div>
                             </div>
                         </div>
                         <div class="var-table">
                             <div class="var-table__header">Парные переменные</div>
-                            <div class="var-table__body pair-tables__body">
-                                <div class="pair-tables__item target-table-data">
-                                    <label class="var-table__item">
-                                        <input type="radio" name="data_value">
-                                        <span>Привет</span>
-                                    </label>
-                                    <label class="var-table__item">
-                                        <input type="radio" name="data_value">
-                                        <span>Мир!</span>
-                                    </label>
+                            <div class="var-table__body paired-sample__table-body">
+                                <div class="paired-sample__item target-table-data">
+                                    
                                 </div>
+                                <div class="paired-sample__delimiter"></div>
                             </div>
                         </div>
                     </div>
@@ -235,18 +271,28 @@ export default class Module extends AbstractModule {
         const vars = DataControls.getVarsBySheetId(sheetId);
         if (!vars)
             return;
-        const tableBody = this.#element.querySelector('.pair-tables__body');
+        const tableBody = this.#element.querySelector('.paired-sample__table-body');
+        const tableSecondItem = this.#element.querySelector('.target-table-data');
+        const arrOfIds = [];
+        arrOfIds.push(tableSecondItem.firstElementChild?.dataset.varId);
+        arrOfIds.push(tableSecondItem.lastElementChild?.dataset.varId);
         let str = '';
         vars.forEach(element => {
-            str += `
-            <label class="var-table__item" data-var-id=${element.getID()}>
+            const item = document.createElement('div');
+            const curVarID = element.getID();
+            let stringElement = `
+            <label class="var-table__item" data-var-id=${curVarID}>
                 <input type="radio" name="data_value">
                 <img src=${element.getImg()} alt="${element.getTypeName()}" class="var-table__img">
                 <span>${element.getName()}</span>
             </label>`;
+            item.innerHTML = stringElement;
+            if (!arrOfIds.includes(curVarID)) {
+                str += stringElement;
+            }
+            str += `<div class='var-table__anchor var-table__anchor_${curVarID}'></div>`;
         });
         tableBody.innerHTML = str;
-
     }
 
     getFormMain() {
@@ -267,6 +313,18 @@ export default class Module extends AbstractModule {
         this.#testType = formData.get('test-type');
         this.#altHypTest = formData.get('hyp-check');
 
+        const data = [];
+        if (tableData) {
+            const selectedVars = [...tableData?.children];
+            if (selectedVars.length == 2) {
+                selectedVars.forEach(el => {
+                    const ids = el.dataset.varId.split('_');
+                    data.push(DataControls.getDataBySheetAndVarId(ids[1], ids[2]));
+                });
+                this.#data.first = data[0];
+                this.#data.second = data[1];
+            }
+        }
     }
 
     getN(alpha) {

@@ -23,7 +23,7 @@ export default class UIControls {
     static calculationWindow;
     static parameters;
     static parametersContainer;
-    static parametersMainForm;
+    static parametersMainItem;
     static resizeBarsEl = [];
     static results;
     static resultsContainer;
@@ -86,7 +86,7 @@ export default class UIControls {
 
         UIControls.parameters = UIControls.calculationWindow.querySelector('.parameters');
         UIControls.parametersContainer = UIControls.parameters.querySelector('.parameters__container');
-        UIControls.parametersMainForm = UIControls.parameters.querySelector('#module-option-form_main');
+        UIControls.parametersMainItem = UIControls.parameters.querySelector('#parameters__item_main');
 
         UIControls.modalVarType = document.querySelector('.modal-var-types');
         UIControls.varTypesForm = UIControls.modalVarType.querySelector('#var-type-form');
@@ -109,7 +109,6 @@ export default class UIControls {
         UIControls.addModalSettingsListener();
         UIControls.addModalVarChooseListener();
         UIControls.addCsvUploadListeners();
-        UIControls.addModuleFormListeners('main', UIControls.parametersMainForm);
     }
 
     static initChangableElements() {
@@ -313,7 +312,7 @@ export default class UIControls {
         });
     }
 
-    static addModuleFormListeners(id, element) {
+    static addModuleFormListeners(id, element, moduleCallbackFunction) {
         const elementFormMain = element.querySelector('.module-option-form');
         const triggers = [...element.querySelectorAll('.form-change-trigger')];
         triggers.forEach(el => el.addEventListener('change', () => {
@@ -325,6 +324,10 @@ export default class UIControls {
             // setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
             displayVars(id, elementFormSheets);
         });
+
+        if (moduleCallbackFunction) {
+            moduleCallbackFunction();
+        }
     }
 
     // COMMON FUNCTIONS //

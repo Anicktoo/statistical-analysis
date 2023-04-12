@@ -44,6 +44,7 @@ export async function createModuleButtons() {
     }
 
     UIControls.addModuleBtnsListeners();
+    UIControls.addModuleFormListeners('main', UIControls.parametersMainItem);
 }
 
 export function addHypothesis(hypTypeId) {
@@ -56,7 +57,7 @@ export function addHypothesis(hypTypeId) {
     const form = newHyp.getFormMain();
     AbstractModule.addSheetOptions(DataControls.getListOfSheets(), newHyp.getSheetSelect());
     displayVars(mainSettings.hypCounter)
-    UIControls.addModuleFormListeners(mainSettings.hypCounter, newEls.newHyp);
+    UIControls.addModuleFormListeners(mainSettings.hypCounter, newEls.newHyp, newHyp.addListeners.bind(newHyp, newEls.newHyp));
     setSettings(mainSettings.hypCounter, form);
     mainSettings.hypCounter++;
 }
@@ -104,7 +105,7 @@ function applySettings() {
 
     const mainHyp = hypotheses[mainSettings.mainHypId];
 
-    if (mainHyp.update) {
+    if (mainHyp?.update) {
         setMainSettings(mainHyp.update);
         mainHyp.update = null;
         updateAllResults = true;
@@ -120,9 +121,9 @@ function applySettings() {
             }
             hyp.setStatPower();
             hypotheses[i].formEl = null;
+            updateResults();
         }
     }
-    updateResults(updateAllResults);
 }
 
 function setGlobalSettings(formaData) {
@@ -131,8 +132,15 @@ function setGlobalSettings(formaData) {
     mainSettings.FWER = formaData.get('FWER');
     mainSettings.mainHypId = Number(formaData.get('mainHypothesis'));
     mainSettings.power = formaData.get('power');
-    mainSettings.alpha = mainSettings.FWER / mainSettings.hypCounter;
-    mainSettings.sampleSize = hypotheses[mainSettings.mainHypId].hyp.getN(mainSettings.alpha);
+    if (mainSettings.hypCounter) {
+        mainSettings.alpha = mainSettings.FWER / mainSettings.hypCounter;
+        mainSettings.sampleSize = hypotheses[mainSettings.mainHypId].hyp.getN(mainSettings.alpha);
+    }
+    else {
+        mainSettings.alpha = '-';
+        mainSettings.sampleSize = '-';
+    }
+
 }
 
 function setMainSettings(formaData) {
