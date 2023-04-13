@@ -1,7 +1,7 @@
 import * as Papa from 'papaparse';
 import Settings from './Settings';
 import UIControls from '@/UIControls';
-import { optionListAdd, displayVarsBySheetId } from '@/module-integration';
+import { optionListAdd, updateVarsOfSheet } from '@/module-integration';
 import Var from './Var';
 
 export default class Sheet {
@@ -58,7 +58,7 @@ export default class Sheet {
 
     setVarSettings(formData, order, twoTables) {
         this.#openedVar.setSettings(formData, order, twoTables);
-        displayVarsBySheetId(this.#id);
+        updateVarsOfSheet(this.#id, false);
     }
 
     readyToShow() {
@@ -218,7 +218,7 @@ export default class Sheet {
                     });
                 }
                 if (this.#id === 0 || !isNewFile) {
-                    displayVarsBySheetId(this.#id);
+                    updateVarsOfSheet(this.#id, true);
                 }
             }
         });
@@ -267,6 +267,10 @@ export default class Sheet {
 
     getVars() {
         return this.#dataVars;
+    }
+
+    getVarById(varId) {
+        return this.#dataVars[varId];
     }
 
     getDataByVarId(varId) {

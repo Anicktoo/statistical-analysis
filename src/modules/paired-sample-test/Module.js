@@ -1,6 +1,6 @@
 import './styles/style.scss';
 import UIControls from '@/UIControls';
-import { setSettings } from '@/module-integration';
+import { setSettings as moduleIntSetSettings } from '@/module-integration';
 import DataControls from '@data/DataControls';
 import img from './img/modulePair.png';
 import AbstractModule from '@modules/AbstractModule';
@@ -15,16 +15,18 @@ export default class Module extends AbstractModule {
         second: undefined
     }
     #power;
-    #element
-    #form;
-    #formSheet;
-    #sheetSelect;
     #testType;
     #altHypTest;
     #vars = {
         first: undefined,
         second: undefined
     }
+
+    #element
+    #form;
+    #formSheet;
+    #sheetSelect;
+    #tableData;
 
     constructor(id) {
         super();
@@ -73,7 +75,7 @@ export default class Module extends AbstractModule {
                 secondTableItem.appendChild(checkedItem);
             }
 
-            setSettings(this.#id, this.#form, secondTableItem);
+            moduleIntSetSettings(this.#id, this.#form, secondTableItem);
         });
     }
 
@@ -264,6 +266,7 @@ export default class Module extends AbstractModule {
         this.#form = newHyp.querySelector('.module-option-form');
         this.#formSheet = newHyp.querySelector('.sheet-form');
         this.#sheetSelect = newHyp.querySelector('.sheet-select');
+        this.#tableData = newHyp.querySelector('.target-table-data');
         return { newHyp, newRes };
     }
 
@@ -272,13 +275,12 @@ export default class Module extends AbstractModule {
         if (!vars)
             return;
         const tableBody = this.#element.querySelector('.paired-sample__table-body');
-        const tableSecondItem = this.#element.querySelector('.target-table-data');
+        const tableSecondItem = this.#tableData;
         const arrOfIds = [];
         arrOfIds.push(tableSecondItem.firstElementChild?.dataset.varId);
         arrOfIds.push(tableSecondItem.lastElementChild?.dataset.varId);
-        let str = '';
+        let strBody = '';
         vars.forEach(element => {
-            const item = document.createElement('div');
             const curVarID = element.getID();
             let stringElement = `
             <label class="var-table__item" data-var-id=${curVarID}>
@@ -286,13 +288,34 @@ export default class Module extends AbstractModule {
                 <img src=${element.getImg()} alt="${element.getTypeName()}" class="var-table__img">
                 <span>${element.getName()}</span>
             </label>`;
-            item.innerHTML = stringElement;
+
             if (!arrOfIds.includes(curVarID)) {
-                str += stringElement;
+                strBody += stringElement;
             }
-            str += `<div class='var-table__anchor var-table__anchor_${curVarID}'></div>`;
+            strBody += `<div class='var-table__anchor var-table__anchor_${curVarID}'></div>`;
         });
-        tableBody.innerHTML = str;
+        tableBody.innerHTML = strBody;
+    }
+
+    updateSelectedVarsVisual(sheetId) {
+        // const tableSecond = this.#tableData;
+        const secondTableItem = this.#element.querySelector('.target-table-data');
+        let curVars = [...secondTableItem.querySelectorAll('label')];
+        curVars.forEach((el => {
+            const ids = el.dataset.varId.split('_');
+            if (ids[1] == sheetId) {
+                const v = DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
+                const elImg = el.querySelector('img');
+                el.querySelector('span').innerHTML = v.getName();
+                elImg.setAttribute('src', v.getImg());
+                elImg.setAttribute('alt', v.getTypeName());
+            }
+        }));
+    }
+
+    clearSelectedVars() {
+        const secondTableItem = this.#element.querySelector('.target-table-data');
+        secondTableItem.innerHTML = '';
     }
 
     getFormMain() {
@@ -307,28 +330,60 @@ export default class Module extends AbstractModule {
         return this.#sheetSelect;
     }
 
-    setSettings(allData) {
-        const formData = allData.formData;
-        const tableData = allData.tableData;
+    setSettings(power) {
+        const formData = new FormData(this.#form);
+        const tableData = this.#tableData;
         this.#testType = formData.get('test-type');
         this.#altHypTest = formData.get('hyp-check');
+        if (power) {
+            this.#power = power;
+        }
 
         const data = [];
+        this.#data.first = null;
+        this.#data.second = null;
+        const vars = [];
+        this.#vars.first = null;
+        this.#vars.second = null;
         if (tableData) {
             const selectedVars = [...tableData?.children];
             if (selectedVars.length == 2) {
                 selectedVars.forEach(el => {
                     const ids = el.dataset.varId.split('_');
-                    data.push(DataControls.getDataBySheetAndVarId(ids[1], ids[2]));
+                    data.push(DataControls.getDataBySheetAndVarId(ids[1], ids[2]).slice(1));
+                    vars.push(DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]));
                 });
                 this.#data.first = data[0];
                 this.#data.second = data[1];
+                this.#vars.first = vars[0];
+                this.#vars.second = vars[1];
+                console.log(this.#data);
+                console.log(this.#vars);
             }
         }
     }
 
     getN(alpha) {
+        if (!this.#data.first || !this.#data.second) {
+            return;
+        }
+        switch (this.#testType) {
+            case 'student': {
+                return this.#studentTest(alpha)
+                break;
+            }
+        }
+    }
 
+    #studentTest(alpha) {
+        const zAlpha = this.#altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha);
+        const z = zAlpha + Math.norminv(100 - this.#power);
+        const differences = this.#data.first.map((el, i) => el - this.#data.second[i]);
+        const d = Math.mean(differences);
+        const sd = Math.stddiv.s(differences);
+        const n = (z * sd / d) ** 2 + ((zAlpha ** 2) / 2);
+        console.log("N ", n);
+        return n;
     }
 
     setStatPower(sampleSize) {

@@ -1,5 +1,5 @@
 import DataControls from '@data/DataControls';
-import { addHypothesis, setSettings, displayVars } from '@/module-integration'
+import { addHypothesis, setSettings, refreshVarsOfHyp } from '@/module-integration'
 
 export default class UIControls {
 
@@ -23,7 +23,7 @@ export default class UIControls {
     static calculationWindow;
     static parameters;
     static parametersContainer;
-    static parametersMainItem;
+    static parametersGlobItem;
     static resizeBarsEl = [];
     static results;
     static resultsContainer;
@@ -86,7 +86,7 @@ export default class UIControls {
 
         UIControls.parameters = UIControls.calculationWindow.querySelector('.parameters');
         UIControls.parametersContainer = UIControls.parameters.querySelector('.parameters__container');
-        UIControls.parametersMainItem = UIControls.parameters.querySelector('#parameters__item_main');
+        UIControls.parametersGlobItem = UIControls.parameters.querySelector('#parameters__item_glob');
 
         UIControls.modalVarType = document.querySelector('.modal-var-types');
         UIControls.varTypesForm = UIControls.modalVarType.querySelector('#var-type-form');
@@ -322,7 +322,7 @@ export default class UIControls {
         const elementFormSheets = element.querySelector('.sheet-form');
         elementFormSheets?.addEventListener('change', () => {
             // setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
-            displayVars(id, elementFormSheets);
+            refreshVarsOfHyp(id, elementFormSheets);
         });
 
         if (moduleCallbackFunction) {

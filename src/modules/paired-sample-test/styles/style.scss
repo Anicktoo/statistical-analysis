@@ -21,8 +21,9 @@
 
     &__table-body {
         position: relative;
-        height: 170px;
+        min-width: 225px;
         max-width: 225px;
+        min-height: 170px;
         max-height: 170px;
     }
 
@@ -50,6 +51,4 @@
         background-color: $second-grey;
         translate: -100% 0;
     }
-
-
 }

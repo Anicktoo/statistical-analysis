@@ -45,7 +45,7 @@
             </div>
             <section class="calculation-window__element parameters">
                 <div class="parameters__container">
-                    <div id="parameters__item_main" class="parameters__item collapsible">
+                    <div id="parameters__item_glob" class="parameters__item collapsible">
                         <label class="collapsible__head">
                             <input class="collapsible__input" type="checkbox" checked>
                             <div class="parameters__head">
@@ -57,25 +57,25 @@
                         </label>
                         <div class="collapsible__content">
                             <div class="parameters__content">
-                                <form id="module-option-form_main" class="module-option-form"></form>
+                                <form id="module-option-form_glob" class="module-option-form"></form>
                                 <div class="option-block">
                                     <label class="input-line">
                                         Название проекта
                                         <input type="text" class="main-input main-input_text" name="name"
-                                            value="Результаты" form="module-option-form_main">
+                                            value="Результаты" form="module-option-form_glob">
                                     </label>
                                     <label class="input-line">
                                         FWER
                                         <input type="number" class="main-input main-input_number form-change-trigger"
                                             name="FWER" value="5" step="0.1" min="0" max="100"
-                                            form="module-option-form_main">
+                                            form="module-option-form_glob">
                                         <span class="input-line__post">%</span>
                                     </label>
                                     <label class="input-line">
                                         Основная гипотеза
                                         <div class="main-select">
                                             <select id="main-hypothesis" name="mainHypothesis"
-                                                class="main-input form-change-trigger" form="module-option-form_main">
+                                                class="main-input form-change-trigger" form="module-option-form_glob">
                                                 <!-- <option value="-">-</option> -->
                                             </select>
                                         </div>
@@ -84,7 +84,7 @@
                                         Планируемая мощность основной гипотезы
                                         <input type="number" class="main-input main-input_number form-change-trigger"
                                             name="power" value="95" step="0.1" min="0" max="100"
-                                            form="module-option-form_main">
+                                            form="module-option-form_glob">
                                         <span class="input-line__post">%</span>
                                     </label>
                                 </div>

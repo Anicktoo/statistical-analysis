@@ -82,6 +82,13 @@ export default class DataControls {
         return null;
     }
 
+    static getVarBySheetIdAndVarId(sheetId, varId) {
+        if (DataControls.#sheets[sheetId]) {
+            return DataControls.#sheets[sheetId].getVarById(varId);
+        }
+        return null;
+    }
+
     static getDataBySheetAndVarId(sheetId, varId) {
         return this.#sheets[sheetId].getDataByVarId(varId);
     }

@@ -6,14 +6,23 @@ const MODULE_FOLDERS = ['paired-sample-test', 'independent-sample-test', 'correl
 const modules = [];
 // const resultsEl = UIControls.resultsEl;
 const hypotheses = [];
-const mainSettings = {
+const globalSettings = {
+    form: document.querySelector('#module-option-form_glob'),
     name: undefined,
     FWER: undefined,
     mainHypId: undefined,
-    alpha: undefined,
+    power: undefined,
     hypCounter: 0,
     sampleSize: undefined,
-    update: null
+    update: null,
+    getAlpha() {
+        if (this.hypCounter) {
+            return this.FWER / this.hypCounter;
+        }
+        else {
+            return '-';
+        }
+    }
 }
 
 
@@ -44,41 +53,63 @@ export async function createModuleButtons() {
     }
 
     UIControls.addModuleBtnsListeners();
-    UIControls.addModuleFormListeners('main', UIControls.parametersMainItem);
+    UIControls.addModuleFormListeners('glob', UIControls.parametersGlobItem);
+    setSettings('glob', UIControls.parametersGlobItem.querySelector('form'));
 }
 
 export function addHypothesis(hypTypeId) {
-    const newHyp = new modules[hypTypeId](mainSettings.hypCounter);
+    const newHyp = new modules[hypTypeId](globalSettings.hypCounter);
     if (hypotheses.length === 0) {
-        mainSettings.mainHypId = mainSettings.hypCounter;
+        globalSettings.mainHypId = globalSettings.hypCounter;
     }
     hypotheses.push({ hyp: newHyp, update: null });
     const newEls = newHyp.createHTML();
     const form = newHyp.getFormMain();
     AbstractModule.addSheetOptions(DataControls.getListOfSheets(), newHyp.getSheetSelect());
-    displayVars(mainSettings.hypCounter)
-    UIControls.addModuleFormListeners(mainSettings.hypCounter, newEls.newHyp, newHyp.addListeners.bind(newHyp, newEls.newHyp));
-    setSettings(mainSettings.hypCounter, form);
-    mainSettings.hypCounter++;
+    refreshVarsOfHyp(globalSettings.hypCounter)
+    UIControls.addModuleFormListeners(globalSettings.hypCounter, newEls.newHyp, newHyp.addListeners.bind(newHyp, newEls.newHyp));
+    setSettings(globalSettings.hypCounter, form);
+    globalSettings.hypCounter++;
 }
 
 export function optionListAdd(newSheet, optionsEmpty = false) {
     for (let i = 0; i < hypotheses.length; i++) {
         AbstractModule.addSheetOptions([newSheet], hypotheses[i].hyp.getSheetSelect());
         if (optionsEmpty) {
-            displayVars(i);
+            refreshVarsOfHyp(i);
         }
     }
 }
 
+export function refreshVarsOfHyp(hypID) {
+    const formElement = hypotheses[hypID].hyp.getFormSheet();
+    const sheetId = new FormData(formElement).get('sheet-select');
+    hypotheses[hypID].hyp.displayVarsOfSheet(sheetId);
+}
+
+export function updateVarsOfSheet(sheetId, clearSelected) {
+    hypotheses.forEach(el => {
+        if (clearSelected) {
+            el.hyp.clearSelectedVars();
+        }
+        else {
+            el.hyp.updateSelectedVarsVisual(sheetId);
+        }
+
+        if (new FormData(el.hyp.getFormSheet()).get('sheet-select') == sheetId) {
+            el.hyp.displayVarsOfSheet(sheetId);
+        }
+    })
+}
+
 let timerId;
-export function setSettings(id, formElement, tableData) {
+export function setSettings(id) {
     UIControls.resultsLoadingShow();
-    if (id === 'main') {
-        mainSettings.update = new FormData(formElement);
+    if (id === 'glob') {
+        globalSettings.update = true;
     }
     else {
-        hypotheses[id].update = { formData: new FormData(formElement), tableData };
+        hypotheses[id].update = true;
     }
 
     function delayed() {
@@ -96,18 +127,14 @@ export function setSettings(id, formElement, tableData) {
 
 function applySettings() {
     let updateAllResults = false;
+    const mainHyp = hypotheses[globalSettings.mainHypId];
 
-    if (mainSettings.update) {
-        setGlobalSettings(mainSettings.update);
-        mainSettings.update = null;
+    if (globalSettings.update) {
+        setGlobalAndMainHypSettings();
         updateAllResults = true;
     }
-
-    const mainHyp = hypotheses[mainSettings.mainHypId];
-
-    if (mainHyp?.update) {
-        setMainSettings(mainHyp.update);
-        mainHyp.update = null;
+    else if (mainHyp?.update) {
+        setMainSettings();
         updateAllResults = true;
     }
 
@@ -117,52 +144,41 @@ function applySettings() {
         if ((updateAllResults || update) && hyp !== mainHyp) {
             console.log('norm ' + i);
             if (update) {
-                hyp.setSettings(update);
+                hyp.setSettings();
             }
             hyp.setStatPower();
-            hypotheses[i].formEl = null;
+            hypotheses[i].update = false;
             updateResults();
         }
     }
 }
 
-function setGlobalSettings(formaData) {
+function setGlobalAndMainHypSettings() {
     console.log('glob');
-    mainSettings.name = formaData.get('name');
-    mainSettings.FWER = formaData.get('FWER');
-    mainSettings.mainHypId = Number(formaData.get('mainHypothesis'));
-    mainSettings.power = formaData.get('power');
-    if (mainSettings.hypCounter) {
-        mainSettings.alpha = mainSettings.FWER / mainSettings.hypCounter;
-        mainSettings.sampleSize = hypotheses[mainSettings.mainHypId].hyp.getN(mainSettings.alpha);
+    const formData = new FormData(globalSettings.form);
+    globalSettings.name = formData.get('name');
+    globalSettings.FWER = formData.get('FWER');
+    globalSettings.mainHypId = Number(formData.get('mainHypothesis'));
+    globalSettings.power = formData.get('power');
+    if (globalSettings.hypCounter) {
+        // globalSettings.sampleSize = hypotheses[globalSettings.mainHypId].hyp.getN(globalSettings.getAlpha());
+        setMainSettings();
     }
     else {
-        mainSettings.alpha = '-';
-        mainSettings.sampleSize = '-';
+        globalSettings.sampleSize = '-';
     }
-
+    globalSettings.update = false;
 }
 
-function setMainSettings(formaData) {
+function setMainSettings() {
     console.log('main');
-    hypotheses[mainSettings.mainHypId].hyp.setSettings(formaData);
-    mainSettings.sampleSize = hypotheses[mainSettings.mainHypId].hyp.getN(mainSettings.alpha);
+    const mainHyp = hypotheses[globalSettings.mainHypId];
+    mainHyp.hyp.setSettings(globalSettings.power);
+    globalSettings.sampleSize = mainHyp.hyp.getN(globalSettings.getAlpha());
+    mainHyp.update = false;
 }
 
 function updateResults(id) {
 
 }
 
-export function displayVars(hypID) {
-    const formElement = hypotheses[hypID].hyp.getFormSheet();
-    const sheetId = new FormData(formElement).get('sheet-select');
-    hypotheses[hypID].hyp.displayVarsOfSheet(sheetId);
-}
-
-export function displayVarsBySheetId(sheetId) {
-    hypotheses.forEach(el => {
-        if (new FormData(el.hyp.getFormSheet()).get('sheet-select') == sheetId) {
-            el.hyp.displayVarsOfSheet(sheetId);
-        }
-    })
-}
