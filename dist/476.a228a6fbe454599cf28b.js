@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[476],{510:(t,e,a)=>{a.r(e),a.d(e,{default:()=>i});const s=a.p+"7475aa54333561737dd6.png";var c=a(820);class i extends c.Z{static _name="Сравнение независимых выборок";static _image=s;static getName(){return this._name}static getImage(){return this._image}}}}]);

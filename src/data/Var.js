@@ -2,7 +2,7 @@ import nominalImg from '@img/table/scaleNominal.png';
 import continuesImg from '@img/table/scaleContinues.png';
 import binaryImg from '@img/table/scaleBinary.png';
 import rangImg from '@img/table/scaleRang.png';
-import UIControls from '../UIControls';
+// import UIControls from '../UIControls';
 
 export default class Var {
     static Binary = {

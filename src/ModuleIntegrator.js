@@ -1,5 +1,5 @@
 import AbstractModule from '@modules/AbstractModule';
-import UIControls from './UIControls';
+// import UIControls from './UIControls';
 import DataControls from './data/DataControls';
 
 export default class ModuleIntegrator {

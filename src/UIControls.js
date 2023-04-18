@@ -1,7 +1,7 @@
 import DataControls from '@data/DataControls';
 import ModuleIntegrator from '@/ModuleIntegrator';
 
-export default class UIControls {
+class UIControls {
 
     static body;
     static moduleListElement;
@@ -443,5 +443,5 @@ export default class UIControls {
 
 }
 
-
+window.UIControls = UIControls;
 

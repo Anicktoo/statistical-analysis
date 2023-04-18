@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[330],{969:(t,e,a)=>{a.r(e),a.d(e,{default:()=>i});const s=a.p+"cd9285569f05521af3fc.png";var c=a(820);class i extends c.Z{static _name="Сравнение парных выборок";static _image=s;static getName(){return this._name}static getImage(){return this._image}}}}]);

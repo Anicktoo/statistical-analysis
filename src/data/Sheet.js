@@ -1,6 +1,6 @@
 import * as Papa from 'papaparse';
 import Settings from './Settings';
-import UIControls from '@/UIControls';
+// import UIControls from '@/UIControls';
 import ModuleIntegrator from '@/ModuleIntegrator';
 import Var from './Var';
 

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[476],{510:(t,e,a)=>{a.r(e),a.d(e,{default:()=>i});const s=a.p+"cd9285569f05521af3fc.png";var c=a(820);class i extends c.Z{static#t="Сравнение независимых выборок";static#e=s;#a;static getName(){return this.#t}static getImage(){return this.#e}setSettings(){}getN(){}setStatPower(){}}}}]);

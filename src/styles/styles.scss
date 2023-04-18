@@ -74,7 +74,6 @@ label {
 
 .main-button {
     cursor: pointer;
-    padding: 8px 10px;
     border-radius: 10px;
 
     &:hover {
@@ -241,7 +240,7 @@ label {
     }
 
     &__item {
-        padding-right: 32px;
+        padding: 8px 32px 8px 10px;
 
         * {
             display: none;
@@ -1158,6 +1157,10 @@ label {
         display: flex;
         gap: 16px;
     }
+
+    &__btn {
+        padding: 8px 10px;
+    }
 }
 
 
@@ -1177,5 +1180,9 @@ label {
     &__btn-container {
         display: flex;
         gap: 16px;
+    }
+
+    &__btn {
+        padding: 8px 10px;
     }
 }

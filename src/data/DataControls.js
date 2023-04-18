@@ -72,6 +72,10 @@ export default class DataControls {
         })
     }
 
+    static getSheetById(id) {
+        return this.#sheets[id];
+    }
+
     static getVarsBySheetId(id) {
         if (DataControls.#sheets[id]) {
             return DataControls.#sheets[id].getVars();

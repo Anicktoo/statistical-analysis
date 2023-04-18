@@ -1,8 +1,9 @@
 import '@styles/styles.scss';
-import '@/utils/utils'
+import '@/utils/utils';
+import '@/UIControls';
 import ModuleIntegrator from '@/ModuleIntegrator';
 // import DataControls from '@data/DataControls';
-import UIControls from '@/UIControls';
+// import UIControls from '@/UIControls';
 
 UIControls.initConstUIControls();
 ModuleIntegrator.createModuleButtons();
