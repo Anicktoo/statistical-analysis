@@ -1,12 +1,9 @@
 import Sheet from '@data/Sheet';
 import Settings from '@data/Settings';
-import { optionListAdd } from '@/module-integration';
-import UIControls from "@/UIControls";
 
 export default class DataControls {
     static #sheets = [];
     static #currentSheet;
-    // static #lastSheetIndex = -1;
 
     static readSingleFile(event) {
         const file = event.target.files[0];

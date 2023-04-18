@@ -1,6 +1,5 @@
 import './styles/style.scss';
-import UIControls from '@/UIControls';
-import { setSettings as moduleIntSetSettings } from '@/module-integration';
+import ModuleIntegrator from '@/ModuleIntegrator';
 import DataControls from '@data/DataControls';
 import img from './img/modulePair.png';
 import AbstractModule from '@modules/AbstractModule';
@@ -9,6 +8,11 @@ export default class Module extends AbstractModule {
 
     static #name = 'Сравнение парных выборок';
     static #image = img;
+    static comElements = {
+        parametersContainer: document.querySelector('.parameters__container'),
+        resultsContainer: document.querySelector('.results__container'),
+        mainHypSelect: document.querySelector('#main-hypothesis')
+    }
     #id;
     #data = {
         first: undefined,
@@ -27,6 +31,7 @@ export default class Module extends AbstractModule {
     #formSheet;
     #sheetSelect;
     #tableData;
+    #secondTableItem
 
     constructor(id) {
         super();
@@ -75,15 +80,15 @@ export default class Module extends AbstractModule {
                 secondTableItem.appendChild(checkedItem);
             }
 
-            moduleIntSetSettings(this.#id, this.#form, secondTableItem);
+            ModuleIntegrator.setSettings(this.#id, this.#form, secondTableItem);
         });
     }
 
     createHTML() {
         const name = 'Гипотеза ' + (this.#id + 1);
-        const parametersContainer = UIControls.parametersContainer;
-        const resultsContainer = UIControls.resultsContainer;
-        const mainHypSelect = parametersContainer.querySelector('#main-hypothesis');
+        const parametersContainer = Module.comElements.parametersContainer;
+        const resultsContainer = Module.comElements.resultsContainer;
+        const mainHypSelect = Module.comElements.mainHypSelect;
         const newHyp = document.createElement('div');
         const newRes = document.createElement('div');
         const newOption = document.createElement('option');
@@ -267,6 +272,7 @@ export default class Module extends AbstractModule {
         this.#formSheet = newHyp.querySelector('.sheet-form');
         this.#sheetSelect = newHyp.querySelector('.sheet-select');
         this.#tableData = newHyp.querySelector('.target-table-data');
+        this.#secondTableItem = this.#element.querySelector('.target-table-data');
         return { newHyp, newRes };
     }
 
@@ -299,7 +305,7 @@ export default class Module extends AbstractModule {
 
     updateSelectedVarsVisual(sheetId) {
         // const tableSecond = this.#tableData;
-        const secondTableItem = this.#element.querySelector('.target-table-data');
+        const secondTableItem = this.#secondTableItem;
         let curVars = [...secondTableItem.querySelectorAll('label')];
         curVars.forEach((el => {
             const ids = el.dataset.varId.split('_');
@@ -314,8 +320,7 @@ export default class Module extends AbstractModule {
     }
 
     clearSelectedVars() {
-        const secondTableItem = this.#element.querySelector('.target-table-data');
-        secondTableItem.innerHTML = '';
+        this.#secondTableItem.innerHTML = '';
     }
 
     getFormMain() {

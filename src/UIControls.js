@@ -1,5 +1,5 @@
 import DataControls from '@data/DataControls';
-import { addHypothesis, setSettings, refreshVarsOfHyp } from '@/module-integration'
+import ModuleIntegrator from '@/ModuleIntegrator';
 
 export default class UIControls {
 
@@ -24,6 +24,8 @@ export default class UIControls {
     static parameters;
     static parametersContainer;
     static parametersGlobItem;
+    static mainHypSelect;
+
     static resizeBarsEl = [];
     static results;
     static resultsContainer;
@@ -57,12 +59,6 @@ export default class UIControls {
         UIControls.initConstListeners();
     }
 
-    static initChangableUIControls() {
-        console.log('initChangable');
-        UIControls.initChangableElements();
-        UIControls.initChangableListeners();
-    }
-
     static initConstElements() {
         UIControls.body = document.getElementsByTagName('body')[0];
         UIControls.moduleListElement = document.querySelector('.modules__list');
@@ -87,6 +83,7 @@ export default class UIControls {
         UIControls.parameters = UIControls.calculationWindow.querySelector('.parameters');
         UIControls.parametersContainer = UIControls.parameters.querySelector('.parameters__container');
         UIControls.parametersGlobItem = UIControls.parameters.querySelector('#parameters__item_glob');
+        UIControls.mainHypSelect = UIControls.parametersContainer.querySelector('#main-hypothesis');
 
         UIControls.modalVarType = document.querySelector('.modal-var-types');
         UIControls.varTypesForm = UIControls.modalVarType.querySelector('#var-type-form');
@@ -111,14 +108,19 @@ export default class UIControls {
         UIControls.addCsvUploadListeners();
     }
 
-    static initChangableElements() {
+    static initNewSheetControls() {
+        UIControls.initNewSheetElements();
+        UIControls.initNewSheetListeners();
+    }
+
+    static initNewSheetElements() {
         // UIControls.dataTable = UIControls.dataContainer.querySelector('.data__table_shown'); //???????????
         UIControls.dataFooterElements.new = [...UIControls.dataFooter.querySelectorAll('.footer__item_new')];
         UIControls.varIcons.new = [...UIControls.dataContainer.querySelectorAll('.data__var-icon_new')];
         UIControls.dataSettingsBtns.new = [...UIControls.dataContainer.querySelectorAll('.dataSettingsBtn_new')];
     }
 
-    static initChangableListeners() {
+    static initNewSheetListeners() {
         UIControls.addVarIconsListeners();
         UIControls.addDataSettingsListener();
         UIControls.addFooterItemListeners();
@@ -307,7 +309,7 @@ export default class UIControls {
         modulesItems.forEach(el => {
             const id = el.dataset.moduleId;
             el.addEventListener('click', () => {
-                addHypothesis(id);
+                ModuleIntegrator.addHypothesis(id);
             });
         });
     }
@@ -316,13 +318,13 @@ export default class UIControls {
         const elementFormMain = element.querySelector('.module-option-form');
         const triggers = [...element.querySelectorAll('.form-change-trigger')];
         triggers.forEach(el => el.addEventListener('change', () => {
-            setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
+            ModuleIntegrator.setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
         }));
 
         const elementFormSheets = element.querySelector('.sheet-form');
         elementFormSheets?.addEventListener('change', () => {
-            // setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
-            refreshVarsOfHyp(id, elementFormSheets);
+            // ModuleIntegrator.setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
+            ModuleIntegrator.refreshVarsOfHyp(id, elementFormSheets);
         });
 
         if (moduleCallbackFunction) {

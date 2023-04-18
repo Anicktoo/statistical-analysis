@@ -1,7 +1,7 @@
 import * as Papa from 'papaparse';
 import Settings from './Settings';
 import UIControls from '@/UIControls';
-import { optionListAdd, updateVarsOfSheet } from '@/module-integration';
+import ModuleIntegrator from '@/ModuleIntegrator';
 import Var from './Var';
 
 export default class Sheet {
@@ -58,7 +58,7 @@ export default class Sheet {
 
     setVarSettings(formData, order, twoTables) {
         this.#openedVar.setSettings(formData, order, twoTables);
-        updateVarsOfSheet(this.#id, false);
+        ModuleIntegrator.updateVarsOfSheet(this.#id, false);
     }
 
     readyToShow() {
@@ -70,7 +70,6 @@ export default class Sheet {
         this.#tableElement.classList.add('data__table_shown');
         this.#footerElement.classList.add('footer__item_selected');
         UIControls.footerChange();
-
     }
 
     hide() {
@@ -177,7 +176,7 @@ export default class Sheet {
             }
         }
 
-        UIControls.initChangableUIControls();
+        UIControls.initNewSheetControls();
         this.show();
     }
 
@@ -212,13 +211,13 @@ export default class Sheet {
                 this.#initVars();
                 this.#createHTML();
                 if (isNewFile) {
-                    optionListAdd({
+                    ModuleIntegrator.optionListAdd({
                         name: this.#name,
                         id: this.#id
                     });
                 }
                 if (this.#id === 0 || !isNewFile) {
-                    updateVarsOfSheet(this.#id, true);
+                    ModuleIntegrator.updateVarsOfSheet(this.#id, true);
                 }
             }
         });
