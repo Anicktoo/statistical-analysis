@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[233],{693:(e,t,a)=>{a.r(t),a.d(t,{default:()=>i});const s=a.p+"f000561d4f327acaf4e7.png";var c=a(820);class i extends c.Z{static _name="Проверка корреляции";static _image=s;static getName(){return this._name}static getImage(){return this._image}}}}]);
