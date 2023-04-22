@@ -1,0 +1,87 @@
+.footer {
+    &__inner {
+        display: flex;
+
+        &::before {
+            content: "";
+            flex-shrink: 0;
+            width: 78px;
+        }
+    }
+
+    &__list {
+        display: flex;
+    }
+
+    &__item {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        margin: -1px -1px;
+        width: max-content;
+
+        &:first-child::before,
+        &::after {
+            content: "";
+            width: 1px;
+            height: 70%;
+            background-color: $third-grey;
+        }
+
+        &_selected {
+            cursor: default;
+            position: relative;
+            background-color: $white;
+            border-left: 1px solid $stroke-grey;
+            border-right: 1px solid $stroke-grey;
+            @include bold-text;
+
+            &:first-child::before {
+                all: unset;
+            }
+
+            &::after {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                content: "";
+                width: 100%;
+                min-width: 0;
+                height: 3px;
+                background-color: $main-blue;
+            }
+        }
+
+        &:not(&_selected):hover {
+            &>.footer__item-content {
+                opacity: 0.5;
+            }
+        }
+    }
+
+    &__item-content {
+        display: flex;
+        padding-top: 4px;
+        padding-bottom: 4px;
+
+        &::before,
+        &::after {
+            content: "";
+            width: 16px;
+        }
+    }
+
+    &__item-text {
+        white-space: nowrap;
+    }
+
+    &__add-sheet {
+        display: flex;
+        align-items: center;
+        padding: 4px 18px;
+
+        &:hover {
+            opacity: 0.5;
+        }
+    }
+}

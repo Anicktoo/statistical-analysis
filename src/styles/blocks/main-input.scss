@@ -1,0 +1,26 @@
+.main-input {
+    cursor: pointer;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    text-align: center;
+    border: 1px solid $second-grey;
+    border-radius: 5px;
+    padding: 1px 0 1px 0;
+    // min-width: 24px;
+    width: max-content;
+
+    &:focus-visible {
+        box-sizing: border-box;
+        border: 1px solid $focus-blue;
+        outline: 1px solid $focus-blue;
+    }
+
+    &_text {
+        cursor: auto;
+    }
+
+    &_number {
+        cursor: auto;
+    }
+}

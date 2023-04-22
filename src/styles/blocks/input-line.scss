@@ -1,0 +1,19 @@
+.input-line {
+    $gap: 15px;
+    $postGap: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: $gap;
+    width: max-content;
+
+    &__text {}
+
+    &__post {
+        margin-left: $postGap - $gap;
+    }
+
+    &_disabled {
+        @include disabled();
+    }
+}

@@ -1,0 +1,22 @@
+.main-select {
+    cursor: pointer;
+    position: relative;
+
+    select {
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        padding: 0 $right-select-padding 0 $default-input-padding;
+    }
+
+    &::after {
+        content: "";
+        pointer-events: none;
+        position: absolute;
+        top: 50%;
+        right: $default-input-padding;
+        translate: 0 $triangle-width / -2;
+        @include triangle();
+        rotate: 180deg;
+    }
+}

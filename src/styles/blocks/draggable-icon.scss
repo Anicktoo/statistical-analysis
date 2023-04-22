@@ -1,0 +1,15 @@
+.draggable-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    div,
+    &::before,
+    &::after {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 9999px;
+        background-color: $third-grey;
+    }
+}

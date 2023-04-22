@@ -48,10 +48,6 @@ export default class Sheet {
 
     createVarSettings(varID) {
         const changedVar = this.#dataVars[Number(varID.split('_')[2])]
-        // if (this.#openedVar === changedVar) {
-        //     console.log('Worked');
-        //     return;
-        // }
         changedVar.createHTML();
         this.#openedVar = changedVar;
     }
@@ -231,8 +227,6 @@ export default class Sheet {
         const idName = () => 'var' + '_' + this.#id + '_' + (i++);
         const dataVars = this.#data[0].map((_, colIndex) => getColumnVar(this.#data.map(row => row[colIndex])));
         this.#dataVars = dataVars;
-
-        console.log(this.#dataVars);
 
         function getColumnVar(column) {
             const columnData = column.slice(1);

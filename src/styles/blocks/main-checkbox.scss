@@ -1,0 +1,17 @@
+.main-checkbox {
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1em;
+    height: 1em;
+    border: 2px solid $second-grey;
+    border-radius: 2px;
+    background-color: $white;
+
+    &:checked {
+        border: 2px solid $main-blue;
+        background-color: $main-blue;
+    }
+}

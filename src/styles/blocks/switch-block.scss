@@ -1,0 +1,46 @@
+.switch-button {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 18px;
+    border-radius: 5px;
+    border: 1px solid $third-grey;
+    background-color: $second-grey;
+
+    &_up {
+        height: 30px;
+        width: 18px;
+    }
+
+    &_down {
+        height: 30px;
+        width: 18px;
+
+        * {
+            rotate: 180deg;
+        }
+    }
+
+    &_left {
+        * {
+            rotate: -90deg;
+        }
+    }
+
+    &_right {
+        * {
+            rotate: 90deg;
+        }
+    }
+
+    &:hover {
+        opacity: 0.5;
+    }
+
+    &__symbol {
+        @include triangle();
+        opacity: 0.65;
+    }
+}

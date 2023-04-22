@@ -1,0 +1,29 @@
+.collapsible {
+    &__head {
+        display: block;
+    }
+
+    &__head:has(.collapsible__input:checked)~&__content {
+        height: fit-content;
+    }
+
+    &__head:has(.collapsible__input:checked) &__symbol {
+        rotate: 180deg;
+    }
+
+    &__symbol {
+        transition: rotate $fast-animation-timing;
+        rotate: 90deg;
+        @include triangle();
+    }
+
+    &__content {
+        height: 1px;
+        overflow: hidden;
+    }
+
+    &__input {
+        display: none;
+    }
+
+}

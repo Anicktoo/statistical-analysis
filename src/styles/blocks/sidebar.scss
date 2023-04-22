@@ -1,0 +1,31 @@
+.sidebar {
+    translate: -100%;
+    z-index: 999;
+    position: absolute;
+    top: $header-height;
+    left: 0;
+    width: max-content;
+    max-width: 20rem;
+    background-color: $main-grey;
+    height: calc(100vh - #{$header-height});
+    border-right: 1px solid $stroke-grey;
+    transition: translate $animation-timing;
+
+    &__inner {
+        padding: 4px;
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    &__item {
+        padding: 8px 32px 8px 10px;
+
+        * {
+            display: none;
+        }
+    }
+}

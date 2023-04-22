@@ -54,6 +54,8 @@ class UIControls {
     };
     static modalSettingsBtns;
 
+    static errorElement;
+
     static initConstUIControls() {
         UIControls.initConstElements();
         UIControls.initConstListeners();
@@ -96,6 +98,8 @@ class UIControls {
         UIControls.varTypesSwitchBtn = UIControls.binSettings.querySelector('.switch-button');
         UIControls.modalSettings = document.querySelector('.modal-settings');
         UIControls.modalSettingsBtns = [...UIControls.modalSettings.querySelectorAll('.modal-settings__btn')];
+
+        UIControls.errorElement = document.querySelector('#error-show');
     }
 
     static initConstListeners() {
@@ -441,6 +445,19 @@ class UIControls {
         UIControls.resultsLoader.style.display = 'none';
     }
 
+    static showError(el, errorText) {
+        const rect = el.getBoundingClientRect();
+        const elX = rect.x;
+        const elY = rect.y;
+        const elW = rect.width;
+        const elH = rect.height;
+        UIControls.errorElement.style.left = elX + 'px';
+        UIControls.errorElement.style.top = elY + 'px';
+        UIControls.errorElement.style.width = elW + 'px';
+        UIControls.errorElement.style.height = elH + 'px';
+        UIControls.errorElement.setCustomValidity(errorText);
+        UIControls.errorElement.reportValidity();
+    }
 }
 
 window.UIControls = UIControls;

@@ -1,0 +1,54 @@
+.burger-menu {
+    $bar-width: 30px;
+    $bar-height: 4px;
+    $burger-gap: 6px;
+    $height: ($bar-height*3)+($burger-gap*2);
+    $x-width: ($height * 1.41421356237);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: $burger-gap;
+        width: max-content;
+
+        &::after,
+        &::before,
+        input {
+            content: '';
+            width: $bar-width;
+            height: $bar-height;
+            background-color: $main-blue;
+            border-radius: 9999px;
+            transform-origin: left center;
+            transition: opacity $animation-timing, width $animation-timing, rotate $animation-timing;
+        }
+
+        input {
+            appearance: none;
+            padding: 0;
+            margin: 0;
+            outline: 0;
+            pointer-events: none;
+        }
+
+        &:has(input:checked)::before {
+            rotate: 45deg;
+            width: $x-width;
+            translate: 0 $bar-height / -2;
+        }
+
+        &:has(input:checked)::after {
+            rotate: -45deg;
+            width: $x-width;
+            translate: 0 $bar-height / 2;
+        }
+
+        input:checked {
+            opacity: 0;
+            width: 0;
+        }
+    }
+}

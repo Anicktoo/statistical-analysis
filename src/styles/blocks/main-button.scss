@@ -1,0 +1,16 @@
+.main-button {
+    cursor: pointer;
+    border-radius: 10px;
+
+    &:hover {
+        background-color: $second-grey;
+    }
+
+    &:active {
+        background-color: $third-grey;
+    }
+
+    &_focused {
+        border: 1px solid $main-blue;
+    }
+}

@@ -1,0 +1,20 @@
+.page-header {
+    &__inner {
+        display: flex;
+        position: relative;
+        z-index: 1000;
+        height: $header-height;
+        background-color: $main-grey;
+        border-bottom: 1px solid $stroke-grey;
+        box-shadow: 0px 4px 10px $shadow;
+    }
+
+    &__burger-menu {
+        width: 58px;
+        height: 100%;
+    }
+
+    &:has(.burger-menu__content input:checked)+.sidebar {
+        translate: 0;
+    }
+}

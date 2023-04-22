@@ -1,0 +1,85 @@
+.data {
+    flex-grow: 1;
+    flex-shrink: 1;
+
+    &__container {
+        position: relative;
+        overflow: auto;
+        width: 100%;
+        height: 100%;
+        background-color: $main-grey;
+    }
+
+    &__table {
+        display: none;
+        background-color: $white;
+        border-spacing: 0px;
+        border-collapse: collapse;
+
+        th,
+        td {
+            border: 1px solid $third-grey;
+            min-width: 100px;
+            max-width: 1000px;
+            overflow: hidden;
+            width: max-content;
+            padding: 4px 8px;
+            font-size: inherit;
+            font-weight: inherit;
+            font-style: inherit;
+        }
+
+        th:first-child,
+        td:first-child {
+            min-width: 32px;
+            text-align: center;
+        }
+
+        td:first-child,
+        th {
+            background-color: $main-grey;
+        }
+
+        th {
+            border-top: none;
+        }
+
+        td {
+            white-space: nowrap;
+        }
+
+        #dataSettingsBtn {
+            cursor: pointer;
+            background-color: $white;
+        }
+
+        &_shown {
+            display: table;
+        }
+    }
+
+    &__column-header {
+        display: flex;
+        gap: 4px;
+    }
+
+    &__var-icon {
+        cursor: pointer;
+        @include single-image($type-icon-size, $type-icon-size);
+        min-width: 18px;
+    }
+
+    &__var-name {
+        white-space: nowrap;
+    }
+
+    &__footer {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 36px;
+        background-color: $main-grey;
+        border-top: 1px solid $stroke-grey;
+    }
+}

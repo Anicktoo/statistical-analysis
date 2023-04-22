@@ -1,0 +1,7 @@
+.calculation-window {
+    flex-shrink: 0;
+    width: $calculations-width;
+    display: flex;
+
+    &__element {}
+}

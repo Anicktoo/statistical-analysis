@@ -3,6 +3,7 @@ import ModuleIntegrator from '@/ModuleIntegrator';
 import DataControls from '@data/DataControls';
 import img from './img/modulePair.png';
 import AbstractModule from '@modules/AbstractModule';
+import Var from '@data/Var';
 
 export default class Module extends AbstractModule {
 
@@ -362,8 +363,6 @@ export default class Module extends AbstractModule {
                 this.#data.second = data[1];
                 this.#vars.first = vars[0];
                 this.#vars.second = vars[1];
-                console.log(this.#data);
-                console.log(this.#vars);
             }
         }
     }
@@ -372,13 +371,37 @@ export default class Module extends AbstractModule {
         if (!this.#data.first || !this.#data.second) {
             return;
         }
+        const firstVarName = this.#vars.first.getTypeName();
+        const secondVarName = this.#vars.second.getTypeName();
+        if (firstVarName !== secondVarName) {
+            UIControls.showError(this.#tableData, 'Нельзя сравнить данные разного типа');
+            return;
+        }
+        if (this.#data.first.length !== this.#data.second.length) {
+            UIControls.showError(this.#tableData, 'Выбранные наборы данных имеют разную длину');
+            return;
+        }
+
         switch (this.#testType) {
             case 'student': {
-                return this.#studentTest(alpha)
-                break;
+                if (firstVarName !== Var.Continues.name) {
+                    UIControls.showError(this.#tableData, errorText([Var.Continues.ruName, Var.Rang.ruName]));
+                    return;
+                }
+                const n = this.#studentTest(alpha);
+                if (!n || Number.isNaN(n)) {
+                    UIControls.showError(this.#tableData, 'Ошибка расчета данных');
+                }
+                return n;
             }
         }
+
+        function errorText(varTypeNameArray) {
+            return `Выбранный тест поддерживает следующий тип данных: ${varTypeNameArray.join(', ')}`;
+        }
     }
+
+    //ПРОВЕРКИ НА ПРОПУЩЕННЫЕ ЗНАЧЕНИЯ. ЧТО С НИМИ ДЕЛАТЬ???
 
     #studentTest(alpha) {
         const zAlpha = this.#altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha);
@@ -387,7 +410,7 @@ export default class Module extends AbstractModule {
         const d = Math.mean(differences);
         const sd = Math.stddiv.s(differences);
         const n = (z * sd / d) ** 2 + ((zAlpha ** 2) / 2);
-        console.log("N ", n);
+
         return n;
     }
 

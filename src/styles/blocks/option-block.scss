@@ -1,0 +1,39 @@
+.option-block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    &__sub {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        &>.radio-line:has(input:not(:checked))~.option-block__list {
+            @include disabled();
+        }
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        width: max-content;
+        gap: 8px;
+        padding-left: 16px;
+    }
+
+    &__two-column {
+        display: flex;
+        // flex-wrap: wrap;
+        gap: 16px;
+
+        &>* {
+            flex-grow: 1;
+            flex-basis: calc((100% - 16px) / 2);
+        }
+    }
+
+    &__tables {
+        display: flex;
+        gap: 22px;
+    }
+}

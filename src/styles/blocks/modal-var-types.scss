@@ -1,0 +1,157 @@
+.modal-var-types {
+    display: none;
+    $modal-width: 400px;
+    $padding-width: 16px;
+    top: 100px;
+    left: 200px;
+    background-color: $white;
+    width: $modal-width;
+    max-width: $modal-width;
+    z-index: 1002;
+
+    &__form {
+        max-width: $modal-width;
+    }
+
+    &__fieldset {
+        padding: $padding-width;
+        min-width: $modal-width;
+        width: $modal-width;
+        max-width: $modal-width;
+    }
+
+    &__name-line {
+        width: 100%;
+
+        input {
+            flex-grow: 1;
+        }
+    }
+
+    &__var-choose {
+        &:has(.modal-var-types__rang:checked)~.modal-var-types__rang-settings {
+            display: block;
+        }
+
+        &:has(.modal-var-types__binary:checked)~.modal-var-types__binary-settings {
+            display: block;
+        }
+    }
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px 4px 4px;
+        border-radius: 5px;
+        width: max-content;
+    }
+
+    &__rang-settings {
+        display: none;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    &__rang-settings-inner {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    &__rang-table {
+        display: flex;
+        gap: 4px;
+        flex: 1 1;
+        max-width: 100%;
+    }
+
+    &__rang-table-body {
+        width: 100%;
+        min-height: 16vh;
+        max-height: 16vh;
+        // resize: vertical;
+        height: 100%;
+    }
+
+    &__img {
+        @include single-image($type-icon-size, $type-icon-size);
+
+        &_nominal {
+            background-image: url("../img/table/scaleNominal.png");
+        }
+
+        &_continues {
+            background-image: url("../img/table/scaleContinues.png");
+        }
+
+        &_rang {
+            background-image: url("../img/table/scaleRang.png");
+        }
+
+        &_binary {
+            background-image: url("../img/table/scaleBinary.png");
+        }
+    }
+
+    &__level-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: max-content;
+        height: max-content;
+    }
+
+    &__binary-settings {
+        display: none;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    &__binary-settings-inner {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    &__binary-table {
+        $gap: 4px;
+        display: flex;
+        gap: $gap;
+        flex: 1 1;
+        max-width: 100%;
+        order: 3;
+
+        &:first-child {
+            order: 1;
+        }
+
+        &:nth-child(2):has(input:checked)~.modal-var-types__switch-container>.switch-button {
+            rotate: 180deg;
+        }
+    }
+
+    &__binary-table-body {
+        width: 100%;
+        flex: 2 0 16vh;
+    }
+
+    &__switch-container {
+        display: flex;
+        align-items: center;
+        order: 2;
+    }
+
+    &__btn-container {
+        display: flex;
+        gap: 16px;
+    }
+
+    &__btn {
+        padding: 8px 10px;
+    }
+}

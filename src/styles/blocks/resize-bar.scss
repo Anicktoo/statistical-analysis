@@ -1,0 +1,11 @@
+.resize-bar {
+    min-width: 22px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: w-resize;
+    border-left: 1px solid $stroke-grey;
+    border-right: 1px solid $stroke-grey;
+    background-color: $main-grey;
+}

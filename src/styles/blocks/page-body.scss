@@ -1,0 +1,15 @@
+.page-body {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - #{$header-height});
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    overflow: hidden;
+
+    &__item {
+        height: 100%;
+        overflow: hidden;
+    }
+}

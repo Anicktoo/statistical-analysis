@@ -14,7 +14,6 @@ export default class Settings {
     #decimalDelimiter;
 
     constructor() {
-        console.log("setGlobalSettings ", Settings.#globalSettings);
         this.init(Settings.#globalSettings);
     }
 

@@ -7,22 +7,27 @@ import rangImg from '@img/table/scaleRang.png';
 export default class Var {
     static Binary = {
         name: 'binary',
+        ruName: 'дихотомический',
         img: binaryImg,
     };
     static Nominal = {
         name: 'nominal',
+        ruName: 'номинативный',
         img: nominalImg,
     };
     static Continues = {
         name: 'continues',
+        ruName: 'количественный',
         img: continuesImg,
     };
     static Rang = {
         name: 'rang',
+        ruName: 'ранговый',
         img: rangImg,
     };
 
     #typeName;
+    #ruTypeName;
     #name;
     #id;
     #img;
@@ -34,6 +39,7 @@ export default class Var {
     constructor(type, id, set, name, onlyNumbers) {
         this.#typeName = type.name;
         this.#img = type.img;
+        this.#ruTypeName = type.ruName;
         this.#id = id;
         this.#name = name;
         this.#onlyNumbers = onlyNumbers;
@@ -168,5 +174,9 @@ export default class Var {
 
     getTypeName() {
         return this.#typeName;
+    }
+
+    getRuTypeName() {
+        return this.#ruTypeName;
     }
 }

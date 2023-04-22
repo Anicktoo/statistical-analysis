@@ -1,0 +1,91 @@
+.parameters {
+    $extra-img-size: 18px;
+    $extra-size: 24px;
+    min-width: $parameters-width;
+    max-width: $parameters-width;
+    background-color: $main-grey;
+
+    &__container {
+        overflow-x: hidden;
+        overflow-y: auto;
+        width: 100%;
+        height: 100%;
+    }
+
+    &__item {
+        border-bottom: 1px solid $third-grey;
+
+        &:has(.parameters__hide-button > input:checked) .parameters__content,
+        &:has(.parameters__hide-button > input:checked) .parameters__title-container {
+            opacity: $hideOpacity;
+        }
+    }
+
+    &__head {
+        padding: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__title-container {
+        display: flex;
+        align-items: center;
+        gap: 10px
+    }
+
+    &__title {}
+
+    &__extra-container {
+        display: flex;
+    }
+
+    &__extra-item {
+        border: none;
+        @include single-image($extra-size, $extra-size);
+        background-size: $extra-img-size;
+        border-radius: 999px;
+    }
+
+    &__edit-button {
+        background-image: url("../img/extra/edit.png");
+    }
+
+    &__hide-button {
+        background-image: url("../img/extra/hide.png");
+
+        input {
+            display: none;
+        }
+
+        &:has(input:checked) {
+            background-image: url("../img/extra/unhide.png");
+        }
+    }
+
+    &__duplicate-button {
+        background-image: url("../img/extra/duplicate.png");
+    }
+
+    &__delete-button {
+        position: relative;
+
+        &::after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: url("../img/extra/delete.png");
+            @include single-image(100%, 100%);
+            background-size: $extra-img-size;
+            transform: rotate(45deg);
+        }
+    }
+
+    &__content {
+        padding: 8px 16px 16px 16px;
+    }
+
+
+}
