@@ -1,36 +1,4 @@
-@import "./reset.scss";
-@import './vars.scss';
-@import './typography.scss';
-
-@import './blocks/burger-menu.scss';
-@import './blocks/main-button.scss';
-@import './blocks/modules.scss';
-@import './blocks/sidebar.scss';
-@import './blocks/page-header.scss';
-@import './blocks/fade.scss';
-@import './blocks/page-body.scss';
-@import './blocks/data.scss';
-@import './blocks/footer.scss';
-@import './blocks/calculation-window.scss';
-@import './blocks/resize-bar.scss';
-@import './blocks/draggable-icon.scss';
-@import './blocks/parameters.scss';
-@import './blocks/collapsible.scss';
-@import './blocks/results.scss';
-@import './blocks/loader.scss';
-@import './blocks/main-input.scss';
-@import './blocks/main-select.scss';
-@import './blocks/main-radio.scss';
-@import './blocks/main-checkbox.scss';
-@import './blocks/input-line.scss';
-@import './blocks/radio-line.scss';
-@import './blocks/option-block.scss';
-@import './blocks/switch-block.scss';
-@import './blocks/var-table.scss';
-@import './blocks/modal-window.scss';
-@import './blocks/modal-var-types.scss';
-@import './blocks/modal-settings.scss';
-@import './blocks/error-show.scss';
+@import '../../../styles/vars.scss';
 
 .independent-sample {
     &__tables {}

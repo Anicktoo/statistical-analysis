@@ -14,12 +14,28 @@ export default class Module extends AbstractModule {
         resultsContainer: document.querySelector('.results__container'),
         mainHypSelect: document.querySelector('#main-hypothesis')
     }
+    static testText = {
+        'student': 'Парный тест Стьюдента',
+        'wilcoxon': 'Тест Уилкоксона',
+        'sign': 'Тест знаков'
+    }
+    static altHypText = {
+        'both': 'Двусторонняя проверка альтернативной гипотезы (M2 ≠ M1)',
+        'right': 'Правосторонняя проверка альтернативной гипотезы (M2 &#62; M1)',
+        'left': 'Левосторонняя проверка альтернативной гипотезы (M2 &#60; M1)',
+
+    }
     #id;
     #data = {
         first: undefined,
         second: undefined
     }
     #power;
+    #resultsTableData = {
+        z: undefined,
+        d: undefined,
+        sd: undefined,
+    }
     #testType;
     #altHypTest;
     #vars = {
@@ -27,12 +43,14 @@ export default class Module extends AbstractModule {
         second: undefined
     }
 
+    #hypName;
     #element
     #form;
     #formSheet;
     #sheetSelect;
     #tableData;
-    #secondTableItem
+    #secondTableItem;
+    #resultBlock;
 
     constructor(id) {
         super();
@@ -45,6 +63,10 @@ export default class Module extends AbstractModule {
 
     static getImage() {
         return this.#image;
+    }
+
+    getName() {
+        return this.#hypName;
     }
 
     addListeners(element) {
@@ -212,58 +234,7 @@ export default class Module extends AbstractModule {
                 </div>
             </div>
         </div>`;
-        const htmlRes = `
-        <h2>Гипотеза 1</h2>
-        <div class="results__block-inner">
-            <p>Основная гипотеза</p>
-            <p>Планируемая мощность: 95%</p>
-            <p>Сравнение парных выборок</p>
-            <p>Тест Стьюдента</p>
-            <table class="results__table">
-                <caption><small>Правосторонняя проверка альтернативной гипотезы (M2 > M1)</small>
-                </caption>
-                <thead>
-                    <tr>
-                        <th>
-                            M1
-                        </th>
-                        <th>
-                            M2
-                        </th>
-                        <th>
-                            t
-                        </th>
-                        <th>
-                            df
-                        </th>
-                        <th>
-                            p
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            Столбец1
-                        </td>
-                        <td>
-                            Столбец2
-                        </td>
-                        <td>
-                            4.232
-                        </td>
-                        <td>
-                            3
-                        </td>
-                        <td>
-                            0.02
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>`;
         newHyp.innerHTML = htmlParam;
-        newRes.innerHTML = htmlRes;
         newOption.textContent = name;
         parametersContainer.appendChild(newHyp);
         resultsContainer.appendChild(newRes);
@@ -274,6 +245,8 @@ export default class Module extends AbstractModule {
         this.#sheetSelect = newHyp.querySelector('.sheet-select');
         this.#tableData = newHyp.querySelector('.target-table-data');
         this.#secondTableItem = this.#element.querySelector('.target-table-data');
+        this.#resultBlock = newRes;
+        this.#hypName = name;
         return { newHyp, newRes };
     }
 
@@ -336,15 +309,14 @@ export default class Module extends AbstractModule {
         return this.#sheetSelect;
     }
 
-    setSettings(power) {
+    setSettings() {
         const formData = new FormData(this.#form);
         const tableData = this.#tableData;
         this.#testType = formData.get('test-type');
         this.#altHypTest = formData.get('hyp-check');
-        if (power) {
-            this.#power = power;
-        }
-
+        this.#resultsTableData.z = null;
+        this.#resultsTableData.d = null;
+        this.#resultsTableData.sd = null;
         const data = [];
         this.#data.first = null;
         this.#data.second = null;
@@ -367,7 +339,27 @@ export default class Module extends AbstractModule {
         }
     }
 
-    getN(alpha) {
+    getN(alpha, power) {
+        if (!alpha || Number.isNaN(alpha) || typeof alpha !== 'number') {
+            return null;
+        }
+        if (!power || Number.isNaN(power) || typeof power !== 'number') {
+            return;
+        }
+        return this.#testChoose(false, alpha, power);
+    }
+
+    setStatPower(alpha, sampleSize) {
+        if (!alpha || Number.isNaN(alpha) || typeof alpha !== 'number') {
+            return null;
+        }
+        if (!sampleSize || Number.isNaN(sampleSize) || typeof sampleSize !== 'number') {
+            return;
+        }
+        this.#power = this.#testChoose(true, alpha, sampleSize);
+    }
+
+    #testChoose(isInv, alpha, arg) {
         if (!this.#data.first || !this.#data.second) {
             return;
         }
@@ -382,19 +374,26 @@ export default class Module extends AbstractModule {
             return;
         }
 
+        let returnValue;
         switch (this.#testType) {
             case 'student': {
                 if (firstVarName !== Var.Continues.name) {
-                    UIControls.showError(this.#tableData, errorText([Var.Continues.ruName, Var.Rang.ruName]));
+                    UIControls.showError(this.#tableData, errorText([Var.Continues.ruName]));
                     return;
                 }
-                const n = this.#studentTest(alpha);
-                if (!n || Number.isNaN(n)) {
-                    UIControls.showError(this.#tableData, 'Ошибка расчета данных');
+                if (isInv) {
+                    returnValue = this.#studentTestInv(alpha, arg);
                 }
-                return n;
+                else {
+                    returnValue = this.#studentTest(alpha, arg);
+                }
             }
         }
+
+        if (!returnValue || Number.isNaN(returnValue)) {
+            UIControls.showError(this.#tableData, 'Ошибка расчета данных');
+        }
+        return returnValue;
 
         function errorText(varTypeNameArray) {
             return `Выбранный тест поддерживает следующий тип данных: ${varTypeNameArray.join(', ')}`;
@@ -403,18 +402,91 @@ export default class Module extends AbstractModule {
 
     //ПРОВЕРКИ НА ПРОПУЩЕННЫЕ ЗНАЧЕНИЯ. ЧТО С НИМИ ДЕЛАТЬ???
 
-    #studentTest(alpha) {
+    #studentTest(alpha, power) {
         const zAlpha = this.#altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha);
-        const z = zAlpha + Math.norminv(100 - this.#power);
+        const z = zAlpha + Math.norminv(100 - power);
         const differences = this.#data.first.map((el, i) => el - this.#data.second[i]);
-        const d = Math.mean(differences);
+        const d = Math.abs(Math.mean(differences));
         const sd = Math.stddiv.s(differences);
         const n = (z * sd / d) ** 2 + ((zAlpha ** 2) / 2);
+
+        this.#resultsTableData.z = z;
+        this.#resultsTableData.d = d;
+        this.#resultsTableData.sd = sd;
 
         return n;
     }
 
-    setStatPower(sampleSize) {
+    #studentTestInv(alpha, n) {
+        const zAlpha = this.#altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha);
+        const differences = this.#data.first.map((el, i) => el - this.#data.second[i]);
+        const d = Math.abs(Math.mean(differences));
+        const sd = Math.stddiv.s(differences);
+        let tmp = Math.sqrt(n - ((zAlpha ** 2) / 2));
+        const z = (tmp * d) / sd * -1;
+        const zB = z - zAlpha;
+        const power = 100 - Math.normdist(zB);
 
+        this.#resultsTableData.z = z;
+        this.#resultsTableData.d = d;
+        this.#resultsTableData.sd = sd;
+
+        return power;
+    }
+
+    updateResultsHtml(isMain) {
+        const name = this.#hypName;
+        const powerString = isMain ? `<p><b>Основная гипотеза</b></p>` : `<p>Статистическая мощность: ${Number.resultForm(this.#power)}</p>`;
+        const htmlRes = `
+        <h2>${name}</h2>
+        <div class="results__block-inner">
+            ${powerString}
+            <p>Сравнение парных выборок</p>
+            <p>${Module.testText[this.#testType]}</p>
+            <table class="results__table">
+                <caption><small>${Module.altHypText[this.#altHypTest]}</small>
+                </caption>
+                <thead>
+                    <tr>
+                        <th>
+                            M1
+                        </th>
+                        <th>
+                            M2
+                        </th>
+                        <th>
+                            d mean
+                        </th>
+                        <th>
+                            sd
+                        </th>
+                        <th>
+                            z
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            ${String.resultForm(this.#vars.first?.getName())}
+                        </td>
+                        <td>
+                            ${String.resultForm(this.#vars.second?.getName())}
+                        </td>
+                        <td>
+                            ${Number.resultForm(this.#resultsTableData.d)}
+                        </td>
+                        <td>
+                            ${Number.resultForm(this.#resultsTableData.sd)}
+                        </td>
+                        <td>
+                            ${Number.resultForm(this.#resultsTableData.z)}
+                        </td>
+                    </tr >
+                </tbody >
+            </table >
+        </div > `;
+
+        this.#resultBlock.innerHTML = htmlRes;
     }
 }

@@ -10,6 +10,7 @@ $stroke-grey: #5C5C5C;
 $shadow: rgba(0, 0, 0, 0.19);
 $fade: rgba(47, 47, 47, 0.5);
 
+$line-height: 19px;
 $type-icon-size: 18px;
 $animation-timing: 200ms ease-in-out;
 $fast-animation-timing: 100ms ease-in-out;
@@ -21,7 +22,8 @@ $triangle-height: 10px;
 $default-input-padding: 11px;
 $right-select-padding: $default-input-padding * 2+$triangle-width;
 $hideOpacity: 0.3;
-
+$varTableBodyPadding: 4px;
+$varTableItemPadding: 2px;
 
 @mixin single-image($width, $height) {
     width: $width;
@@ -46,6 +48,17 @@ $hideOpacity: 0.3;
         pointer-events: none;
     }
 }
+
+// @mixin enabled {
+//     cursor: unset;
+//     pointer-events: auto;
+//     opacity: inherit;
+
+//     * {
+//         cursor: auto;
+//         pointer-events: auto;
+//     }
+// }
 
 @mixin custom-scrollbar {
     &::-webkit-scrollbar {

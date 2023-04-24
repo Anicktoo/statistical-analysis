@@ -61,8 +61,8 @@
                                 <div class="option-block">
                                     <label class="input-line">
                                         Название проекта
-                                        <input type="text" class="main-input main-input_text" name="name"
-                                            value="Результаты" form="module-option-form_glob">
+                                        <input type="text" class="main-input main-input_text form-change-trigger"
+                                            name="name" value="Результаты" form="module-option-form_glob">
                                     </label>
                                     <label class="input-line">
                                         FWER
@@ -92,6 +92,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </section>
             <div class="calculation-window__element resize-bar">
@@ -102,67 +103,17 @@
             <section class="calculation-window__element results">
                 <div class="loader"></div>
                 <div class="results__container">
-                    <div class="results__block">
+                    <div id="global-results" class="results__block">
                         <h1 id="results-name">Результаты</h1>
                         <div class="results__block-inner">
-                            <p>FWER: <span class="results-FWER">5.0</span> %</p>
-                            <p>Количество проверяемых гипотез: <span class="results-number">0</span></p>
-                            <p>Уровень значимости α: <span class="results-importance">-</span></p>
-                            <p>Основная гипотеза: <span class="results-main-hyp">-</span></p>
-                            <p>Требуемый размер выборки: <span class="results-sample-size">-</span></p>
+                            <p>FWER: <span id="results-FWER">-</span> %</p>
+                            <p>Количество проверяемых гипотез: <span id="results-number">0</span></p>
+                            <p>Уровень значимости α: <span id="results-importance">-</span></p>
+                            <p>Основная гипотеза: <span id="results-main-hyp">-</span></p>
+                            <p>Планируемая мощность основной гипотезы: <span id="results-power">-</span> %</p>
+                            <p>Требуемый размер выборки: <span id="results-sample-size">-</span></p>
                         </div>
                     </div>
-                    <!-- <div class="results__block">
-                        <h2>Гипотеза 1</h2>
-                        <div class="results__block-inner">
-                            <p>Основная гипотеза</p>
-                            <p>Планируемая мощность: 95%</p>
-                            <p>Сравнение парных выборок</p>
-                            <p>Тест Стьюдента</p>
-                            <table class="results__table">
-                                <caption><small>Правосторонняя проверка альтернативной гипотезы (M2 > M1)</small>
-                                </caption>
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            M1
-                                        </th>
-                                        <th>
-                                            M2
-                                        </th>
-                                        <th>
-                                            t
-                                        </th>
-                                        <th>
-                                            df
-                                        </th>
-                                        <th>
-                                            p
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            Столбец1
-                                        </td>
-                                        <td>
-                                            Столбец2
-                                        </td>
-                                        <td>
-                                            4.232
-                                        </td>
-                                        <td>
-                                            3
-                                        </td>
-                                        <td>
-                                            0.02
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div> -->
                 </div>
             </section>
         </section>

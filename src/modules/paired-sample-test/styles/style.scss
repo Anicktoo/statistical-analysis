@@ -4,10 +4,6 @@
 
     &__tables:has(.target-table-data input:checked) .switch-button {
         rotate: 180deg;
-
-        .switch-button__direction {
-            flex-shrink: 1;
-        }
     }
 
     &__sheet-select {

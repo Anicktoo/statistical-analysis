@@ -17,7 +17,7 @@
         align-items: flex-start;
         // min-width: 225px;
         // min-height: 130px;
-        padding: 4px;
+        padding: $varTableBodyPadding;
         gap: $inner-gap-width;
         overflow: auto;
         background-color: $white;
@@ -32,7 +32,7 @@
         display: flex;
         align-items: center;
         gap: 4px;
-        padding: 2px 10px 2px 2px;
+        padding: $varTableItemPadding 10px $varTableItemPadding $varTableItemPadding;
         border-radius: 5px;
         border: 1px solid transparent;
         min-width: 100%;

@@ -30,6 +30,16 @@ class UIControls {
     static results;
     static resultsContainer;
     static resultsLoader;
+
+    static resBlock;
+    static resFwer;
+    static resNumber;
+    static resImportance;
+    static resMainHyp;
+    static resPower;
+    static resSampleSize;
+
+
     static modalVarType;
     static varIcons = {
         old: [],
@@ -53,7 +63,6 @@ class UIControls {
         new: []
     };
     static modalSettingsBtns;
-
     static errorElement;
 
     static initConstUIControls() {
@@ -81,6 +90,15 @@ class UIControls {
         UIControls.results = UIControls.calculationWindow.querySelector('.results');
         UIControls.resultsLoader = UIControls.results.querySelector('.loader');
         UIControls.resultsContainer = UIControls.results.querySelector('.results__container');
+
+        UIControls.resBlock = UIControls.resultsContainer.querySelector('#global-results');
+        UIControls.resName = UIControls.resBlock.querySelector('#results-name');
+        UIControls.resFwer = UIControls.resBlock.querySelector('#results-FWER');
+        UIControls.resNumber = UIControls.resBlock.querySelector('#results-number');
+        UIControls.resImportance = UIControls.resBlock.querySelector('#results-importance');
+        UIControls.resMainHyp = UIControls.resBlock.querySelector('#results-main-hyp');
+        UIControls.resPower = UIControls.resBlock.querySelector('#results-power');
+        UIControls.resSampleSize = UIControls.resBlock.querySelector('#results-sample-size');
 
         UIControls.parameters = UIControls.calculationWindow.querySelector('.parameters');
         UIControls.parametersContainer = UIControls.parameters.querySelector('.parameters__container');

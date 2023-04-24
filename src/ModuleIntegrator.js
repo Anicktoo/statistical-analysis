@@ -16,6 +16,7 @@ export default class ModuleIntegrator {
         hypCounter: 0,
         sampleSize: undefined,
         update: null,
+
         getAlpha() {
             if (this.hypCounter) {
                 return this.FWER / this.hypCounter;
@@ -23,7 +24,11 @@ export default class ModuleIntegrator {
             else {
                 return '-';
             }
-        }
+        },
+        getMainHypName() {
+            const main = ModuleIntegrator.hypotheses[this.mainHypId];
+            return main && main.hyp ? main.hyp.getName() : '-';
+        },
     }
 
 
@@ -135,7 +140,7 @@ export default class ModuleIntegrator {
         const hypotheses = ModuleIntegrator.hypotheses;
         const globalSettings = ModuleIntegrator.globalSettings;
         let updateAllResults = false;
-        const mainHyp = hypotheses[globalSettings.mainHypId];
+        let mainHyp = hypotheses[globalSettings.mainHypId];
 
         if (globalSettings.update) {
             ModuleIntegrator.setGlobalSettings();
@@ -145,6 +150,7 @@ export default class ModuleIntegrator {
             else {
                 globalSettings.sampleSize = '-';
             }
+            mainHyp = hypotheses[globalSettings.mainHypId];
             globalSettings.update = false;
             updateAllResults = true;
         }
@@ -153,17 +159,21 @@ export default class ModuleIntegrator {
             updateAllResults = true;
         }
 
+        if (updateAllResults) {
+            ModuleIntegrator.updateResultsGlob();
+            mainHyp?.hyp.updateResultsHtml(true);
+        }
+
+        const alpha = globalSettings.getAlpha();
         for (let i = 0; i < hypotheses.length; i++) {
             const { hyp, update } = hypotheses[i];
 
-            if ((updateAllResults || update) && hyp !== mainHyp) {
+            if ((updateAllResults || update) && hyp !== mainHyp.hyp) {
                 console.log('norm ' + i);
-                if (update) {
-                    hyp.setSettings();
-                }
-                hyp.setStatPower();
+                hyp.setSettings();
+                hyp.setStatPower(alpha, globalSettings.sampleSize);
                 hypotheses[i].update = false;
-                ModuleIntegrator.updateResults();
+                hyp.updateResultsHtml(false);
             }
         }
     }
@@ -173,22 +183,31 @@ export default class ModuleIntegrator {
         const globalSettings = ModuleIntegrator.globalSettings;
         const formData = new FormData(globalSettings.form);
         globalSettings.name = formData.get('name');
-        globalSettings.FWER = formData.get('FWER');
+        globalSettings.FWER = Number(formData.get('FWER'));
         globalSettings.mainHypId = Number(formData.get('mainHypothesis'));
-        globalSettings.power = formData.get('power');
+        globalSettings.power = Number(formData.get('power'));
     }
 
     static setMainSettings() {
         console.log('main');
         const globalSettings = ModuleIntegrator.globalSettings;
         const mainHyp = ModuleIntegrator.hypotheses[globalSettings.mainHypId];
-        mainHyp.hyp.setSettings(globalSettings.power);
-        globalSettings.sampleSize = mainHyp.hyp.getN(globalSettings.getAlpha());
+        mainHyp.hyp.setSettings();
+        globalSettings.sampleSize = mainHyp.hyp.getN(globalSettings.getAlpha(), globalSettings.power);
         mainHyp.update = false;
+
     }
 
-    static updateResults(id) {
+    static updateResultsGlob() {
+        const globalSettings = ModuleIntegrator.globalSettings;
 
+        UIControls.resName.textContent = globalSettings.name;
+        UIControls.resFwer.textContent = Number.resultForm(globalSettings.FWER);
+        UIControls.resNumber.textContent = globalSettings.hypCounter;
+        UIControls.resImportance.textContent = globalSettings.getAlpha();
+        UIControls.resMainHyp.textContent = globalSettings.getMainHypName();
+        UIControls.resPower.textContent = Number.resultForm(globalSettings.power);
+        UIControls.resSampleSize.textContent = Number.resultForm(globalSettings.sampleSize);
     }
 }
 
