@@ -14,12 +14,18 @@ export default class ModuleIntegrator {
         mainHypId: undefined,
         power: undefined,
         hypCounter: 0,
+        preciseSampleSize: undefined,
         sampleSize: undefined,
         update: null,
 
-        getAlpha() {
+        getAlpha(asString = true) {
             if (this.hypCounter) {
-                return this.FWER / this.hypCounter;
+                if (asString) {
+                    return Math.roundGOST(this.FWER / this.hypCounter);
+                }
+                else {
+                    return this.FWER / this.hypCounter;
+                }
             }
             else {
                 return '-';
@@ -164,7 +170,7 @@ export default class ModuleIntegrator {
             mainHyp?.hyp.updateResultsHtml(true);
         }
 
-        const alpha = globalSettings.getAlpha();
+        const alpha = globalSettings.getAlpha(false);
         for (let i = 0; i < hypotheses.length; i++) {
             const { hyp, update } = hypotheses[i];
 
@@ -179,23 +185,25 @@ export default class ModuleIntegrator {
     }
 
     static setGlobalSettings() {
-        console.log('glob');
         const globalSettings = ModuleIntegrator.globalSettings;
         const formData = new FormData(globalSettings.form);
         globalSettings.name = formData.get('name');
         globalSettings.FWER = Number(formData.get('FWER'));
+        if (globalSettings.FWER === 0) {
+            UIControls.showError(UIControls.FWERInput, 'FWER не может принимать нулевое значение');
+        }
         globalSettings.mainHypId = Number(formData.get('mainHypothesis'));
         globalSettings.power = Number(formData.get('power'));
     }
 
     static setMainSettings() {
-        console.log('main');
         const globalSettings = ModuleIntegrator.globalSettings;
         const mainHyp = ModuleIntegrator.hypotheses[globalSettings.mainHypId];
         mainHyp.hyp.setSettings();
-        globalSettings.sampleSize = mainHyp.hyp.getN(globalSettings.getAlpha(), globalSettings.power);
+        const n = mainHyp.hyp.getN(globalSettings.getAlpha(false), globalSettings.power);
+        globalSettings.preciseSampleSize = n;
+        globalSettings.sampleSize = Math.ceil(n);
         mainHyp.update = false;
-
     }
 
     static updateResultsGlob() {
@@ -207,6 +215,7 @@ export default class ModuleIntegrator {
         UIControls.resImportance.textContent = globalSettings.getAlpha();
         UIControls.resMainHyp.textContent = globalSettings.getMainHypName();
         UIControls.resPower.textContent = Number.resultForm(globalSettings.power);
+        UIControls.resSampleSizePrecise.textContent = Number.resultForm(globalSettings.preciseSampleSize, false);
         UIControls.resSampleSize.textContent = Number.resultForm(globalSettings.sampleSize);
     }
 }

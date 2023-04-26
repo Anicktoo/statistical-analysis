@@ -24,6 +24,7 @@ class UIControls {
     static parameters;
     static parametersContainer;
     static parametersGlobItem;
+    static FWERInput;
     static mainHypSelect;
 
     static resizeBarsEl = [];
@@ -37,6 +38,7 @@ class UIControls {
     static resImportance;
     static resMainHyp;
     static resPower;
+    static resSampleSizePrecise;
     static resSampleSize;
 
 
@@ -99,10 +101,12 @@ class UIControls {
         UIControls.resMainHyp = UIControls.resBlock.querySelector('#results-main-hyp');
         UIControls.resPower = UIControls.resBlock.querySelector('#results-power');
         UIControls.resSampleSize = UIControls.resBlock.querySelector('#results-sample-size');
+        UIControls.resSampleSizePrecise = UIControls.resBlock.querySelector('#results-sample-size-precise');
 
         UIControls.parameters = UIControls.calculationWindow.querySelector('.parameters');
         UIControls.parametersContainer = UIControls.parameters.querySelector('.parameters__container');
         UIControls.parametersGlobItem = UIControls.parameters.querySelector('#parameters__item_glob');
+        UIControls.FWERInput = UIControls.parametersGlobItem.querySelector('#FWER-input');
         UIControls.mainHypSelect = UIControls.parametersContainer.querySelector('#main-hypothesis');
 
         UIControls.modalVarType = document.querySelector('.modal-var-types');
@@ -349,8 +353,47 @@ class UIControls {
             ModuleIntegrator.refreshVarsOfHyp(id, elementFormSheets);
         });
 
+        // manual input listener
+
+        const manualInput = element.querySelector('.manual-input-on');
+        const dataTables = element.querySelector('.option-block__tables');
+        const testTypeBlock = element.querySelector('.option-block__test-type');
+        manualInput?.addEventListener('click', () => {
+            const testName = testTypeBlock.querySelector('input:checked').value;
+            console.log(testName);
+            const manualEllement = element.querySelector(`.option-block__${testName}`);
+            manualEllement?.classList.remove('option-block_hidden');
+            dataTables.classList.add('option-block_hidden');
+        });
+
+        const manualInputOff = element.querySelector('.manual-input-off');
+        const manualEllements = [...element.querySelectorAll(`.option-block__manual-input`)];
+        manualInputOff?.addEventListener('click', () => {
+            hideAllManualOptionBlocks();
+            dataTables.classList.remove('option-block_hidden');
+        });
+
+        if (testTypeBlock) {
+            const testTypeInputs = [...testTypeBlock.querySelectorAll('input')];
+            testTypeInputs.forEach((el) => {
+                el.addEventListener('click', () => {
+                    if (manualInput.checked) {
+                        hideAllManualOptionBlocks();
+                        const manualEllement = element.querySelector(`.option-block__${el.value}`);
+                        manualEllement.classList.remove('option-block_hidden');
+                    }
+                });
+            });
+        }
+
         if (moduleCallbackFunction) {
             moduleCallbackFunction();
+        }
+
+        function hideAllManualOptionBlocks() {
+            manualEllements.forEach((el) => {
+                el.classList.add('option-block_hidden');
+            });
         }
     }
 

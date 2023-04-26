@@ -23,7 +23,6 @@
 
     &__two-column {
         display: flex;
-        // flex-wrap: wrap;
         gap: 16px;
 
         &>* {
@@ -35,5 +34,9 @@
     &__tables {
         display: flex;
         gap: 22px;
+    }
+
+    &_hidden {
+        display: none;
     }
 }

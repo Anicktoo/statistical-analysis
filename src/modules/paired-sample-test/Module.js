@@ -33,10 +33,18 @@ export default class Module extends AbstractModule {
     #power;
     #resultsTableData = {
         z: undefined,
-        d: undefined,
-        sd: undefined,
+        student: {
+            d: undefined,
+            sd: undefined,
+        },
+        sign: {
+            p0: undefined,
+            p1: undefined,
+            p2: undefined,
+        }
     }
     #testType;
+    #inputType;
     #altHypTest;
     #vars = {
         first: undefined,
@@ -49,7 +57,6 @@ export default class Module extends AbstractModule {
     #formSheet;
     #sheetSelect;
     #tableData;
-    #secondTableItem;
     #resultBlock;
 
     constructor(id) {
@@ -73,7 +80,7 @@ export default class Module extends AbstractModule {
         const tables = element.querySelector('.paired-sample__tables');
         const switchBtn = tables.querySelector('.switch-button');
         const firstTable = tables.querySelector('.paired-sample__table-body');
-        const secondTableItem = tables.querySelector('.target-table-data');
+        const tableData = tables.querySelector('.target-table-data');
 
         const insertChild = (item, toTable) => {
             const nextChild = toTable.querySelector('.var-table__anchor_' + item.dataset.varId);
@@ -89,21 +96,21 @@ export default class Module extends AbstractModule {
             const checkedItem = checkedInput.parentElement;
             const parentOfItem = checkedItem.parentElement;
 
-            if (parentOfItem.isSameNode(secondTableItem)) {
+            if (parentOfItem.isSameNode(tableData)) {
                 parentOfItem.removeChild(checkedItem);
                 insertChild(checkedItem, firstTable);
             }
             else {
-                if (secondTableItem.children.length === 2) {
-                    // const removed = secondTableItem.removeChild(secondTableItem.firstElementChild);
+                if (tableData.children.length === 2) {
+                    // const removed = tableData.removeChild(tableData.firstElementChild);
                     // insertChild(removed, firstTable);
                     return;
                 }
                 parentOfItem.removeChild(checkedItem);
-                secondTableItem.appendChild(checkedItem);
+                tableData.appendChild(checkedItem);
             }
 
-            ModuleIntegrator.setSettings(this.#id, this.#form, secondTableItem);
+            ModuleIntegrator.setSettings(this.#id, this.#form, tableData);
         });
     }
 
@@ -149,13 +156,43 @@ export default class Module extends AbstractModule {
                         Тип ввода
                         <div class="option-block__list">
                             <label class="radio-line">
-                                <input class="main-radio form-change-trigger" type="radio" name="input-type" value="data" form="module-option-form_${this.#id}"
+                                <input class="main-radio form-change-trigger manual-input-off" type="radio" name="input-type" value="data" form="module-option-form_${this.#id}"
                                     checked>
                                 <span>Вычисление по данным</span>
                             </label>
                             <label class="radio-line">
-                                <input class="main-radio form-change-trigger" type="radio" name="input-type" value="manual" form="module-option-form_${this.#id}">
+                                <input class="main-radio form-change-trigger manual-input-on" type="radio" name="input-type" value="manual" form="module-option-form_${this.#id}">
                                 <span>Ввести величину эффекта</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="option-block__sub option-block__manual-input option-block__student option-block_hidden">
+                        Введите параметры:
+                        <div class="option-block__list">
+                            <label class="input-line">
+                                Средняя разность (d):
+                                <input type="number" class="main-input main-input_number form-change-trigger" name="d" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
+                            </label>
+                            <label class="input-line">
+                                Стандартное отклонение (sd):
+                                <input type="number" class="main-input main-input_number form-change-trigger" name="sd" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="option-block__sub option-block__manual-input option-block__sign option-block_hidden">
+                        Введите параметры:
+                        <div class="option-block__list">
+                            <label class="input-line">
+                                <span>Доля нулевых разностей (&#961;<sub>&#965;</sub>):</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger" name="zero" value="0" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
+                            </label>
+                            <label class="input-line">
+                                <span>Доля положительных разностей (&#961;<sub>1</sub>):</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger" name="positive" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
+                            </label>
+                            <label class="input-line">
+                                <span>Доля отрицательных разностей (&#961;<sub>2</sub>):</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger" name="negative" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
                             </label>
                         </div>
                     </div>
@@ -189,7 +226,7 @@ export default class Module extends AbstractModule {
                         <div class="option-block">
                             <div class="option-block__sub">
                                 Тест
-                                <div class="option-block__list">
+                                <div class="option-block__list option-block__test-type">
                                     <label class="radio-line">
                                         <input class="main-radio form-change-trigger" type="radio" name="test-type"
                                             value="student" form="module-option-form_${this.#id}" checked>
@@ -244,7 +281,6 @@ export default class Module extends AbstractModule {
         this.#formSheet = newHyp.querySelector('.sheet-form');
         this.#sheetSelect = newHyp.querySelector('.sheet-select');
         this.#tableData = newHyp.querySelector('.target-table-data');
-        this.#secondTableItem = this.#element.querySelector('.target-table-data');
         this.#resultBlock = newRes;
         this.#hypName = name;
         return { newHyp, newRes };
@@ -263,7 +299,7 @@ export default class Module extends AbstractModule {
         vars.forEach(element => {
             const curVarID = element.getID();
             let stringElement = `
-            <label class="var-table__item" data-var-id=${curVarID}>
+            <label title="${element.getName()}" class="var-table__item" data-var-id=${curVarID}>
                 <input type="radio" name="data_value">
                 <img src=${element.getImg()} alt="${element.getTypeName()}" class="var-table__img">
                 <span>${element.getName()}</span>
@@ -279,8 +315,8 @@ export default class Module extends AbstractModule {
 
     updateSelectedVarsVisual(sheetId) {
         // const tableSecond = this.#tableData;
-        const secondTableItem = this.#secondTableItem;
-        let curVars = [...secondTableItem.querySelectorAll('label')];
+        const tableData = this.#tableData;
+        let curVars = [...tableData.querySelectorAll('label')];
         curVars.forEach((el => {
             const ids = el.dataset.varId.split('_');
             if (ids[1] == sheetId) {
@@ -294,7 +330,7 @@ export default class Module extends AbstractModule {
     }
 
     clearSelectedVars() {
-        this.#secondTableItem.innerHTML = '';
+        this.#tableData.innerHTML = '';
     }
 
     getFormMain() {
@@ -314,9 +350,35 @@ export default class Module extends AbstractModule {
         const tableData = this.#tableData;
         this.#testType = formData.get('test-type');
         this.#altHypTest = formData.get('hyp-check');
+        this.#inputType = formData.get('input-type');
+        switch (this.#testType) {
+            case 'student': {
+                if (this.#inputType === 'manual') {
+                    this.#resultsTableData.student.d = Number(formData.get('d'));
+                    this.#resultsTableData.student.sd = Number(formData.get('sd'));
+                }
+                else {
+                    this.#resultsTableData.student.d = null;
+                    this.#resultsTableData.student.sd = null;
+                }
+                break;
+            }
+            case 'sign': {
+                if (this.#inputType === 'manual') {
+                    this.#resultsTableData.sign.p0 = Number(formData.get('p0'));
+                    this.#resultsTableData.sign.p1 = Number(formData.get('p1'));
+                    this.#resultsTableData.sign.p2 = Number(formData.get('p2'));
+                }
+                else {
+                    this.#resultsTableData.sign.p0 = null;
+                    this.#resultsTableData.sign.p1 = null;
+                    this.#resultsTableData.sign.p2 = null;
+                }
+                break;
+            }
+        }
         this.#resultsTableData.z = null;
-        this.#resultsTableData.d = null;
-        this.#resultsTableData.sd = null;
+
         const data = [];
         this.#data.first = null;
         this.#data.second = null;
@@ -360,39 +422,66 @@ export default class Module extends AbstractModule {
     }
 
     #testChoose(isInv, alpha, arg) {
-        if (!this.#data.first || !this.#data.second) {
-            return;
+
+        let firstVarName, secondVarName;
+        let errorElement;
+
+        if (this.#inputType !== 'manual') {
+            errorElement = this.#tableData;
+
+            if (!this.#data.first || !this.#data.second) {
+                return;
+            }
+            firstVarName = this.#vars.first.getTypeName();
+            secondVarName = this.#vars.second.getTypeName();
+            if (firstVarName !== secondVarName) {
+                UIControls.showError(errorElement, 'Нельзя сравнить данные разного типа');
+                return;
+            }
+            if (this.#data.first.length !== this.#data.second.length) {
+                UIControls.showError(errorElement, 'Выбранные наборы данных имеют разный размер');
+                return;
+            }
+
         }
-        const firstVarName = this.#vars.first.getTypeName();
-        const secondVarName = this.#vars.second.getTypeName();
-        if (firstVarName !== secondVarName) {
-            UIControls.showError(this.#tableData, 'Нельзя сравнить данные разного типа');
-            return;
-        }
-        if (this.#data.first.length !== this.#data.second.length) {
-            UIControls.showError(this.#tableData, 'Выбранные наборы данных имеют разную длину');
-            return;
+        else {
+            errorElement = this.#element;
         }
 
         let returnValue;
-        switch (this.#testType) {
-            case 'student': {
-                if (firstVarName !== Var.Continues.name) {
-                    UIControls.showError(this.#tableData, errorText([Var.Continues.ruName]));
-                    return;
+        try {
+            switch (this.#testType) {
+                case 'student': {
+                    if (this.#inputType !== 'manual' && firstVarName !== Var.Continues.name) {
+                        errorElement = this.#tableData;
+                        throw new Error(errorText([Var.Continues.ruName]));
+                    }
+                    if (isInv) {
+                        returnValue = this.#studentTestInv(alpha, arg);
+                    }
+                    else {
+                        returnValue = this.#studentTest(alpha, arg);
+                    }
                 }
-                if (isInv) {
-                    returnValue = this.#studentTestInv(alpha, arg);
-                }
-                else {
-                    returnValue = this.#studentTest(alpha, arg);
+                case 'sign': {
+                    if (this.#inputType !== 'manual' && firstVarName === Var.Nominal.name) {
+                        errorElement = this.#tableData;
+                        throw new Error(errorText([Var.Continues.ruName, Var.Rang.ruName, Var.Binary.ruName]));
+                    }
+                    if (isInv) {
+                        returnValue = this.#signTestInv(alpha, arg);
+                    }
+                    else {
+                        returnValue = this.#signTest(alpha, arg);
+                    }
                 }
             }
         }
-
-        if (!returnValue || Number.isNaN(returnValue)) {
-            UIControls.showError(this.#tableData, 'Ошибка расчета данных');
+        catch (err) {
+            UIControls.showError(errorElement, err.message);
+            return;
         }
+
         return returnValue;
 
         function errorText(varTypeNameArray) {
@@ -400,51 +489,125 @@ export default class Module extends AbstractModule {
         }
     }
 
-    //ПРОВЕРКИ НА ПРОПУЩЕННЫЕ ЗНАЧЕНИЯ. ЧТО С НИМИ ДЕЛАТЬ???
-
     #studentTest(alpha, power) {
-        const zAlpha = this.#altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha);
+        let d, sd;
+        const zAlpha = this.#getZAlpha(alpha);
         const z = zAlpha + Math.norminv(100 - power);
-        const differences = this.#data.first.map((el, i) => el - this.#data.second[i]);
-        const d = Math.abs(Math.mean(differences));
-        const sd = Math.stddiv.s(differences);
+        if (this.#inputType === 'manual') {
+            d = this.#resultsTableData.student.d;
+            sd = this.#resultsTableData.student.sd;
+        }
+        else {
+            const differences = this.#data.first.map((el, i) => {
+                if (el === '' || this.#data.second[i] === '')
+                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения')
+                return el - this.#data.second[i];
+            });
+            d = Math.abs(Math.mean(differences));
+            sd = Math.stddiv.s(differences);
+        }
+        if (d === 0) {
+            throw new Error('Средняя разность равна нулю. Проверьте, что сравниваются разные наборы данных')
+        }
+
         const n = (z * sd / d) ** 2 + ((zAlpha ** 2) / 2);
 
+        if (!n || Number.isNaN(n)) {
+            throw new Error('Ошибка расчета данных');
+        }
+
         this.#resultsTableData.z = z;
-        this.#resultsTableData.d = d;
-        this.#resultsTableData.sd = sd;
+        this.#resultsTableData.student.d = d;
+        this.#resultsTableData.student.sd = sd;
 
         return n;
     }
 
     #studentTestInv(alpha, n) {
-        const zAlpha = this.#altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha);
-        const differences = this.#data.first.map((el, i) => el - this.#data.second[i]);
-        const d = Math.abs(Math.mean(differences));
-        const sd = Math.stddiv.s(differences);
-        let tmp = Math.sqrt(n - ((zAlpha ** 2) / 2));
-        const z = (tmp * d) / sd * -1;
+        let d, sd;
+        const zAlpha = this.#getZAlpha(alpha);
+
+        if (this.#inputType === 'manual') {
+            d = this.#resultsTableData.student.d;
+            sd = this.#resultsTableData.student.sd;
+        }
+        else {
+            const differences = this.#data.first.map((el, i) => {
+                if (el === '' || this.#data.second[i] === '')
+                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения')
+                return el - this.#data.second[i];
+            });
+            d = Math.abs(Math.mean(differences));
+            sd = Math.stddiv.s(differences);
+        }
+
+        if (d === 0) {
+            throw new Error('Средняя разность равна нулю. Проверьте, что сравниваются разные наборы данных')
+        }
+
+        let z = (Math.sqrt(n - ((zAlpha ** 2) / 2)) * d) / sd * -1;
+        if (z > 0) {
+            z *= -1;
+        }
         const zB = z - zAlpha;
         const power = 100 - Math.normdist(zB);
 
+        if (!power || Number.isNaN(power)) {
+            throw new Error('Ошибка расчета данных');
+        }
+
         this.#resultsTableData.z = z;
-        this.#resultsTableData.d = d;
-        this.#resultsTableData.sd = sd;
+        this.#resultsTableData.student.d = d;
+        this.#resultsTableData.student.sd = sd;
 
         return power;
     }
 
+    #signTest(alpha, power) {
+        let p0, p1, p2;
+        const zAlpha = this.#getZAlpha(alpha);
+        if (this.#inputType === 'manual') {
+            p0 = this.#resultsTableData.sign.p0;
+            p2 = this.#resultsTableData.sign.p1;
+            p1 = this.#resultsTableData.sign.p2;
+        }
+        else {
+            const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName());
+        }
+    }
+
+    #signTestGetListOfNumberOfSigns(type) {
+        const list = [0, 0, 0];
+        switch (type) {
+            case 'binary': {
+
+                break;
+            }
+            case 'rang': {
+
+            }
+            case 'continues': {
+
+            }
+        }
+    }
+
+    #getZAlpha(alpha) {
+        return this.#altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha)
+    }
+
     updateResultsHtml(isMain) {
         const name = this.#hypName;
-        const powerString = isMain ? `<p><b>Основная гипотеза</b></p>` : `<p>Статистическая мощность: ${Number.resultForm(this.#power)}</p>`;
+        const powerString = isMain ? `<p><b>Основная гипотеза</b></p>` : `<p>Статистическая мощность: ${Number.resultForm(this.#power)}%</p>`;
         const htmlRes = `
         <h2>${name}</h2>
         <div class="results__block-inner">
             ${powerString}
             <p>Сравнение парных выборок</p>
             <p>${Module.testText[this.#testType]}</p>
+            ${Module.altHypText[this.#altHypTest]}
             <table class="results__table">
-                <caption><small>${Module.altHypText[this.#altHypTest]}</small>
+                <caption><small>${this.#inputType === 'manual' ? 'Данные введены вручную' : ''}</small>
                 </caption>
                 <thead>
                     <tr>
@@ -474,10 +637,10 @@ export default class Module extends AbstractModule {
                             ${String.resultForm(this.#vars.second?.getName())}
                         </td>
                         <td>
-                            ${Number.resultForm(this.#resultsTableData.d)}
+                            ${Number.resultForm(this.#resultsTableData.student.d)}
                         </td>
                         <td>
-                            ${Number.resultForm(this.#resultsTableData.sd)}
+                            ${Number.resultForm(this.#resultsTableData.student.sd)}
                         </td>
                         <td>
                             ${Number.resultForm(this.#resultsTableData.z)}

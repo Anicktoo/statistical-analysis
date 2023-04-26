@@ -66,9 +66,10 @@
                                     </label>
                                     <label class="input-line">
                                         FWER
-                                        <input type="number" class="main-input main-input_number form-change-trigger"
-                                            name="FWER" value="5" step="0.1" min="0" max="100"
-                                            form="module-option-form_glob">
+                                        <input type="number" id="FWER-input"
+                                            class="main-input main-input_number form-change-trigger" name="FWER"
+                                            value="5" step="0.1" min="0" max="100" form="module-option-form_glob"
+                                            required>
                                         <span class="input-line__post">%</span>
                                     </label>
                                     <label class="input-line">
@@ -85,7 +86,7 @@
                                         Планируемая мощность основной гипотезы
                                         <input type="number" class="main-input main-input_number form-change-trigger"
                                             name="power" value="95" step="0.1" min="0" max="100"
-                                            form="module-option-form_glob">
+                                            form="module-option-form_glob" required>
                                         <span class="input-line__post">%</span>
                                     </label>
                                 </div>
@@ -111,6 +112,7 @@
                             <p>Уровень значимости α: <span id="results-importance">-</span></p>
                             <p>Основная гипотеза: <span id="results-main-hyp">-</span></p>
                             <p>Планируемая мощность основной гипотезы: <span id="results-power">-</span> %</p>
+                            <p>Точный размер выборки: <span id="results-sample-size-precise">-</span></p>
                             <p>Требуемый размер выборки: <span id="results-sample-size">-</span></p>
                         </div>
                     </div>

@@ -74,15 +74,49 @@ Math.stddiv.s = function (array) {
     return Math.sqrt(array.map(x => ((x - mean) ** 2)).reduce((a, b) => a + b) / (n - 1))
 }
 
-Number.resultForm = function (n) {
-    return n && !Number.isNaN(n) && typeof n === 'number' ? Math.roundFixed(n, 2) : '-';
+Number.resultForm = function (n, noRound) {
+    return typeof n === 'number' && !Number.isNaN(n) ? (noRound ? n : Math.roundGOST(n, 2)) : '-';
 }
 
 String.resultForm = function (s) {
-    return s ? s : '-';
+    return s !== undefined && s !== null ? s : '-';
 }
 
-Math.roundFixed = function (num, dec) {
-    const mult = 10 ** dec;
-    return Math.round((num + Number.EPSILON) * mult) / mult;
+// Math.roundFixed = function (num, dec) {
+//     const mult = 10 ** dec;
+//     return Math.round((num + Number.EPSILON) * mult) / mult;
+// }
+
+Math.roundGOST = function (num) {
+    let tempN = Math.abs(num);
+    let tempAnswer;
+    if (tempN >= 10) {
+        tempAnswer = num;
+        if (String(tempN).split('.')[1]?.charAt(1) === '5') {
+            tempAnswer += 0.01 * Math.sign(num);
+        }
+        return tempAnswer.toFixed(1);
+    }
+    else if (tempN >= 1) {
+        tempAnswer = num;
+        if (String(tempN).charAt(4) === '5') {
+            tempAnswer += 0.001 * Math.sign(num);
+        }
+        return tempAnswer.toPrecision(3);
+    }
+    else {
+        if (tempN === 0.995) {
+            return Math.round(num).toFixed(2);
+        }
+        tempAnswer = num.toPrecision(2);
+        if (tempAnswer == 1) {
+            return '1.00';
+        }
+        else if (tempAnswer == -1) {
+            return '-1.00';
+        }
+        else {
+            return tempAnswer;
+        }
+    }
 }
