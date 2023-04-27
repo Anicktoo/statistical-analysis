@@ -25,6 +25,7 @@ class UIControls {
     static parametersContainer;
     static parametersGlobItem;
     static FWERInput;
+    static powerInput;
     static mainHypSelect;
 
     static resizeBarsEl = [];
@@ -107,6 +108,7 @@ class UIControls {
         UIControls.parametersContainer = UIControls.parameters.querySelector('.parameters__container');
         UIControls.parametersGlobItem = UIControls.parameters.querySelector('#parameters__item_glob');
         UIControls.FWERInput = UIControls.parametersGlobItem.querySelector('#FWER-input');
+        UIControls.powerInput = UIControls.parametersGlobItem.querySelector('#power-input');
         UIControls.mainHypSelect = UIControls.parametersContainer.querySelector('#main-hypothesis');
 
         UIControls.modalVarType = document.querySelector('.modal-var-types');
@@ -360,7 +362,6 @@ class UIControls {
         const testTypeBlock = element.querySelector('.option-block__test-type');
         manualInput?.addEventListener('click', () => {
             const testName = testTypeBlock.querySelector('input:checked').value;
-            console.log(testName);
             const manualEllement = element.querySelector(`.option-block__${testName}`);
             manualEllement?.classList.remove('option-block_hidden');
             dataTables.classList.add('option-block_hidden');

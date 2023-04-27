@@ -143,10 +143,13 @@ export default class Var {
 
             for (let i = 0; i < 32; i++) {
                 if ((this.#binaryGroups[q] & binNumber) === 0x0) {
-                    str1 += getLabel(counter, this.#set[counter]) + getAnchor(counter);
+                    str1 += getLabel(counter, this.#set[counter]);
                 } else {
-                    str2 += getLabel(counter, this.#set[counter]) + getAnchor(counter);
+                    str2 += getLabel(counter, this.#set[counter]);
                 }
+
+                str1 += getAnchor(counter);
+                str2 += getAnchor(counter);
 
                 counter++;
                 binNumber = binNumber >>> 1;
@@ -158,6 +161,37 @@ export default class Var {
         binBodies[0].innerHTML = str1;
         binBodies[1].innerHTML = str2;
 
+    }
+
+    //returns 0 if zero group, 1 if in first, -1 if val is not in the set 
+    isValInZeroGroup(val) {
+        const indexInSet = this.#set.indexOf(val);
+        if (indexInSet === -1)
+            return -1;
+        const grLength = this.#binaryGroups.length;
+
+        const groupIndex = grLength - Math.floor(indexInSet / 32) - 1;
+        if (groupIndex < 0) {
+            return -1;
+        }
+        const bitIndex = indexInSet % 32;
+        const bit = this.#binaryGroups[groupIndex] >>> (31 - bitIndex);
+
+        if (bit & 0x1 === 1) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    getOrderOfVal(val) {
+        const indexInSet = this.#set.indexOf(val);
+        if (indexInSet === -1)
+            return -1;
+        const order = this.#order.indexOf(indexInSet);
+
+        return order !== undefined ? order : -1;
     }
 
     getID() {

@@ -184,15 +184,11 @@ export default class Module extends AbstractModule {
                         <div class="option-block__list">
                             <label class="input-line">
                                 <span>Доля нулевых разностей (&#961;<sub>&#965;</sub>):</span>
-                                <input type="number" class="main-input main-input_number form-change-trigger" name="zero" value="0" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
+                                <input type="number" class="main-input main-input_number form-change-trigger" name="p0" value="0" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
                             </label>
                             <label class="input-line">
                                 <span>Доля положительных разностей (&#961;<sub>1</sub>):</span>
-                                <input type="number" class="main-input main-input_number form-change-trigger" name="positive" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
-                            </label>
-                            <label class="input-line">
-                                <span>Доля отрицательных разностей (&#961;<sub>2</sub>):</span>
-                                <input type="number" class="main-input main-input_number form-change-trigger" name="negative" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
+                                <input type="number" class="main-input main-input_number form-change-trigger" name="p1" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
                             </label>
                         </div>
                     </div>
@@ -367,7 +363,6 @@ export default class Module extends AbstractModule {
                 if (this.#inputType === 'manual') {
                     this.#resultsTableData.sign.p0 = Number(formData.get('p0'));
                     this.#resultsTableData.sign.p1 = Number(formData.get('p1'));
-                    this.#resultsTableData.sign.p2 = Number(formData.get('p2'));
                 }
                 else {
                     this.#resultsTableData.sign.p0 = null;
@@ -462,6 +457,7 @@ export default class Module extends AbstractModule {
                     else {
                         returnValue = this.#studentTest(alpha, arg);
                     }
+                    break;
                 }
                 case 'sign': {
                     if (this.#inputType !== 'manual' && firstVarName === Var.Nominal.name) {
@@ -474,6 +470,7 @@ export default class Module extends AbstractModule {
                     else {
                         returnValue = this.#signTest(alpha, arg);
                     }
+                    break;
                 }
             }
         }
@@ -492,7 +489,7 @@ export default class Module extends AbstractModule {
     #studentTest(alpha, power) {
         let d, sd;
         const zAlpha = this.#getZAlpha(alpha);
-        const z = zAlpha + Math.norminv(100 - power);
+        const z = this.#getZ(zAlpha, power);
         if (this.#inputType === 'manual') {
             d = this.#resultsTableData.student.d;
             sd = this.#resultsTableData.student.sd;
@@ -512,7 +509,7 @@ export default class Module extends AbstractModule {
 
         const n = (z * sd / d) ** 2 + ((zAlpha ** 2) / 2);
 
-        if (!n || Number.isNaN(n)) {
+        if (n === undefined || Number.isNaN(n)) {
             throw new Error('Ошибка расчета данных');
         }
 
@@ -552,7 +549,7 @@ export default class Module extends AbstractModule {
         const zB = z - zAlpha;
         const power = 100 - Math.normdist(zB);
 
-        if (!power || Number.isNaN(power)) {
+        if (power === undefined || Number.isNaN(power)) {
             throw new Error('Ошибка расчета данных');
         }
 
@@ -566,29 +563,120 @@ export default class Module extends AbstractModule {
     #signTest(alpha, power) {
         let p0, p1, p2;
         const zAlpha = this.#getZAlpha(alpha);
+        const z = this.#getZ(zAlpha, power);
         if (this.#inputType === 'manual') {
             p0 = this.#resultsTableData.sign.p0;
-            p2 = this.#resultsTableData.sign.p1;
-            p1 = this.#resultsTableData.sign.p2;
+            p1 = this.#resultsTableData.sign.p1;
         }
         else {
             const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName());
+            const dataLength = signs[1] + signs[2];
+            p0 = signs[0] / this.#data.first.length;
+            p1 = signs[1] / dataLength;
         }
+
+        p2 = 1 - p1;
+
+        const n = (z ** 2) / (4 * (1 - p0) * ((p1 - 0.5) ** 2));
+
+        if (n === undefined || Number.isNaN(n)) {
+            throw new Error('Ошибка расчета данных');
+        }
+
+        this.#resultsTableData.z = z;
+        this.#resultsTableData.sign.p0 = p0;
+        this.#resultsTableData.sign.p1 = p1;
+        this.#resultsTableData.sign.p2 = p2;
+
+        return n;
     }
 
+    #signTestInv(alpha, n) {
+        let p0, p1, p2;
+        const zAlpha = this.#getZAlpha(alpha);
+
+        if (this.#inputType === 'manual') {
+            p0 = this.#resultsTableData.sign.p0;
+            p1 = this.#resultsTableData.sign.p1;
+        }
+        else {
+            const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName());
+            const dataLength = signs[1] + signs[2];
+            p0 = signs[0] / this.#data.first.length;
+            p1 = signs[1] / dataLength;
+        }
+        p2 = 1 - p1;
+
+        let z = Math.sqrt(n * 4 * ((p1 - 0.5) ** 2) * (1 - p0));
+        if (z > 0) {
+            z *= -1;
+        }
+        const zB = z - zAlpha;
+        const power = 100 - Math.normdist(zB);
+
+        if (power === undefined || Number.isNaN(power)) {
+            throw new Error('Ошибка расчета данных');
+        }
+
+        this.#resultsTableData.z = z;
+        this.#resultsTableData.sign.p0 = p0;
+        this.#resultsTableData.sign.p1 = p1;
+        this.#resultsTableData.sign.p2 = p2;
+
+        return power;
+    }
+
+    // returns list of number of 0-s, positive and negative differences
     #signTestGetListOfNumberOfSigns(type) {
         const list = [0, 0, 0];
-        switch (type) {
-            case 'binary': {
+        let callback;
+        let firstDataColumn;
+        let secondDataColumn;
 
-                break;
-            }
-            case 'rang': {
+        if (type === 'binary') {
+            callback = this.#vars.first.isValInZeroGroup;
+        }
+        else if (type === 'rang') {
+            callback = this.#vars.first.getOrderOfVal;
+        }
 
-            }
-            case 'continues': {
+        if (type === 'continues') {
+            firstDataColumn = this.#data.first;
+            secondDataColumn = this.#data.second;
+        }
+        else {
+            firstDataColumn = getColumnOfAdaptedVals(this.#data.first, this.#vars.first, callback);
+            secondDataColumn = getColumnOfAdaptedVals(this.#data.second, this.#vars.second, callback);
+        }
 
+        console.log(firstDataColumn, secondDataColumn);
+
+        firstDataColumn.forEach((el, index) => {
+            if (el === '' || secondDataColumn[index] === '')
+                throw new Error('Невозможно обработать набор данных, имеются пропущенные значения')
+            const dif = el - secondDataColumn[index];
+            if (dif === 0) {
+                list[0]++;
             }
+            else if (dif > 0) {
+                list[1]++;
+            }
+            else if (dif < 0) {
+                list[2]++;
+            }
+        });
+
+        return list;
+
+        function getColumnOfAdaptedVals(data, curVar, callback) {
+            return data.map(el => {
+                const group = callback.call(curVar, el);
+                if (group === -1)
+                    throw new Error('Ошибка вычислений');
+                else {
+                    return group;
+                }
+            });
         }
     }
 
@@ -596,9 +684,100 @@ export default class Module extends AbstractModule {
         return this.#altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha)
     }
 
+    #getZ(zAlpha, power) {
+        return zAlpha + Math.norminv(100 - power);
+    }
+
     updateResultsHtml(isMain) {
         const name = this.#hypName;
         const powerString = isMain ? `<p><b>Основная гипотеза</b></p>` : `<p>Статистическая мощность: ${Number.resultForm(this.#power)}%</p>`;
+        let table;
+        if (this.#testType === 'student') {
+            table = `<thead>
+                        <tr>
+                            <th>
+                                M1
+                            </th>
+                            <th>
+                                M2
+                            </th>
+                            <th>
+                                d mean
+                            </th>
+                            <th>
+                                sd
+                            </th>
+                            <th>
+                                z
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                ${String.resultForm(this.#vars.first?.getName())}
+                            </td>
+                            <td>
+                                ${String.resultForm(this.#vars.second?.getName())}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.student.d)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.student.sd)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.z)}
+                            </td>
+                        </tr >
+                    </tbody >`;
+        }
+        else if (this.#testType === 'sign') {
+            table = `<thead>
+                        <tr>
+                            <th>
+                                M1
+                            </th>
+                            <th>
+                                M2
+                            </th>
+                            <th>
+                                &#961;<sub>&#965;</sub>
+                            </th>
+                            <th>
+                                &#961;<sub>1</sub>
+                            </th>
+                            <th>
+                                &#961;<sub>2</sub>
+                            </th>
+                            <th>
+                                z
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                ${String.resultForm(this.#vars.first?.getName())}
+                            </td>
+                            <td>
+                                ${String.resultForm(this.#vars.second?.getName())}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.sign.p0)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.sign.p1)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.sign.p2)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.z)}
+                            </td>
+                        </tr >
+                    </tbody >`;
+        }
         const htmlRes = `
         <h2>${name}</h2>
         <div class="results__block-inner">
@@ -609,44 +788,7 @@ export default class Module extends AbstractModule {
             <table class="results__table">
                 <caption><small>${this.#inputType === 'manual' ? 'Данные введены вручную' : ''}</small>
                 </caption>
-                <thead>
-                    <tr>
-                        <th>
-                            M1
-                        </th>
-                        <th>
-                            M2
-                        </th>
-                        <th>
-                            d mean
-                        </th>
-                        <th>
-                            sd
-                        </th>
-                        <th>
-                            z
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            ${String.resultForm(this.#vars.first?.getName())}
-                        </td>
-                        <td>
-                            ${String.resultForm(this.#vars.second?.getName())}
-                        </td>
-                        <td>
-                            ${Number.resultForm(this.#resultsTableData.student.d)}
-                        </td>
-                        <td>
-                            ${Number.resultForm(this.#resultsTableData.student.sd)}
-                        </td>
-                        <td>
-                            ${Number.resultForm(this.#resultsTableData.z)}
-                        </td>
-                    </tr >
-                </tbody >
+                ${table}
             </table >
         </div > `;
 

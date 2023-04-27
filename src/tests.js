@@ -7,6 +7,11 @@ export function binTest() {
     }
 
     function startBinTest() {
+        function getTest(max) {
+            for (let i = 0; i <= max; i++) {
+                console.log(isValInZeroGroup(i));
+            }
+        }
         //1
         (function () {
             gr = [0, 0, 0, 0];
@@ -19,6 +24,7 @@ export function binTest() {
                 twoTables.group0.push(i);
             }
             binCheck(1);
+            getTest(102);
         })();
         //2
         (function () {
@@ -32,6 +38,8 @@ export function binTest() {
                 twoTables.group1.push(i);
             }
             binCheck(2);
+            getTest(102);
+
         })();
         //3
         (function () {
@@ -39,6 +47,8 @@ export function binTest() {
             twoTables.group1 = [];
             twoTables.group0 = [0, 1, 2, 3, 4];
             binCheck(3);
+            getTest(4);
+
         })();
         //4
         (function () {
@@ -46,6 +56,8 @@ export function binTest() {
             twoTables.group1 = [0, 1];
             twoTables.group0 = [2, 3, 4];
             binCheck(4);
+            getTest(4);
+
         })();
         //5
         (function () {
@@ -53,6 +65,8 @@ export function binTest() {
             twoTables.group1 = [3, 4];
             twoTables.group0 = [0, 1, 2];
             binCheck(5);
+            getTest(4);
+
         })();
         //6
         (function () {
@@ -60,6 +74,8 @@ export function binTest() {
             twoTables.group1 = [0, 1, 4];
             twoTables.group0 = [2, 3];
             binCheck(6);
+            getTest(4);
+
         })();
         //7
         (function () {
@@ -67,6 +83,8 @@ export function binTest() {
             twoTables.group1 = [2, 3];
             twoTables.group0 = [0, 1, 4, 5];
             binCheck(7);
+            getTest(5);
+
         })();
         //8
         (function () {
@@ -74,6 +92,7 @@ export function binTest() {
             twoTables.group1 = [2, 3, 6, 7];
             twoTables.group0 = [0, 1, 4, 5];
             binCheck(8);
+            getTest(7);
         })();
         //9
         (function () {
@@ -81,6 +100,7 @@ export function binTest() {
             twoTables.group1 = [];
             twoTables.group0 = [0];
             binCheck(9);
+            getTest(0);
         })();
         //10
         (function () {
@@ -88,6 +108,7 @@ export function binTest() {
             twoTables.group1 = [0];
             twoTables.group0 = [];
             binCheck(10);
+            getTest(0);
         })();
         //11
         (function () {
@@ -98,6 +119,7 @@ export function binTest() {
                 twoTables.group1.push(i);
             }
             binCheck(11);
+            getTest(30);
         })();
         //12
         (function () {
@@ -108,6 +130,7 @@ export function binTest() {
                 twoTables.group1.push(i);
             }
             binCheck(12);
+            getTest(31);
         })();
         //13
         (function () {
@@ -118,6 +141,7 @@ export function binTest() {
                 twoTables.group0.push(i);
             }
             binCheck(13);
+            getTest(30);
         })();
         //14
         (function () {
@@ -128,6 +152,7 @@ export function binTest() {
                 twoTables.group0.push(i);
             }
             binCheck(14);
+            getTest(31);
         })();
         //15
         (function () {
@@ -141,6 +166,7 @@ export function binTest() {
                 twoTables.group1.push(i);
             }
             binCheck(15);
+            getTest(30);
         })();
         //16
         (function () {
@@ -154,6 +180,8 @@ export function binTest() {
                 twoTables.group0.push(i);
             }
             binCheck(16);
+            getTest(30);
+
         })();
         //17
         (function () {
@@ -167,6 +195,7 @@ export function binTest() {
                 twoTables.group1.push(i);
             }
             binCheck(17);
+            getTest(31);
         })();
         //18
         (function () {
@@ -180,6 +209,8 @@ export function binTest() {
                 twoTables.group0.push(i);
             }
             binCheck(18);
+            getTest(31);
+
         })();
         //19
         (function () {
@@ -193,6 +224,8 @@ export function binTest() {
                 twoTables.group1.push(i);
             }
             binCheck(19);
+            getTest(31);
+
         })();
         //20
         (function () {
@@ -206,6 +239,8 @@ export function binTest() {
                 twoTables.group0.push(i);
             }
             binCheck(20);
+            getTest(31);
+
         })();
         //21
         (function () {
@@ -219,6 +254,7 @@ export function binTest() {
                 twoTables.group1.push(i);
             }
             binCheck(21);
+            getTest(254);
         })();
         //22
         (function () {
@@ -232,6 +268,8 @@ export function binTest() {
                 twoTables.group0.push(i);
             }
             binCheck(22);
+            getTest(254);
+
         })();
         //23
         (function () {
@@ -246,6 +284,7 @@ export function binTest() {
             }
             twoTables.group0.push(255);
             binCheck(23);
+            getTest(255);
         })();
         //24
         (function () {
@@ -260,6 +299,8 @@ export function binTest() {
             }
             twoTables.group1.push(255);
             binCheck(24);
+            getTest(255);
+
         })();
         //25
         (function () {
@@ -275,6 +316,8 @@ export function binTest() {
             twoTables.group0.push(255);
             twoTables.group1.push(256);
             binCheck(25);
+            getTest(256);
+
         })();
         //26
         (function () {
@@ -290,6 +333,8 @@ export function binTest() {
             twoTables.group1.push(255);
             twoTables.group0.push(256);
             binCheck(26);
+            getTest(256);
+
         })();
         //27
         (function () {
@@ -305,6 +350,8 @@ export function binTest() {
             }
             twoTables.group0.push(255);
             binCheck(27);
+            getTest(255);
+
         })();
         //28
         (function () {
@@ -320,6 +367,8 @@ export function binTest() {
             }
             twoTables.group1.push(255);
             binCheck(28);
+            getTest(255);
+
         })();
 
     }
@@ -346,6 +395,8 @@ export function binTest() {
             gr[gr.length - i - 1] = number;
         }
 
+        console.log(gr.map(el => dec2bin(el)));
+
         let str = [];
         let str2 = [];
         let counter = 0;
@@ -371,6 +422,31 @@ export function binTest() {
 
         console.log(`TEST ${n}: `, JSON.stringify(str) === JSON.stringify(twoTables.group0) &&
             JSON.stringify(str2) === JSON.stringify(twoTables.group1));
+    }
+
+    function isValInZeroGroup(ind) {
+        const indexInSet = ind;
+        if (indexInSet === -1)
+            return -1;
+        const grLength = gr.length;
+
+        const groupIndex = grLength - Math.floor(indexInSet / 32) - 1;
+        if (groupIndex < 0) {
+            return -1;
+        }
+        const bitIndex = indexInSet % 32;
+        const bit = gr[groupIndex] >>> (31 - bitIndex);
+
+        if (bit & 0x1 === 1) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    function dec2bin(dec) {
+        return (dec >>> 0).toString(2);
     }
 
     startBinTest();

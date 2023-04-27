@@ -189,11 +189,14 @@ export default class ModuleIntegrator {
         const formData = new FormData(globalSettings.form);
         globalSettings.name = formData.get('name');
         globalSettings.FWER = Number(formData.get('FWER'));
-        if (globalSettings.FWER === 0) {
-            UIControls.showError(UIControls.FWERInput, 'FWER не может принимать нулевое значение');
+        if (globalSettings.FWER <= 0 || globalSettings.FWER >= 100) {
+            UIControls.showError(UIControls.FWERInput, 'Значение FWER должно быть больше, чем 0% и меньше, чем 100%');
         }
         globalSettings.mainHypId = Number(formData.get('mainHypothesis'));
         globalSettings.power = Number(formData.get('power'));
+        if (globalSettings.power <= 0 || globalSettings.power >= 100) {
+            UIControls.showError(UIControls.powerInput, 'Значение мощности должно быть больше, чем 0% и меньше, чем 100%');
+        }
     }
 
     static setMainSettings() {
