@@ -1,7 +1,5 @@
 export default class AbstractModule {
 
-    #form;
-
     constructor() {
         if (AbstractModule === new.target)
             throw new Error("Can't create an instance of an abstract class");
@@ -15,7 +13,35 @@ export default class AbstractModule {
         throw new Error('This method must be implemented');
     }
 
-    static createHTML() {
+    getName() {
+        throw new Error('This method must be implemented');
+    }
+
+    getFormSheet() {
+        throw new Error('This method must be implemented');
+    }
+
+    getSheetSelect() {
+        throw new Error('This method must be implemented');
+    }
+
+    addListeners(element) {
+        throw new Error('This method must be implemented');
+    }
+
+    displayVarsOfSheet(sheetId) {
+        throw new Error('This method must be implemented');
+    }
+
+    updateSelectedVarsVisual(sheetId) {
+        throw new Error('This method must be implemented');
+    }
+
+    clearSelectedVars() {
+        throw new Error('This method must be implemented');
+    }
+
+    createHTML() {
         throw new Error('This method must be implemented');
     }
 
@@ -23,13 +49,19 @@ export default class AbstractModule {
         throw new Error('This method must be implemented');
     }
 
-    getN() {
+    getN(alpha, power) {
         throw new Error('This method must be implemented');
     }
 
-    setStatPower() {
+    setStatPower(alpha, sampleSize) {
         throw new Error('This method must be implemented');
     }
+
+    updateResultsHtml(isMain) {
+        throw new Error('This method must be implemented');
+    }
+
+    //ABSTRACT ONLY
 
     static addSheetOptions(listOfSheets, select) {
         const options = [];
@@ -40,6 +72,14 @@ export default class AbstractModule {
             options.push(option);
         }
         select.append(...options);
+    }
+
+    getZAlpha(altHypTest, alpha) {
+        return altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha)
+    }
+
+    getZ(zAlpha, power) {
+        return zAlpha + Math.norminv(100 - power);
     }
 }
 

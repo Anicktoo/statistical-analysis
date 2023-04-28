@@ -17,7 +17,7 @@ export default class Module extends AbstractModule {
     static testText = {
         'fisher': 'Точный тест фишера',
         'mann': 'Тест Манна-Уитни',
-        'sign': 'Независимый тест Стьюдента'
+        'student': 'Независимый тест Стьюдента'
     }
     static altHypText = {
         'both': 'Двусторонняя проверка альтернативной гипотезы (M2 ≠ M1)',
@@ -31,11 +31,24 @@ export default class Module extends AbstractModule {
         second: undefined
     }
     #power;
+    #resultsTableData = {
+        z: undefined,
+        student: {
+            d: undefined,
+            sd: undefined,
+        },
+        fisher: {
+            // p0: undefined,
+            // p1: undefined,
+            // p2: undefined,
+        }
+    }
     #testType;
+    #inputType;
     #altHypTest;
     #vars = {
-        first: undefined,
-        second: undefined
+        dep: undefined,
+        indep: undefined
     }
 
     #hypName;
@@ -43,7 +56,10 @@ export default class Module extends AbstractModule {
     #form;
     #formSheet;
     #sheetSelect;
-    #tableData;
+    #tableData = {
+        indepTable: undefined,
+        depTable: undefined
+    };
     #resultBlock;
 
     constructor(id) {
@@ -63,12 +79,19 @@ export default class Module extends AbstractModule {
         return this.#hypName;
     }
 
-    //!
+    getFormSheet() {
+        return this.#formSheet;
+    }
+
+    getSheetSelect() {
+        return this.#sheetSelect;
+    }
+
     addListeners(element) {
-        const tables = element.querySelector('.paired-sample__tables');
-        const switchBtn = tables.querySelector('.switch-button');
-        const firstTable = tables.querySelector('.paired-sample__table-body');
-        const tableData = tables.querySelector('.target-table-data');
+        const [switch1, switch2] = [...element.querySelectorAll('.switch-button')];
+        const leftTable = element.querySelector('.independent-sample__table-body');
+        const depTable = element.querySelector('.independent-sample__dependent-table-body');
+        const indepTable = element.querySelector('.independent-sample__independent-table-body');
 
         const insertChild = (item, toTable) => {
             const nextChild = toTable.querySelector('.var-table__anchor_' + item.dataset.varId);
@@ -77,29 +100,82 @@ export default class Module extends AbstractModule {
             }
         }
 
-        switchBtn.addEventListener('click', () => {
-            const checkedInput = tables.querySelector('input:checked');
+        const swapItem = function (secondTable) {
+            const checkedInput = leftTable.querySelector('input:checked') || secondTable.querySelector('input:checked');
             if (!checkedInput)
                 return;
             const checkedItem = checkedInput.parentElement;
             const parentOfItem = checkedItem.parentElement;
-
-            if (parentOfItem.isSameNode(tableData)) {
+            if (parentOfItem.isSameNode(secondTable)) {
                 parentOfItem.removeChild(checkedItem);
-                insertChild(checkedItem, firstTable);
+                insertChild(checkedItem, leftTable);
             }
             else {
-                if (tableData.children.length === 2) {
-                    // const removed = tableData.removeChild(tableData.firstElementChild);
-                    // insertChild(removed, firstTable);
+                if (secondTable.children.length === 1) {
                     return;
                 }
                 parentOfItem.removeChild(checkedItem);
-                tableData.appendChild(checkedItem);
+                secondTable.appendChild(checkedItem);
             }
 
-            ModuleIntegrator.setSettings(this.#id, this.#form, tableData);
+            if (depTable.firstElementChild && indepTable.firstElementChild) {
+                ModuleIntegrator.setSettings(this.#id, this.#form, { depTable, indepTable });
+            }
+        }
+
+        switch1.addEventListener('click', swapItem.bind(this, depTable));
+        switch2.addEventListener('click', swapItem.bind(this, indepTable));
+    }
+
+    displayVarsOfSheet(sheetId) {
+        const vars = DataControls.getVarsBySheetId(sheetId);
+        if (!vars)
+            return;
+        const tableBody = this.#element.querySelector('.independent-sample__table-body');
+        const { depTable, indepTable } = this.#tableData;
+        const dep = depTable.firstElementChild;
+        const indep = indepTable.firstElementChild;
+        const arrOfIds = [];
+        arrOfIds.push(dep?.dataset.varId);
+        arrOfIds.push(indep?.dataset.varId);
+        let strBody = '';
+        vars.forEach(element => {
+            const curVarID = element.getID();
+            let stringElement = `
+            <label class="var-table__item" data-var-id=${curVarID}>
+                <input type="radio" name="data_value">
+                <img src=${element.getImg()} alt="${element.getTypeName()}" class="var-table__img">
+                <span>${element.getName()}</span>
+            </label>`;
+
+            if (!arrOfIds.includes(curVarID)) {
+                strBody += stringElement;
+            }
+            strBody += `<div class='var-table__anchor var-table__anchor_${curVarID}'></div>`;
         });
+        tableBody.innerHTML = strBody;
+    }
+
+    updateSelectedVarsVisual(sheetId) {
+        const tableData = this.#tableData;
+        let curVars = [tableData.depTable?.firstElementChild, tableData.indepTable?.firstElementChild];
+        curVars.forEach((el => {
+            if (el) {
+                const ids = el.dataset.varId.split('_');
+                if (ids[1] == sheetId) {
+                    const v = DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
+                    const elImg = el.querySelector('img');
+                    el.querySelector('span').innerHTML = v.getName();
+                    elImg.setAttribute('src', v.getImg());
+                    elImg.setAttribute('alt', v.getTypeName());
+                }
+            }
+        }));
+    }
+
+    clearSelectedVars() {
+        this.#tableData.depTable.innerHTML = '';
+        this.#tableData.indepTable.innerHTML = '';
     }
 
     createHTML() {
@@ -167,11 +243,6 @@ export default class Module extends AbstractModule {
                                 </form>
                             </div>
                             <div class="var-table__body independent-sample__table-body">
-                                <label class="var-table__item">
-                                    <input type="radio" name="data_value">
-                                    <img src=# class="var-table__img">
-                                    <span>Hello world!</span>
-                                </label>
                             </div>
                         </div>
                         <div class="independent-sample__tables-and-switches">
@@ -184,11 +255,6 @@ export default class Module extends AbstractModule {
                                 <div class="var-table">
                                     <div class="var-table__header">Зависимая переменная</div>
                                     <div class="var-table__body independent-sample__dependent-table-body">
-                                        <label class="var-table__item">
-                                            <input type="radio" name="data_value">
-                                            <img src=# class="var-table__img">
-                                            <span>Hello world!</span>
-                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -201,11 +267,6 @@ export default class Module extends AbstractModule {
                                 <div class="var-table">
                                     <div class="var-table__header">Группировка по переменной</div>
                                     <div class="var-table__body independent-sample__independent-table-body">
-                                        <label class="var-table__item">
-                                            <input type="radio" name="data_value">
-                                            <img src=# class="var-table__img">
-                                            <span>Hello world!</span>
-                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -218,13 +279,13 @@ export default class Module extends AbstractModule {
                                 <div class="option-block__list">
                                     <label class="radio-line">
                                         <input class="main-radio form-change-trigger" type="radio"
-                                            name="test-type" value="sign"
+                                            name="test-type" value="fisher"
                                             form="module-option-form_${this.#id}" checked>
                                         <span>Точный тест Фишера</span>
                                     </label>
                                     <label class="radio-line">
                                         <input class="main-radio form-change-trigger" type="radio"
-                                            name="test-type" value="wilcoxon"
+                                            name="test-type" value="mann"
                                             form="module-option-form_${this.#id}">
                                         <span>Манна-Уитни</span>
                                     </label>
@@ -275,104 +336,74 @@ export default class Module extends AbstractModule {
         this.#form = newHyp.querySelector('.module-option-form');
         this.#formSheet = newHyp.querySelector('.sheet-form');
         this.#sheetSelect = newHyp.querySelector('.sheet-select');
-        this.#tableData = newHyp.querySelector('.target-table-data');
+        this.#tableData.indepTable = newHyp.querySelector('.independent-sample__independent-table-body');
+        this.#tableData.depTable = newHyp.querySelector('.independent-sample__dependent-table-body');
         this.#resultBlock = newRes;
         this.#hypName = name;
         return { newHyp, newRes };
     }
 
     //!
-    displayVarsOfSheet(sheetId) {
-        const vars = DataControls.getVarsBySheetId(sheetId);
-        if (!vars)
-            return;
-        const tableBody = this.#element.querySelector('.paired-sample__table-body');
-        const tableSecondItem = this.#tableData;
-        const arrOfIds = [];
-        arrOfIds.push(tableSecondItem.firstElementChild?.dataset.varId);
-        arrOfIds.push(tableSecondItem.lastElementChild?.dataset.varId);
-        let strBody = '';
-        vars.forEach(element => {
-            const curVarID = element.getID();
-            let stringElement = `
-            <label class="var-table__item" data-var-id=${curVarID}>
-                <input type="radio" name="data_value">
-                <img src=${element.getImg()} alt="${element.getTypeName()}" class="var-table__img">
-                <span>${element.getName()}</span>
-            </label>`;
-
-            if (!arrOfIds.includes(curVarID)) {
-                strBody += stringElement;
-            }
-            strBody += `<div class='var-table__anchor var-table__anchor_${curVarID}'></div>`;
-        });
-        tableBody.innerHTML = strBody;
-    }
-
-    //!
-    updateSelectedVarsVisual(sheetId) {
-        // const tableSecond = this.#tableData;
-        const tableData = this.#tableData;
-        let curVars = [...tableData.querySelectorAll('label')];
-        curVars.forEach((el => {
-            const ids = el.dataset.varId.split('_');
-            if (ids[1] == sheetId) {
-                const v = DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
-                const elImg = el.querySelector('img');
-                el.querySelector('span').innerHTML = v.getName();
-                elImg.setAttribute('src', v.getImg());
-                elImg.setAttribute('alt', v.getTypeName());
-            }
-        }));
-    }
-
-    //!
-    clearSelectedVars() {
-        this.#tableData.innerHTML = '';
-    }
-
-    getFormMain() {
-        return this.#form;
-    }
-
-    //!
-    getFormSheet() {
-        return this.#formSheet;
-    }
-
-    getSheetSelect() {
-        return this.#sheetSelect;
-    }
-
-    //!
     setSettings() {
         const formData = new FormData(this.#form);
-        const tableData = this.#tableData;
         this.#testType = formData.get('test-type');
         this.#altHypTest = formData.get('hyp-check');
+        this.#inputType = formData.get('input-type');
+
+        switch (this.#testType) {
+            case 'student': {
+                if (this.#inputType === 'manual') {
+                    this.#resultsTableData.student.d = Number(formData.get('d'));
+                    this.#resultsTableData.student.sd = Number(formData.get('sd'));
+                }
+                else {
+                    this.#resultsTableData.student.d = null;
+                    this.#resultsTableData.student.sd = null;
+                }
+                break;
+            }
+            case 'fisher': {
+                // if (this.#inputType === 'manual') {
+                //     this.#resultsTableData.sign.p0 = Number(formData.get('p0'));
+                //     this.#resultsTableData.sign.p1 = Number(formData.get('p1'));
+                // }
+                // else {
+                //     this.#resultsTableData.sign.p0 = null;
+                //     this.#resultsTableData.sign.p1 = null;
+                //     this.#resultsTableData.sign.p2 = null;
+                // }
+                break;
+            }
+        }
+        this.#resultsTableData.z = null;
 
         const data = [];
         this.#data.first = null;
         this.#data.second = null;
         const vars = [];
-        this.#vars.first = null;
-        this.#vars.second = null;
-        if (tableData) {
-            const selectedVars = [...tableData?.children];
-            if (selectedVars.length == 2) {
-                selectedVars.forEach(el => {
-                    const ids = el.dataset.varId.split('_');
-                    data.push(DataControls.getDataBySheetAndVarId(ids[1], ids[2]).slice(1));
-                    vars.push(DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]));
-                });
-                this.#data.first = data[0];
-                this.#data.second = data[1];
-                this.#vars.first = vars[0];
-                this.#vars.second = vars[1];
-            }
+        this.#vars.dep = null;
+        this.#vars.indep = null;
+
+        if (!this.#tableData) {
+            return;
+        }
+        const tableData = this.#tableData;
+        const dep = tableData.depTable.firstElementChild;
+        const indep = tableData.indepTable.firstElementChild;
+        const selectedVars = [dep, indep];
+
+        if (dep && indep) {
+            selectedVars.forEach(el => {
+                const ids = el.dataset.varId.split('_');
+                data.push(DataControls.getDataBySheetAndVarId(ids[1], ids[2]).slice(1));
+                vars.push(DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]));
+            });
+            this.#data.first = data[0];
+            this.#data.second = data[1];
+            this.#vars.dep = vars[0];
+            this.#vars.indep = vars[1];
         }
     }
-
 
     getN(alpha, power) {
         if (!alpha || Number.isNaN(alpha) || typeof alpha !== 'number') {
@@ -394,40 +425,89 @@ export default class Module extends AbstractModule {
         this.#power = this.#testChoose(true, alpha, sampleSize);
     }
 
+    //!
     #testChoose(isInv, alpha, arg) {
-        if (!this.#data.first || !this.#data.second) {
-            return;
+        let depVarName, indepVarName;
+        let errorElement;
+        let data1 = [], data2 = [];
+
+        if (this.#inputType !== 'manual') {
+
+            if (!this.#data.first || !this.#data.second) {
+                return;
+            }
+            errorElement = this.#tableData.indepTable;
+
+            depVarName = this.#vars.first.getTypeName();
+            indepVarName = this.#vars.second.getTypeName();
+
+            if (indepVarName !== Var.Binary.name) {
+                UIControls.showError(errorElement, 'Переменная для группировки должна быть дихотомического типа');
+                return;
+            }
+            if (this.#data.first.length !== this.#data.second.length) {
+                UIControls.showError(errorElement, 'Размеры данных зависимой переменной и переменной для группировки должны совпадать');
+                return;
+            }
+
+            //ПРОВЕРИТЬ !!!!!!!!!!!!!!
+            const indepVar = this.#vars.indep;
+            this.#data.first.forEach((el, ind) => {
+                const group = indepVar.isValInZeroGroup(this.#data.second[ind]);
+                if (group === 0) {
+                    data1.push(el);
+                }
+                else if (group === 1) {
+                    data2.push(el);
+                }
+                else {
+                    UIControls.showError(errorElement, 'Ошибка вычисления');
+                    return;
+                }
+            });
         }
-        const firstVarName = this.#vars.first.getTypeName();
-        const secondVarName = this.#vars.second.getTypeName();
-        if (firstVarName !== secondVarName) {
-            UIControls.showError(this.#tableData, 'Нельзя сравнить данные разного типа');
-            return;
-        }
-        if (this.#data.first.length !== this.#data.second.length) {
-            UIControls.showError(this.#tableData, 'Выбранные наборы данных имеют разную длину');
-            return;
+        else {
+            errorElement = this.#element;
+            data1 = null, data2 = null;
         }
 
         let returnValue;
-        switch (this.#testType) {
-            case 'student': {
-                if (firstVarName !== Var.Continues.name) {
-                    UIControls.showError(this.#tableData, errorText([Var.Continues.ruName, Var.Rang.ruName]));
-                    return;
+        try {
+            switch (this.#testType) {
+                case 'student': {
+                    // if (this.#inputType !== 'manual' && depVarName !== Var.Binary.name) {
+                    //     errorElement = this.#tableData.depTable;
+                    //     throw new Error(errorText([Var.Binary.ruName]));
+                    // }
+                    // if (isInv) {
+                    //     returnValue = this.#studentTestInv(alpha, arg);
+                    // }
+                    // else {
+                    //     returnValue = this.#studentTest(alpha, arg);
+                    // }
+                    break;
                 }
-                if (isInv) {
-                    returnValue = this.#studentTestInv(alpha, arg);
-                }
-                else {
-                    returnValue = this.#studentTest(alpha, arg);
+                case 'fisher': {
+                    if (this.#inputType !== 'manual' && depVarName === Var.Binary.name) {
+                        errorElement = this.#tableData.depTable;
+                        throw new Error(errorText([Var.Binary.ruName]));
+                    }
+
+                    if (isInv) {
+                        returnValue = this.#fisherTestInv(alpha, arg, data1, data2);
+                    }
+                    else {
+                        returnValue = this.#fisherTest(alpha, arg, data1, data2);
+                    }
+                    break;
                 }
             }
         }
-
-        if (!returnValue || Number.isNaN(returnValue)) {
-            UIControls.showError(this.#tableData, 'Ошибка расчета данных');
+        catch (err) {
+            UIControls.showError(errorElement, err.message);
+            return;
         }
+
         return returnValue;
 
         function errorText(varTypeNameArray) {
@@ -435,84 +515,196 @@ export default class Module extends AbstractModule {
         }
     }
 
-    //ПРОВЕРКИ НА ПРОПУЩЕННЫЕ ЗНАЧЕНИЯ. ЧТО С НИМИ ДЕЛАТЬ???
-
+    //!
     #studentTest(alpha, power) {
-        const zAlpha = this.#altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha);
-        const z = zAlpha + Math.norminv(100 - power);
-        const differences = this.#data.first.map((el, i) => el - this.#data.second[i]);
-        const d = Math.abs(Math.mean(differences));
-        const sd = Math.stddiv.s(differences);
+        let d, sd;
+        const zAlpha = this.getZAlpha(alpha);
+        const z = this.getZ(zAlpha, power);
+        if (this.#inputType === 'manual') {
+            d = this.#resultsTableData.student.d;
+            sd = this.#resultsTableData.student.sd;
+        }
+        else {
+            const differences = this.#data.first.map((el, i) => {
+                if (el === '' || this.#data.second[i] === '')
+                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения')
+                return el - this.#data.second[i];
+            });
+            d = Math.abs(Math.mean(differences));
+            sd = Math.stddiv.s(differences);
+        }
+        if (d === 0) {
+            throw new Error('Средняя разность равна нулю. Проверьте, что сравниваются разные наборы данных')
+        }
+
         const n = (z * sd / d) ** 2 + ((zAlpha ** 2) / 2);
+
+        if (n === undefined || Number.isNaN(n)) {
+            throw new Error('Ошибка расчета данных');
+        }
+
+        this.#resultsTableData.z = z;
+        this.#resultsTableData.student.d = d;
+        this.#resultsTableData.student.sd = sd;
 
         return n;
     }
 
+    //!
     #studentTestInv(alpha, n) {
-        const zAlpha = this.#altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha);
-        const differences = this.#data.first.map((el, i) => el - this.#data.second[i]);
-        const d = Math.abs(Math.mean(differences));
-        const sd = Math.stddiv.s(differences);
-        let tmp = Math.sqrt(n - ((zAlpha ** 2) / 2));
-        const z = (tmp * d) / sd * -1;
+        let d, sd;
+        const zAlpha = this.getZAlpha(alpha);
+
+        if (this.#inputType === 'manual') {
+            d = this.#resultsTableData.student.d;
+            sd = this.#resultsTableData.student.sd;
+        }
+        else {
+            const differences = this.#data.first.map((el, i) => {
+                if (el === '' || this.#data.second[i] === '')
+                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения')
+                return el - this.#data.second[i];
+            });
+            d = Math.abs(Math.mean(differences));
+            sd = Math.stddiv.s(differences);
+        }
+
+        if (d === 0) {
+            throw new Error('Средняя разность равна нулю. Проверьте, что сравниваются разные наборы данных')
+        }
+
+        let z = (Math.sqrt(n - ((zAlpha ** 2) / 2)) * d) / sd * -1;
+        if (z > 0) {
+            z *= -1;
+        }
         const zB = z - zAlpha;
         const power = 100 - Math.normdist(zB);
+
+        if (power === undefined || Number.isNaN(power)) {
+            throw new Error('Ошибка расчета данных');
+        }
+
+        this.#resultsTableData.z = z;
+        this.#resultsTableData.student.d = d;
+        this.#resultsTableData.student.sd = sd;
 
         return power;
     }
 
+    #fisherTest(alpha, power, data1, data2) {
+        const zAlpha = this.getZAlpha(alpha);
+        const z = this.getZ(zAlpha, power);
+
+
+    }
+
+    #fisherTestInv(alpha, n, data1, data2) {
+
+    }
+
     updateResultsHtml(isMain) {
         const name = this.#hypName;
-        const powerString = isMain ? `<p><b>Основная гипотеза</b></p>` : `<p>Статистическая мощность: ${this.#power ? this.#power : '-'}</p>`;
+        const powerString = isMain ? `<p><b>Основная гипотеза</b></p>` : `<p>Статистическая мощность: ${Number.resultForm(this.#power)}%</p>`;
+        let table;
+        if (this.#testType === 'student') {
+            table = `<thead>
+                        <tr>
+                            <th>
+                                Зависимая переменная
+                            </th>
+                            <th>
+                                Переменная для группировки
+                            </th>
+                            <th>
+                                d mean
+                            </th>
+                            <th>
+                                sd
+                            </th>
+                            <th>
+                                z
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                ${String.resultForm(this.#vars.dep?.getName())}
+                            </td>
+                            <td>
+                                ${String.resultForm(this.#vars.indep?.getName())}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.student.d)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.student.sd)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.z)}
+                            </td>
+                        </tr >
+                    </tbody >`;
+        }
+        else if (this.#testType === 'fisher') {
+            table = `<thead>
+                        <tr>
+                            <th>
+                                M1
+                            </th>
+                            <th>
+                                M2
+                            </th>
+                            <th>
+                                &#961;<sub>&#965;</sub>
+                            </th>
+                            <th>
+                                &#961;<sub>1</sub>
+                            </th>
+                            <th>
+                                &#961;<sub>2</sub>
+                            </th>
+                            <th>
+                                z
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                ${String.resultForm(this.#vars.first?.getName())}
+                            </td>
+                            <td>
+                                ${String.resultForm(this.#vars.second?.getName())}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.sign.p0)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.sign.p1)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.sign.p2)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.z)}
+                            </td>
+                        </tr >
+                    </tbody >`;
+        }
         const htmlRes = `
         <h2>${name}</h2>
         <div class="results__block-inner">
             ${powerString}
             <p>Сравнение парных выборок</p>
             <p>${Module.testText[this.#testType]}</p>
+            ${Module.altHypText[this.#altHypTest]}
             <table class="results__table">
-                <caption><small>${Module.altHypText[this.#altHypTest]}</small>
+                <caption><small>${this.#inputType === 'manual' ? 'Данные введены вручную' : ''}</small>
                 </caption>
-                <thead>
-                    <tr>
-                        <th>
-                            M1
-                        </th>
-                        <th>
-                            M2
-                        </th>
-                        <th>
-                            t
-                        </th>
-                        <th>
-                            df
-                        </th>
-                        <th>
-                            p
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            Столбец1
-                        </td>
-                        <td>
-                            Столбец2
-                        </td>
-                        <td>
-                            4.232
-                        </td>
-                        <td>
-                            3
-                        </td>
-                        <td>
-                            0.02
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>`;
+                ${table}
+            </table >
+        </div > `;
 
         this.#resultBlock.innerHTML = htmlRes;
     }

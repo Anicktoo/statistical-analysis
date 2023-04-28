@@ -76,6 +76,14 @@ export default class Module extends AbstractModule {
         return this.#hypName;
     }
 
+    getFormSheet() {
+        return this.#formSheet;
+    }
+
+    getSheetSelect() {
+        return this.#sheetSelect;
+    }
+
     addListeners(element) {
         const tables = element.querySelector('.paired-sample__tables');
         const switchBtn = tables.querySelector('.switch-button');
@@ -112,6 +120,53 @@ export default class Module extends AbstractModule {
 
             ModuleIntegrator.setSettings(this.#id, this.#form, tableData);
         });
+    }
+
+    displayVarsOfSheet(sheetId) {
+        const vars = DataControls.getVarsBySheetId(sheetId);
+        if (!vars)
+            return;
+        const tableBody = this.#element.querySelector('.paired-sample__table-body');
+        const tableSecondItem = this.#tableData;
+        const arrOfIds = [];
+        arrOfIds.push(tableSecondItem.firstElementChild?.dataset.varId);
+        arrOfIds.push(tableSecondItem.lastElementChild?.dataset.varId);
+        let strBody = '';
+        vars.forEach(element => {
+            const curVarID = element.getID();
+            let stringElement = `
+            <label title="${element.getName()}" class="var-table__item" data-var-id=${curVarID}>
+                <input type="radio" name="data_value">
+                <img src=${element.getImg()} alt="${element.getTypeName()}" class="var-table__img">
+                <span>${element.getName()}</span>
+            </label>`;
+
+            if (!arrOfIds.includes(curVarID)) {
+                strBody += stringElement;
+            }
+            strBody += `<div class='var-table__anchor var-table__anchor_${curVarID}'></div>`;
+        });
+        tableBody.innerHTML = strBody;
+    }
+
+    updateSelectedVarsVisual(sheetId) {
+        // const tableSecond = this.#tableData;
+        const tableData = this.#tableData;
+        let curVars = [...tableData.querySelectorAll('label')];
+        curVars.forEach((el => {
+            const ids = el.dataset.varId.split('_');
+            if (ids[1] == sheetId) {
+                const v = DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
+                const elImg = el.querySelector('img');
+                el.querySelector('span').innerHTML = v.getName();
+                elImg.setAttribute('src', v.getImg());
+                elImg.setAttribute('alt', v.getTypeName());
+            }
+        }));
+    }
+
+    clearSelectedVars() {
+        this.#tableData.innerHTML = '';
     }
 
     createHTML() {
@@ -282,65 +337,6 @@ export default class Module extends AbstractModule {
         return { newHyp, newRes };
     }
 
-    displayVarsOfSheet(sheetId) {
-        const vars = DataControls.getVarsBySheetId(sheetId);
-        if (!vars)
-            return;
-        const tableBody = this.#element.querySelector('.paired-sample__table-body');
-        const tableSecondItem = this.#tableData;
-        const arrOfIds = [];
-        arrOfIds.push(tableSecondItem.firstElementChild?.dataset.varId);
-        arrOfIds.push(tableSecondItem.lastElementChild?.dataset.varId);
-        let strBody = '';
-        vars.forEach(element => {
-            const curVarID = element.getID();
-            let stringElement = `
-            <label title="${element.getName()}" class="var-table__item" data-var-id=${curVarID}>
-                <input type="radio" name="data_value">
-                <img src=${element.getImg()} alt="${element.getTypeName()}" class="var-table__img">
-                <span>${element.getName()}</span>
-            </label>`;
-
-            if (!arrOfIds.includes(curVarID)) {
-                strBody += stringElement;
-            }
-            strBody += `<div class='var-table__anchor var-table__anchor_${curVarID}'></div>`;
-        });
-        tableBody.innerHTML = strBody;
-    }
-
-    updateSelectedVarsVisual(sheetId) {
-        // const tableSecond = this.#tableData;
-        const tableData = this.#tableData;
-        let curVars = [...tableData.querySelectorAll('label')];
-        curVars.forEach((el => {
-            const ids = el.dataset.varId.split('_');
-            if (ids[1] == sheetId) {
-                const v = DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
-                const elImg = el.querySelector('img');
-                el.querySelector('span').innerHTML = v.getName();
-                elImg.setAttribute('src', v.getImg());
-                elImg.setAttribute('alt', v.getTypeName());
-            }
-        }));
-    }
-
-    clearSelectedVars() {
-        this.#tableData.innerHTML = '';
-    }
-
-    getFormMain() {
-        return this.#form;
-    }
-
-    getFormSheet() {
-        return this.#formSheet;
-    }
-
-    getSheetSelect() {
-        return this.#sheetSelect;
-    }
-
     setSettings() {
         const formData = new FormData(this.#form);
         const tableData = this.#tableData;
@@ -488,8 +484,8 @@ export default class Module extends AbstractModule {
 
     #studentTest(alpha, power) {
         let d, sd;
-        const zAlpha = this.#getZAlpha(alpha);
-        const z = this.#getZ(zAlpha, power);
+        const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
+        const z = this.getZ(zAlpha, power);
         if (this.#inputType === 'manual') {
             d = this.#resultsTableData.student.d;
             sd = this.#resultsTableData.student.sd;
@@ -522,7 +518,7 @@ export default class Module extends AbstractModule {
 
     #studentTestInv(alpha, n) {
         let d, sd;
-        const zAlpha = this.#getZAlpha(alpha);
+        const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
 
         if (this.#inputType === 'manual') {
             d = this.#resultsTableData.student.d;
@@ -562,8 +558,8 @@ export default class Module extends AbstractModule {
 
     #signTest(alpha, power) {
         let p0, p1, p2;
-        const zAlpha = this.#getZAlpha(alpha);
-        const z = this.#getZ(zAlpha, power);
+        const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
+        const z = this.getZ(zAlpha, power);
         if (this.#inputType === 'manual') {
             p0 = this.#resultsTableData.sign.p0;
             p1 = this.#resultsTableData.sign.p1;
@@ -593,7 +589,7 @@ export default class Module extends AbstractModule {
 
     #signTestInv(alpha, n) {
         let p0, p1, p2;
-        const zAlpha = this.#getZAlpha(alpha);
+        const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
 
         if (this.#inputType === 'manual') {
             p0 = this.#resultsTableData.sign.p0;
@@ -678,14 +674,6 @@ export default class Module extends AbstractModule {
                 }
             });
         }
-    }
-
-    #getZAlpha(alpha) {
-        return this.#altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha)
-    }
-
-    #getZ(zAlpha, power) {
-        return zAlpha + Math.norminv(100 - power);
     }
 
     updateResultsHtml(isMain) {

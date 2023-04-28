@@ -75,11 +75,10 @@ export default class ModuleIntegrator {
         const newHyp = new ModuleIntegrator.modules[hypTypeId](globalSettings.hypCounter);
         ModuleIntegrator.hypotheses.push({ hyp: newHyp, update: null });
         const newEls = newHyp.createHTML();
-        const form = newHyp.getFormMain();
         AbstractModule.addSheetOptions(DataControls.getListOfSheets(), newHyp.getSheetSelect());
         ModuleIntegrator.refreshVarsOfHyp(globalSettings.hypCounter)
         UIControls.addModuleFormListeners(globalSettings.hypCounter, newEls.newHyp, newHyp.addListeners.bind(newHyp, newEls.newHyp));
-        ModuleIntegrator.setSettings(globalSettings.hypCounter, form);
+        ModuleIntegrator.setSettings(globalSettings.hypCounter);
 
         if (ModuleIntegrator.hypotheses.length === 1) {
             globalSettings.mainHypId = globalSettings.hypCounter;
@@ -139,7 +138,7 @@ export default class ModuleIntegrator {
             clearTimeout(ModuleIntegrator.timerId);
         }
 
-        ModuleIntegrator.timerId = setTimeout(delayed, 1500);
+        ModuleIntegrator.timerId = setTimeout(delayed, 1000);
     }
 
     static applySettings() {
