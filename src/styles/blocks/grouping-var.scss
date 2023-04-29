@@ -1,8 +1,4 @@
-@import '../../../styles/vars.scss';
-
-.independent-sample {
-    &__tables {}
-
+.grouping-var {
     &__tables-and-switches {
         display: flex;
         flex-direction: column;
@@ -53,7 +49,7 @@
         position: relative;
         min-width: 225px;
         max-width: 225px;
-        min-height: 2 * $varTableItemPadding + 2 * $varTableBodyPadding + $line-height + 4px;
-        max-height: 2 * $varTableItemPadding + 2 * $varTableBodyPadding + $line-height + 4px;
+        min-height: 2 * $varTableItemPadding + 2 * $varTableBodyPadding + 2 * $line-height + 4px;
+        max-height: 2 * $varTableItemPadding + 2 * $varTableBodyPadding + 2 * $line-height + 4px;
     }
 }

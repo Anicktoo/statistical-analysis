@@ -63,15 +63,18 @@ export default class AbstractModule {
 
     //ABSTRACT ONLY
 
-    static addSheetOptions(listOfSheets, select) {
-        const options = [];
+    static addSheetOptions(listOfSheets, selects) {
+        let str = '';
         for (let el of listOfSheets) {
-            const option = document.createElement('option');
-            option.setAttribute('value', el.id);
-            option.textContent = el.name;
-            options.push(option);
+            if (!selects[0].querySelector(`.select-option-${el.id}`)) {
+                const option = `<option class='select-option-${el.id}' value="${el.id}">${el.name}</option>`
+                str += option;
+            }
         }
-        select.append(...options);
+
+        for (let select of selects) {
+            select.innerHTML += str;
+        }
     }
 
     getZAlpha(altHypTest, alpha) {

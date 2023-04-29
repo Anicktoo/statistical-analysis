@@ -349,29 +349,42 @@ class UIControls {
             ModuleIntegrator.setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
         }));
 
-        const elementFormSheets = element.querySelector('.sheet-form');
-        elementFormSheets?.addEventListener('change', () => {
-            // ModuleIntegrator.setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
-            ModuleIntegrator.refreshVarsOfHyp(id, elementFormSheets);
+        const elementFormSheets = [...element.querySelectorAll('.sheet-form')];
+        elementFormSheets?.forEach(el => {
+            el.addEventListener('change', () => {
+                // ModuleIntegrator.setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
+                ModuleIntegrator.refreshVarsOfHyp(id, el);
+            });
         });
 
         // manual input listener
 
         const manualInput = element.querySelector('.manual-input-on');
-        const dataTables = element.querySelector('.option-block__tables');
+        const dataInputTwo = element.querySelector('.data-input-two');
+        const dataInputGroup = element.querySelector('.data-input-group');
+        const tableTwo = element.querySelector('.two-column-var');
+        const tableGroup = element.querySelector('.grouping-var');
         const testTypeBlock = element.querySelector('.option-block__test-type');
+        const manualEllements = [...element.querySelectorAll(`.option-block__manual-input`)];
+
         manualInput?.addEventListener('click', () => {
             const testName = testTypeBlock.querySelector('input:checked').value;
             const manualEllement = element.querySelector(`.option-block__${testName}`);
             manualEllement?.classList.remove('option-block_hidden');
-            dataTables.classList.add('option-block_hidden');
+            tableTwo.classList.add('option-block_hidden');
+            tableGroup.classList.add('option-block_hidden');
         });
 
-        const manualInputOff = element.querySelector('.manual-input-off');
-        const manualEllements = [...element.querySelectorAll(`.option-block__manual-input`)];
-        manualInputOff?.addEventListener('click', () => {
+        dataInputTwo?.addEventListener('click', () => {
             hideAllManualOptionBlocks();
-            dataTables.classList.remove('option-block_hidden');
+            tableGroup.classList.add('option-block_hidden');
+            tableTwo.classList.remove('option-block_hidden');
+        });
+
+        dataInputGroup?.addEventListener('click', () => {
+            hideAllManualOptionBlocks();
+            tableTwo.classList.add('option-block_hidden');
+            tableGroup.classList.remove('option-block_hidden');
         });
 
         if (testTypeBlock) {

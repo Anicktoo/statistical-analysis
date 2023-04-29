@@ -1,5 +1,4 @@
 import img from './img/moduleIndependent.png';
-import './styles/style.scss';
 import ModuleIntegrator from '@/ModuleIntegrator';
 import DataControls from '@data/DataControls';
 import AbstractModule from '@modules/AbstractModule';
@@ -89,9 +88,9 @@ export default class Module extends AbstractModule {
 
     addListeners(element) {
         const [switch1, switch2] = [...element.querySelectorAll('.switch-button')];
-        const leftTable = element.querySelector('.independent-sample__table-body');
-        const depTable = element.querySelector('.independent-sample__dependent-table-body');
-        const indepTable = element.querySelector('.independent-sample__independent-table-body');
+        const leftTable = element.querySelector('.grouping-var__table-body');
+        const depTable = element.querySelector('.grouping-var__dependent-table-body');
+        const indepTable = element.querySelector('.grouping-var__independent-table-body');
 
         const insertChild = (item, toTable) => {
             const nextChild = toTable.querySelector('.var-table__anchor_' + item.dataset.varId);
@@ -131,7 +130,7 @@ export default class Module extends AbstractModule {
         const vars = DataControls.getVarsBySheetId(sheetId);
         if (!vars)
             return;
-        const tableBody = this.#element.querySelector('.independent-sample__table-body');
+        const tableBody = this.#element.querySelector('.grouping-var__table-body');
         const { depTable, indepTable } = this.#tableData;
         const dep = depTable.firstElementChild;
         const indep = indepTable.firstElementChild;
@@ -186,7 +185,7 @@ export default class Module extends AbstractModule {
         const newHyp = document.createElement('div');
         const newRes = document.createElement('div');
         const newOption = document.createElement('option');
-        newHyp.classList.add('parameters__item', 'collapsible', 'independent-sample');
+        newHyp.classList.add('parameters__item', 'collapsible', 'grouping-var');
         newRes.classList.add('results__block');
         newOption.setAttribute('value', this.#id);
         const htmlParam = `
@@ -231,42 +230,42 @@ export default class Module extends AbstractModule {
                             </label>
                         </div>
                     </div>
-                    <div class="option-block__tables independent-sample__tables">
+                    <div class="option-block__tables grouping-var__tables">
                         <div class="var-table">
                             <div class="var-table__header">
                                 <form id="sheet-form-${this.#id}" class="sheet-form">
                                     <div class="main-select">
                                         <select
-                                            class="main-input independent-sample__sheet-select sheet-select"
+                                            class="main-input grouping-var__sheet-select sheet-select"
                                             name="sheet-select"></select>
                                     </div>
                                 </form>
                             </div>
-                            <div class="var-table__body independent-sample__table-body">
+                            <div class="var-table__body grouping-var__table-body">
                             </div>
                         </div>
-                        <div class="independent-sample__tables-and-switches">
-                            <div class="independent-sample__container">
-                                <div class="independent-sample__switch-container">
+                        <div class="grouping-var__tables-and-switches">
+                            <div class="grouping-var__container">
+                                <div class="grouping-var__switch-container">
                                     <div class="switch-button switch-button_right">
                                         <div class="switch-button__symbol"></div>
                                     </div>
                                 </div>
                                 <div class="var-table">
                                     <div class="var-table__header">Зависимая переменная</div>
-                                    <div class="var-table__body independent-sample__dependent-table-body">
+                                    <div class="var-table__body grouping-var__dependent-table-body">
                                     </div>
                                 </div>
                             </div>
-                            <div class="independent-sample__container">
-                                <div class="independent-sample__switch-container">
+                            <div class="grouping-var__container">
+                                <div class="grouping-var__switch-container">
                                     <div class="switch-button switch-button_right">
                                         <div class="switch-button__symbol"></div>
                                     </div>
                                 </div>
                                 <div class="var-table">
                                     <div class="var-table__header">Группировка по переменной</div>
-                                    <div class="var-table__body independent-sample__independent-table-body">
+                                    <div class="var-table__body grouping-var__independent-table-body">
                                     </div>
                                 </div>
                             </div>
@@ -336,8 +335,8 @@ export default class Module extends AbstractModule {
         this.#form = newHyp.querySelector('.module-option-form');
         this.#formSheet = newHyp.querySelector('.sheet-form');
         this.#sheetSelect = newHyp.querySelector('.sheet-select');
-        this.#tableData.indepTable = newHyp.querySelector('.independent-sample__independent-table-body');
-        this.#tableData.depTable = newHyp.querySelector('.independent-sample__dependent-table-body');
+        this.#tableData.indepTable = newHyp.querySelector('.grouping-var__independent-table-body');
+        this.#tableData.depTable = newHyp.querySelector('.grouping-var__dependent-table-body');
         this.#resultBlock = newRes;
         this.#hypName = name;
         return { newHyp, newRes };
@@ -384,9 +383,6 @@ export default class Module extends AbstractModule {
         this.#vars.dep = null;
         this.#vars.indep = null;
 
-        if (!this.#tableData) {
-            return;
-        }
         const tableData = this.#tableData;
         const dep = tableData.depTable.firstElementChild;
         const indep = tableData.indepTable.firstElementChild;

@@ -1,7 +1,6 @@
-import './styles/style.scss';
+import img from './img/modulePair.png';
 import ModuleIntegrator from '@/ModuleIntegrator';
 import DataControls from '@data/DataControls';
-import img from './img/modulePair.png';
 import AbstractModule from '@modules/AbstractModule';
 import Var from '@data/Var';
 
@@ -54,9 +53,13 @@ export default class Module extends AbstractModule {
     #hypName;
     #element
     #form;
-    #formSheet;
-    #sheetSelect;
-    #tableData;
+    #formSheets = [];
+    #sheetSelects = [];
+    #tableData = {
+        pair: undefined,
+        indepTable: undefined,
+        depTable: undefined
+    };
     #resultBlock;
 
     constructor(id) {
@@ -76,19 +79,25 @@ export default class Module extends AbstractModule {
         return this.#hypName;
     }
 
-    getFormSheet() {
-        return this.#formSheet;
+    getFormSheets() {
+        return this.#formSheets;
     }
 
-    getSheetSelect() {
-        return this.#sheetSelect;
+    getSheetSelects() {
+        return this.#sheetSelects;
     }
 
     addListeners(element) {
-        const tables = element.querySelector('.paired-sample__tables');
-        const switchBtn = tables.querySelector('.switch-button');
-        const firstTable = tables.querySelector('.paired-sample__table-body');
-        const tableData = tables.querySelector('.target-table-data');
+        const tableTwo = element.querySelector('.two-column-var');
+        const switch0 = tableTwo.querySelector('.switch-button');
+        const firstTable = tableTwo.querySelector('.two-column-var__table-body');
+        const tableData = tableTwo.querySelector('.target-table-data');
+
+        const tableGroup = element.querySelector('.grouping-var');
+        const [switch1, switch2] = [...tableGroup.querySelectorAll('.switch-button')];
+        const leftTable = element.querySelector('.grouping-var__table-body');
+        const depTable = element.querySelector('.grouping-var__dependent-table-body');
+        const indepTable = element.querySelector('.grouping-var__independent-table-body');
 
         const insertChild = (item, toTable) => {
             const nextChild = toTable.querySelector('.var-table__anchor_' + item.dataset.varId);
@@ -97,76 +106,110 @@ export default class Module extends AbstractModule {
             }
         }
 
-        switchBtn.addEventListener('click', () => {
-            const checkedInput = tables.querySelector('input:checked');
+        const callSettings = () => {
+            if ((depTable.firstElementChild && indepTable.firstElementChild) || tableData.children.length === 2) {
+                ModuleIntegrator.setSettings(this.#id);
+            }
+        }
+
+        const swapItem = function (firstTable, secondTable, maxItemsInSecondTable) {
+            const checkedInput = firstTable.querySelector('input:checked') || secondTable.querySelector('input:checked');
             if (!checkedInput)
                 return;
             const checkedItem = checkedInput.parentElement;
             const parentOfItem = checkedItem.parentElement;
-
-            if (parentOfItem.isSameNode(tableData)) {
+            if (parentOfItem.isSameNode(secondTable)) {
                 parentOfItem.removeChild(checkedItem);
                 insertChild(checkedItem, firstTable);
             }
             else {
-                if (tableData.children.length === 2) {
-                    // const removed = tableData.removeChild(tableData.firstElementChild);
-                    // insertChild(removed, firstTable);
+                if (secondTable.children.length === maxItemsInSecondTable) {
                     return;
                 }
                 parentOfItem.removeChild(checkedItem);
-                tableData.appendChild(checkedItem);
+                secondTable.appendChild(checkedItem);
             }
 
-            ModuleIntegrator.setSettings(this.#id, this.#form, tableData);
-        });
+            callSettings();
+        }
+
+        switch0.addEventListener('click', swapItem.bind(this, firstTable, tableData, 2));
+        switch1.addEventListener('click', swapItem.bind(this, leftTable, depTable, 1));
+        switch2.addEventListener('click', swapItem.bind(this, leftTable, indepTable, 1));
+
     }
 
     displayVarsOfSheet(sheetId) {
         const vars = DataControls.getVarsBySheetId(sheetId);
         if (!vars)
             return;
-        const tableBody = this.#element.querySelector('.paired-sample__table-body');
-        const tableSecondItem = this.#tableData;
-        const arrOfIds = [];
+        let tableBody = this.#element.querySelector('.two-column-var__table-body');
+        const tableSecondItem = this.#tableData.pair;
+        let arrOfIds = [];
         arrOfIds.push(tableSecondItem.firstElementChild?.dataset.varId);
         arrOfIds.push(tableSecondItem.lastElementChild?.dataset.varId);
-        let strBody = '';
-        vars.forEach(element => {
-            const curVarID = element.getID();
-            let stringElement = `
-            <label title="${element.getName()}" class="var-table__item" data-var-id=${curVarID}>
-                <input type="radio" name="data_value">
-                <img src=${element.getImg()} alt="${element.getTypeName()}" class="var-table__img">
-                <span>${element.getName()}</span>
-            </label>`;
 
-            if (!arrOfIds.includes(curVarID)) {
-                strBody += stringElement;
-            }
-            strBody += `<div class='var-table__anchor var-table__anchor_${curVarID}'></div>`;
-        });
-        tableBody.innerHTML = strBody;
+        tableBody.innerHTML = createElementsStr();
+
+        tableBody = this.#element.querySelector('.grouping-var__table-body');
+        const dep = this.#tableData.depTable.firstElementChild;
+        const indep = this.#tableData.indepTable.firstElementChild;
+        arrOfIds = [];
+        arrOfIds.push(dep?.dataset.varId);
+        arrOfIds.push(indep?.dataset.varId);
+
+        tableBody.innerHTML = createElementsStr();
+
+        function createElementsStr() {
+            let strBody = '';
+            vars.forEach(element => {
+                const curVarID = element.getID();
+                let stringElement = `
+                <label title="${element.getName()}" class="var-table__item" data-var-id=${curVarID}>
+                    <input type="radio" name="data_value">
+                    <img src=${element.getImg()} alt="${element.getTypeName()}" class="var-table__img">
+                    <span>${element.getName()}</span>
+                </label>`;
+
+                if (!arrOfIds.includes(curVarID)) {
+                    strBody += stringElement;
+                }
+                strBody += `<div class='var-table__anchor var-table__anchor_${curVarID}'></div>`;
+            });
+            return strBody;
+        }
     }
 
     updateSelectedVarsVisual(sheetId) {
-        // const tableSecond = this.#tableData;
-        const tableData = this.#tableData;
+        let tableData = this.#tableData.pair;
         let curVars = [...tableData.querySelectorAll('label')];
-        curVars.forEach((el => {
-            const ids = el.dataset.varId.split('_');
-            if (ids[1] == sheetId) {
-                const v = DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
-                const elImg = el.querySelector('img');
-                el.querySelector('span').innerHTML = v.getName();
-                elImg.setAttribute('src', v.getImg());
-                elImg.setAttribute('alt', v.getTypeName());
-            }
-        }));
+        curVarsUpdate(curVars);
+
+        tableData = this.#tableData;
+        curVars = [tableData.depTable?.firstElementChild, tableData.indepTable?.firstElementChild];
+        curVarsUpdate(curVars);
+
+
+        function curVarsUpdate(curVars) {
+            curVars.forEach((el => {
+                if (el) {
+                    const ids = el.dataset.varId.split('_');
+                    if (ids[1] == sheetId) {
+                        const v = DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
+                        const elImg = el.querySelector('img');
+                        el.querySelector('span').innerHTML = v.getName();
+                        elImg.setAttribute('src', v.getImg());
+                        elImg.setAttribute('alt', v.getTypeName());
+                    }
+                }
+            }));
+        }
     }
 
     clearSelectedVars() {
-        this.#tableData.innerHTML = '';
+        this.#tableData.pair.innerHTML = '';
+        this.#tableData.depTable.innerHTML = '';
+        this.#tableData.indepTable.innerHTML = '';
     }
 
     createHTML() {
@@ -177,7 +220,7 @@ export default class Module extends AbstractModule {
         const newHyp = document.createElement('div');
         const newRes = document.createElement('div');
         const newOption = document.createElement('option');
-        newHyp.classList.add('parameters__item', 'collapsible', 'paired-sample');
+        newHyp.classList.add('parameters__item', 'collapsible');
         newRes.classList.add('results__block');
         newOption.setAttribute('value', this.#id);
         const htmlParam = `
@@ -211,9 +254,14 @@ export default class Module extends AbstractModule {
                         Тип ввода
                         <div class="option-block__list">
                             <label class="radio-line">
-                                <input class="main-radio form-change-trigger manual-input-off" type="radio" name="input-type" value="data" form="module-option-form_${this.#id}"
+                                <input class="main-radio form-change-trigger data-input-two" type="radio" name="input-type" value="data-input-two" form="module-option-form_${this.#id}"
                                     checked>
-                                <span>Вычисление по данным</span>
+                                <span>Вычисление по данным (два столбца)</span>
+                            </label>
+                            <label class="radio-line">
+                                <input class="main-radio form-change-trigger data-input-group" type="radio" name="input-type" value="data-input-group" form="module-option-form_${this.#id}"
+                                    >
+                                <span>Вычисление по данным (группировка по переменной)</span>
                             </label>
                             <label class="radio-line">
                                 <input class="main-radio form-change-trigger manual-input-on" type="radio" name="input-type" value="manual" form="module-option-form_${this.#id}">
@@ -247,32 +295,77 @@ export default class Module extends AbstractModule {
                             </label>
                         </div>
                     </div>
-                    <div class="option-block__tables paired-sample__tables">
+
+
+                    <div class="option-block__tables two-column-var">
                         <div class="var-table">
                             <div class="var-table__header">
-                                <form id="sheet-form-${this.#id}" class="sheet-form">
+                                <form class="sheet-form">
                                     <div class="main-select">
-                                       <select class="main-input paired-sample__sheet-select sheet-select" name="sheet-select"></select>
+                                       <select class="main-input two-column-var__sheet-select sheet-select" name="sheet-select"></select>
                                     </div>
                                 </form>
                             </div>
-                            <div class="var-table__body paired-sample__table-body"></div>
+                            <div class="var-table__body two-column-var__table-body"></div>
                         </div>
-                        <div class="paired-sample__switch-container">
+                        <div class="two-column-var__switch-container">
                             <div class="switch-button switch-button_right">
                                 <div class="switch-button__symbol"></div>
                             </div>
                         </div>
                         <div class="var-table">
                             <div class="var-table__header">Парные переменные</div>
-                            <div class="var-table__body paired-sample__table-body">
-                                <div class="paired-sample__item target-table-data">
-                                    
+                            <div class="var-table__body two-column-var__table-body">
+                                <div class="two-column-var__item target-table-data">
                                 </div>
-                                <div class="paired-sample__delimiter"></div>
+                                <div class="two-column-var__delimiter"></div>
                             </div>
                         </div>
                     </div>
+
+
+                    <div class="option-block__tables grouping-var option-block_hidden">
+                        <div class="var-table">
+                            <div class="var-table__header">
+                                <form class="sheet-form">
+                                    <div class="main-select">
+                                        <select class="main-input grouping-var__sheet-select sheet-select"
+                                            name="sheet-select"></select>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="var-table__body grouping-var__table-body">
+                            </div>
+                        </div>
+                        <div class="grouping-var__tables-and-switches">
+                            <div class="grouping-var__container">
+                                <div class="grouping-var__switch-container">
+                                    <div class="switch-button switch-button_right">
+                                        <div class="switch-button__symbol"></div>
+                                    </div>
+                                </div>
+                                <div class="var-table">
+                                    <div class="var-table__header">Зависимая переменная</div>
+                                    <div class="var-table__body grouping-var__dependent-table-body">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grouping-var__container">
+                                <div class="grouping-var__switch-container">
+                                    <div class="switch-button switch-button_right">
+                                        <div class="switch-button__symbol"></div>
+                                    </div>
+                                </div>
+                                <div class="var-table">
+                                    <div class="var-table__header">Группировка по переменной</div>
+                                    <div class="var-table__body grouping-var__independent-table-body">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
                     <div class="option-block__two-column">
                         <div class="option-block">
                             <div class="option-block__sub">
@@ -329,9 +422,11 @@ export default class Module extends AbstractModule {
         mainHypSelect.appendChild(newOption);
         this.#element = newHyp;
         this.#form = newHyp.querySelector('.module-option-form');
-        this.#formSheet = newHyp.querySelector('.sheet-form');
-        this.#sheetSelect = newHyp.querySelector('.sheet-select');
-        this.#tableData = newHyp.querySelector('.target-table-data');
+        this.#formSheets = [...newHyp.querySelectorAll('.sheet-form')];
+        this.#sheetSelects = [...newHyp.querySelectorAll('.sheet-select')];
+        this.#tableData.pair = newHyp.querySelector('.target-table-data');
+        this.#tableData.indepTable = newHyp.querySelector('.grouping-var__independent-table-body');
+        this.#tableData.depTable = newHyp.querySelector('.grouping-var__dependent-table-body');
         this.#resultBlock = newRes;
         this.#hypName = name;
         return { newHyp, newRes };
@@ -339,10 +434,10 @@ export default class Module extends AbstractModule {
 
     setSettings() {
         const formData = new FormData(this.#form);
-        const tableData = this.#tableData;
         this.#testType = formData.get('test-type');
         this.#altHypTest = formData.get('hyp-check');
         this.#inputType = formData.get('input-type');
+
         switch (this.#testType) {
             case 'student': {
                 if (this.#inputType === 'manual') {
@@ -376,9 +471,25 @@ export default class Module extends AbstractModule {
         const vars = [];
         this.#vars.first = null;
         this.#vars.second = null;
-        if (tableData) {
-            const selectedVars = [...tableData?.children];
-            if (selectedVars.length == 2) {
+
+        if (this.#inputType !== 'manual') {
+
+            const tableData = this.#tableData;
+            const dep = tableData.depTable.firstElementChild;
+            const indep = tableData.indepTable.firstElementChild;
+            let selectedVars;
+            let validTableData;
+
+            if (this.#inputType === 'data-input-two') {
+                selectedVars = [...tableData.pair.children];
+                validTableData = (selectedVars.length === 2);
+            }
+            else {
+                selectedVars = [dep, indep];
+                validTableData = (dep && indep);
+            }
+
+            if (validTableData) {
                 selectedVars.forEach(el => {
                     const ids = el.dataset.varId.split('_');
                     data.push(DataControls.getDataBySheetAndVarId(ids[1], ids[2]).slice(1));
@@ -416,24 +527,63 @@ export default class Module extends AbstractModule {
 
         let firstVarName, secondVarName;
         let errorElement;
+        let data1 = [], data2 = [];
 
         if (this.#inputType !== 'manual') {
-            errorElement = this.#tableData;
 
             if (!this.#data.first || !this.#data.second) {
                 return;
             }
+
             firstVarName = this.#vars.first.getTypeName();
             secondVarName = this.#vars.second.getTypeName();
-            if (firstVarName !== secondVarName) {
-                UIControls.showError(errorElement, 'Нельзя сравнить данные разного типа');
-                return;
-            }
-            if (this.#data.first.length !== this.#data.second.length) {
-                UIControls.showError(errorElement, 'Выбранные наборы данных имеют разный размер');
-                return;
-            }
 
+            if (this.#inputType === 'data-input-two') {
+                errorElement = this.#tableData.pair;
+
+                if (firstVarName !== secondVarName) {
+                    UIControls.showError(errorElement, 'Нельзя сравнить данные разного типа');
+                    return;
+                }
+                if (this.#data.first.length !== this.#data.second.length) {
+                    UIControls.showError(errorElement, 'Выбранные наборы данных должны иметь равный размер');
+                    return;
+                }
+
+                data1 = [...this.#data.first];
+                data2 = [...this.#data.second];
+            }
+            else {
+                errorElement = this.#tableData.indepTable;
+
+                if (secondVarName !== Var.Binary.name) {
+                    UIControls.showError(errorElement, 'Переменная для группировки должна быть дихотомического типа');
+                    return;
+                }
+                if (this.#data.first.length !== this.#data.second.length) {
+                    UIControls.showError(errorElement, 'Размеры данных зависимой переменной и переменной для группировки должны совпадать');
+                    return;
+                }
+
+                const indepVar = this.#vars.second;
+                this.#data.first.forEach((el, ind) => {
+                    const group = indepVar.isValInZeroGroup(this.#data.second[ind]);
+                    if (group === 0) {
+                        data1.push(el);
+                    }
+                    else if (group === 1) {
+                        data2.push(el);
+                    }
+                    else {
+                        UIControls.showError(errorElement, 'Ошибка вычисления');
+                        return;
+                    }
+                });
+                if (data1.length !== data2.length) {
+                    UIControls.showError(errorElement, 'Выборки должны иметь равный размер');
+                    return;
+                }
+            }
         }
         else {
             errorElement = this.#element;
@@ -444,27 +594,25 @@ export default class Module extends AbstractModule {
             switch (this.#testType) {
                 case 'student': {
                     if (this.#inputType !== 'manual' && firstVarName !== Var.Continues.name) {
-                        errorElement = this.#tableData;
                         throw new Error(errorText([Var.Continues.ruName]));
                     }
                     if (isInv) {
-                        returnValue = this.#studentTestInv(alpha, arg);
+                        returnValue = this.#studentTestInv(alpha, arg, data1, data2);
                     }
                     else {
-                        returnValue = this.#studentTest(alpha, arg);
+                        returnValue = this.#studentTest(alpha, arg, data1, data2);
                     }
                     break;
                 }
                 case 'sign': {
                     if (this.#inputType !== 'manual' && firstVarName === Var.Nominal.name) {
-                        errorElement = this.#tableData;
                         throw new Error(errorText([Var.Continues.ruName, Var.Rang.ruName, Var.Binary.ruName]));
                     }
                     if (isInv) {
-                        returnValue = this.#signTestInv(alpha, arg);
+                        returnValue = this.#signTestInv(alpha, arg, data1, data2);
                     }
                     else {
-                        returnValue = this.#signTest(alpha, arg);
+                        returnValue = this.#signTest(alpha, arg, data1, data2);
                     }
                     break;
                 }
@@ -482,7 +630,7 @@ export default class Module extends AbstractModule {
         }
     }
 
-    #studentTest(alpha, power) {
+    #studentTest(alpha, power, data1, data2) {
         let d, sd;
         const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
         const z = this.getZ(zAlpha, power);
@@ -491,10 +639,10 @@ export default class Module extends AbstractModule {
             sd = this.#resultsTableData.student.sd;
         }
         else {
-            const differences = this.#data.first.map((el, i) => {
-                if (el === '' || this.#data.second[i] === '')
+            const differences = data1.map((el, i) => {
+                if (el === '' || data2[i] === '')
                     throw new Error('Невозможно обработать набор данных, имеются пропущенные значения')
-                return el - this.#data.second[i];
+                return el - data2[i];
             });
             d = Math.abs(Math.mean(differences));
             sd = Math.stddiv.s(differences);
@@ -516,7 +664,7 @@ export default class Module extends AbstractModule {
         return n;
     }
 
-    #studentTestInv(alpha, n) {
+    #studentTestInv(alpha, n, data1, data2) {
         let d, sd;
         const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
 
@@ -525,10 +673,10 @@ export default class Module extends AbstractModule {
             sd = this.#resultsTableData.student.sd;
         }
         else {
-            const differences = this.#data.first.map((el, i) => {
-                if (el === '' || this.#data.second[i] === '')
+            const differences = data1.map((el, i) => {
+                if (el === '' || data2[i] === '')
                     throw new Error('Невозможно обработать набор данных, имеются пропущенные значения')
-                return el - this.#data.second[i];
+                return el - data2[i];
             });
             d = Math.abs(Math.mean(differences));
             sd = Math.stddiv.s(differences);
@@ -556,7 +704,7 @@ export default class Module extends AbstractModule {
         return power;
     }
 
-    #signTest(alpha, power) {
+    #signTest(alpha, power, data1, data2) {
         let p0, p1, p2;
         const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
         const z = this.getZ(zAlpha, power);
@@ -565,9 +713,9 @@ export default class Module extends AbstractModule {
             p1 = this.#resultsTableData.sign.p1;
         }
         else {
-            const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName());
+            const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName(), data1, data2);
             const dataLength = signs[1] + signs[2];
-            p0 = signs[0] / this.#data.first.length;
+            p0 = signs[0] / data1.length;
             p1 = signs[1] / dataLength;
         }
 
@@ -587,7 +735,7 @@ export default class Module extends AbstractModule {
         return n;
     }
 
-    #signTestInv(alpha, n) {
+    #signTestInv(alpha, n, data1, data2) {
         let p0, p1, p2;
         const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
 
@@ -596,9 +744,9 @@ export default class Module extends AbstractModule {
             p1 = this.#resultsTableData.sign.p1;
         }
         else {
-            const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName());
+            const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName(), data1, data2);
             const dataLength = signs[1] + signs[2];
-            p0 = signs[0] / this.#data.first.length;
+            p0 = signs[0] / data1.length;
             p1 = signs[1] / dataLength;
         }
         p2 = 1 - p1;
@@ -623,7 +771,7 @@ export default class Module extends AbstractModule {
     }
 
     // returns list of number of 0-s, positive and negative differences
-    #signTestGetListOfNumberOfSigns(type) {
+    #signTestGetListOfNumberOfSigns(type, data1, data2) {
         const list = [0, 0, 0];
         let callback;
         let firstDataColumn;
@@ -637,12 +785,12 @@ export default class Module extends AbstractModule {
         }
 
         if (type === 'continues') {
-            firstDataColumn = this.#data.first;
-            secondDataColumn = this.#data.second;
+            firstDataColumn = data1;
+            secondDataColumn = data2;
         }
         else {
-            firstDataColumn = getColumnOfAdaptedVals(this.#data.first, this.#vars.first, callback);
-            secondDataColumn = getColumnOfAdaptedVals(this.#data.second, this.#vars.second, callback);
+            firstDataColumn = getColumnOfAdaptedVals(data1, this.#vars.first, callback);
+            secondDataColumn = getColumnOfAdaptedVals(data2, this.#vars.second, callback);
         }
 
         console.log(firstDataColumn, secondDataColumn);
@@ -680,15 +828,36 @@ export default class Module extends AbstractModule {
         const name = this.#hypName;
         const powerString = isMain ? `<p><b>Основная гипотеза</b></p>` : `<p>Статистическая мощность: ${Number.resultForm(this.#power)}%</p>`;
         let table;
+        let inputTypeHeader;
+        if (this.#inputType === 'manual') {
+            inputTypeHeader = `
+            <th>
+            </th>
+            <th>
+            </th>`;
+        }
+        else if (this.#inputType === 'data-input-two') {
+            inputTypeHeader = `
+            <th>
+                M1
+            </th>
+            <th>
+                M2
+            </th>`;
+        }
+        else {
+            inputTypeHeader = `
+            <th>
+                Зависимая переменная
+            </th>
+            <th>
+                Переменная для группировки
+            </th>`;
+        }
         if (this.#testType === 'student') {
             table = `<thead>
                         <tr>
-                            <th>
-                                M1
-                            </th>
-                            <th>
-                                M2
-                            </th>
+                            ${inputTypeHeader}
                             <th>
                                 d mean
                             </th>
@@ -723,12 +892,7 @@ export default class Module extends AbstractModule {
         else if (this.#testType === 'sign') {
             table = `<thead>
                         <tr>
-                            <th>
-                                M1
-                            </th>
-                            <th>
-                                M2
-                            </th>
+                            ${inputTypeHeader}
                             <th>
                                 &#961;<sub>&#965;</sub>
                             </th>

@@ -75,7 +75,7 @@ export default class ModuleIntegrator {
         const newHyp = new ModuleIntegrator.modules[hypTypeId](globalSettings.hypCounter);
         ModuleIntegrator.hypotheses.push({ hyp: newHyp, update: null });
         const newEls = newHyp.createHTML();
-        AbstractModule.addSheetOptions(DataControls.getListOfSheets(), newHyp.getSheetSelect());
+        AbstractModule.addSheetOptions(DataControls.getListOfSheets(), newHyp.getSheetSelects());
         ModuleIntegrator.refreshVarsOfHyp(globalSettings.hypCounter)
         UIControls.addModuleFormListeners(globalSettings.hypCounter, newEls.newHyp, newHyp.addListeners.bind(newHyp, newEls.newHyp));
         ModuleIntegrator.setSettings(globalSettings.hypCounter);
@@ -90,17 +90,25 @@ export default class ModuleIntegrator {
     static optionListAdd(newSheet, optionsEmpty = false) {
         const hypotheses = ModuleIntegrator.hypotheses;
         for (let i = 0; i < hypotheses.length; i++) {
-            AbstractModule.addSheetOptions([newSheet], hypotheses[i].hyp.getSheetSelect());
+            AbstractModule.addSheetOptions([newSheet], hypotheses[i].hyp.getSheetSelects());
             if (optionsEmpty) {
                 ModuleIntegrator.refreshVarsOfHyp(i);
             }
         }
     }
 
-    static refreshVarsOfHyp(hypID) {
-        const formElement = ModuleIntegrator.hypotheses[hypID].hyp.getFormSheet();
-        const sheetId = new FormData(formElement).get('sheet-select');
-        ModuleIntegrator.hypotheses[hypID].hyp.displayVarsOfSheet(sheetId);
+    static refreshVarsOfHyp(hypID, el = null) {
+        let formElements;
+        if (el) {
+            formElements = [el];
+        }
+        else {
+            formElements = ModuleIntegrator.hypotheses[hypID].hyp.getFormSheets();
+        }
+        formElements.forEach(el => {
+            const sheetId = new FormData(el).get('sheet-select');
+            ModuleIntegrator.hypotheses[hypID].hyp.displayVarsOfSheet(sheetId);
+        })
     }
 
     static updateVarsOfSheet(sheetId, clearSelected) {
@@ -112,10 +120,16 @@ export default class ModuleIntegrator {
                 el.hyp.updateSelectedVarsVisual(sheetId);
             }
 
-            if (new FormData(el.hyp.getFormSheet()).get('sheet-select') == sheetId) {
-                el.hyp.displayVarsOfSheet(sheetId);
-            }
-        })
+            const formSheets = el.hyp.getFormSheets();
+
+            formSheets.forEach((element) => {
+                if (new FormData(element).get('sheet-select') == sheetId) {
+                    el.hyp.displayVarsOfSheet(sheetId);
+                }
+            });
+        });
+
+        this.setSettings('glob');
     }
 
     static setSettings(id) {
