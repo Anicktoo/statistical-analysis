@@ -458,8 +458,8 @@ export default class Module extends AbstractModule {
                 else {
                     this.#resultsTableData.sign.p0 = null;
                     this.#resultsTableData.sign.p1 = null;
-                    this.#resultsTableData.sign.p2 = null;
                 }
+                this.#resultsTableData.sign.p2 = null;
                 break;
             }
         }
@@ -584,6 +584,10 @@ export default class Module extends AbstractModule {
                     return;
                 }
             }
+            if (data1.length === 0 || data2.length === 0) {
+                UIControls.showError(errorElement, 'Присутствует пустая выборка, невозможно провести вычисления');
+                return;
+            }
         }
         else {
             errorElement = this.#element;
@@ -641,14 +645,20 @@ export default class Module extends AbstractModule {
         else {
             const differences = data1.map((el, i) => {
                 if (el === '' || data2[i] === '')
-                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения')
+                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
                 return el - data2[i];
             });
             d = Math.abs(Math.mean(differences));
             sd = Math.stddiv.s(differences);
         }
+
+        this.#resultsTableData.z = z;
+        this.#resultsTableData.student.d = d;
+        this.#resultsTableData.student.sd = sd;
+
         if (d === 0) {
-            throw new Error('Средняя разность равна нулю. Проверьте, что сравниваются разные наборы данных')
+            return Infinity;
+            // throw new Error('Средняя разность равна нулю. Проверьте, что сравниваются разные наборы данных');
         }
 
         const n = (z * sd / d) ** 2 + ((zAlpha ** 2) / 2);
@@ -657,15 +667,11 @@ export default class Module extends AbstractModule {
             throw new Error('Ошибка расчета данных');
         }
 
-        this.#resultsTableData.z = z;
-        this.#resultsTableData.student.d = d;
-        this.#resultsTableData.student.sd = sd;
-
         return n;
     }
 
     #studentTestInv(alpha, n, data1, data2) {
-        let d, sd;
+        let d, sd, z;
         const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
 
         if (this.#inputType === 'manual') {
@@ -682,26 +688,29 @@ export default class Module extends AbstractModule {
             sd = Math.stddiv.s(differences);
         }
 
-        if (d === 0) {
-            throw new Error('Средняя разность равна нулю. Проверьте, что сравниваются разные наборы данных')
-        }
-
-        let z = (Math.sqrt(n - ((zAlpha ** 2) / 2)) * d) / sd * -1;
-        if (z > 0) {
-            z *= -1;
-        }
-        const zB = z - zAlpha;
-        const power = 100 - Math.normdist(zB);
-
-        if (power === undefined || Number.isNaN(power)) {
-            throw new Error('Ошибка расчета данных');
-        }
-
-        this.#resultsTableData.z = z;
         this.#resultsTableData.student.d = d;
         this.#resultsTableData.student.sd = sd;
 
-        return power;
+        if (sd === 0) {
+            this.#resultsTableData.z = Infinity;
+            return 0;
+        }
+        else {
+            z = (Math.sqrt(n - ((zAlpha ** 2) / 2)) * d) / sd;
+            if (z > 0) {
+                z *= -1;
+            }
+            this.#resultsTableData.z = z;
+            const zB = z - zAlpha;
+            const power = 100 - Math.normdist(zB);
+
+            if (power === undefined || Number.isNaN(power)) {
+                throw new Error('Ошибка расчета данных');
+            }
+
+
+            return power;
+        }
     }
 
     #signTest(alpha, power, data1, data2) {
@@ -713,7 +722,9 @@ export default class Module extends AbstractModule {
             p1 = this.#resultsTableData.sign.p1;
         }
         else {
-            const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName(), data1, data2);
+            const var1 = this.#vars.first;
+            const var2 = this.#inputType === 'data-input-two' ? this.#vars.second : var1;
+            const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName(), data1, data2, var1, var2);
             const dataLength = signs[1] + signs[2];
             p0 = signs[0] / data1.length;
             p1 = signs[1] / dataLength;
@@ -721,16 +732,20 @@ export default class Module extends AbstractModule {
 
         p2 = 1 - p1;
 
+        this.#resultsTableData.z = z;
+        this.#resultsTableData.sign.p0 = p0;
+        this.#resultsTableData.sign.p1 = p1;
+        this.#resultsTableData.sign.p2 = p2;
+
+        if (p0 === 1 || p1 === 0.5) {
+            return Infinity
+        }
+
         const n = (z ** 2) / (4 * (1 - p0) * ((p1 - 0.5) ** 2));
 
         if (n === undefined || Number.isNaN(n)) {
             throw new Error('Ошибка расчета данных');
         }
-
-        this.#resultsTableData.z = z;
-        this.#resultsTableData.sign.p0 = p0;
-        this.#resultsTableData.sign.p1 = p1;
-        this.#resultsTableData.sign.p2 = p2;
 
         return n;
     }
@@ -744,17 +759,24 @@ export default class Module extends AbstractModule {
             p1 = this.#resultsTableData.sign.p1;
         }
         else {
-            const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName(), data1, data2);
+            const var1 = this.#vars.first;
+            const var2 = this.#inputType === 'data-input-two' ? this.#vars.second : var1;
+            const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName(), data1, data2, var1, var2);
             const dataLength = signs[1] + signs[2];
             p0 = signs[0] / data1.length;
             p1 = signs[1] / dataLength;
         }
         p2 = 1 - p1;
 
+        this.#resultsTableData.sign.p0 = p0;
+        this.#resultsTableData.sign.p1 = p1;
+        this.#resultsTableData.sign.p2 = p2;
+
         let z = Math.sqrt(n * 4 * ((p1 - 0.5) ** 2) * (1 - p0));
         if (z > 0) {
             z *= -1;
         }
+        this.#resultsTableData.z = z;
         const zB = z - zAlpha;
         const power = 100 - Math.normdist(zB);
 
@@ -762,26 +784,21 @@ export default class Module extends AbstractModule {
             throw new Error('Ошибка расчета данных');
         }
 
-        this.#resultsTableData.z = z;
-        this.#resultsTableData.sign.p0 = p0;
-        this.#resultsTableData.sign.p1 = p1;
-        this.#resultsTableData.sign.p2 = p2;
-
         return power;
     }
 
     // returns list of number of 0-s, positive and negative differences
-    #signTestGetListOfNumberOfSigns(type, data1, data2) {
+    #signTestGetListOfNumberOfSigns(type, data1, data2, var1, var2) {
         const list = [0, 0, 0];
         let callback;
         let firstDataColumn;
         let secondDataColumn;
 
         if (type === 'binary') {
-            callback = this.#vars.first.isValInZeroGroup;
+            callback = var1.isValInZeroGroup;
         }
         else if (type === 'rang') {
-            callback = this.#vars.first.getOrderOfVal;
+            callback = var1.getOrderOfVal;
         }
 
         if (type === 'continues') {
@@ -789,15 +806,13 @@ export default class Module extends AbstractModule {
             secondDataColumn = data2;
         }
         else {
-            firstDataColumn = getColumnOfAdaptedVals(data1, this.#vars.first, callback);
-            secondDataColumn = getColumnOfAdaptedVals(data2, this.#vars.second, callback);
+            firstDataColumn = getColumnOfAdaptedVals(data1, var1, callback);
+            secondDataColumn = getColumnOfAdaptedVals(data2, var2, callback);
         }
 
         console.log(firstDataColumn, secondDataColumn);
 
         firstDataColumn.forEach((el, index) => {
-            if (el === '' || secondDataColumn[index] === '')
-                throw new Error('Невозможно обработать набор данных, имеются пропущенные значения')
             const dif = el - secondDataColumn[index];
             if (dif === 0) {
                 list[0]++;
@@ -814,6 +829,8 @@ export default class Module extends AbstractModule {
 
         function getColumnOfAdaptedVals(data, curVar, callback) {
             return data.map(el => {
+                if (el === '')
+                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
                 const group = callback.call(curVar, el);
                 if (group === -1)
                     throw new Error('Ошибка вычислений');
