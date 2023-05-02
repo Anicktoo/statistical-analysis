@@ -25,7 +25,7 @@
 
         &:has(.parameters__hide-button > input:checked) .parameters__content,
         &:has(.parameters__hide-button > input:checked) .parameters__title-container {
-            opacity: $hideOpacity;
+            @include disabled;
         }
     }
 
@@ -42,7 +42,24 @@
         gap: 10px
     }
 
-    &__title {}
+    &__title {
+        overflow-wrap: break-word;
+        max-width: 400px;
+    }
+
+    &__title-input {
+        display: none;
+        border: none;
+        border-radius: 5px;
+        background-color: inherit;
+        @include h2-text;
+
+        &:focus-visible {
+            margin: -1px;
+            box-sizing: border-box;
+            outline: 3px solid $focus-blue;
+        }
+    }
 
     &__extra-container {
         display: flex;

@@ -8,10 +8,10 @@ export default class Module extends AbstractModule {
 
     static #name = 'Сравнение независимых выборок';
     static #image = img;
+    static #moduleTypeId = null;
     static comElements = {
         parametersContainer: document.querySelector('.parameters__container'),
         resultsContainer: document.querySelector('.results__container'),
-        mainHypSelect: document.querySelector('#main-hypothesis')
     }
     static testText = {
         'fisher': 'Точный тест фишера',
@@ -62,9 +62,70 @@ export default class Module extends AbstractModule {
     };
     #resultBlock;
 
-    constructor(id) {
+    constructor(id, reference = null) {
         super();
         this.#id = id;
+
+        if (reference) {
+            this.#makeCopy(reference);
+        }
+    }
+
+    static setModuleTypeId(id) {
+        Module.#moduleTypeId = id;
+    }
+    static getModuleTypeId() {
+        return Module.#moduleTypeId;
+    }
+
+    #makeCopy(reference) {
+        const refData = reference.getAllData();
+        this.#data = refData.data;
+        this.#power = refData.power;
+        this.#resultsTableData = refData.resultsTableData;
+        this.#testType = refData.testType;
+        this.#inputType = refData.inputType;
+        this.#altHypTest = refData.altHypTest;
+        this.#vars = refData.vars;
+        this.#hypName = refData.hypName;
+
+        const parametersContainer = Module.comElements.parametersContainer;
+        const resultsContainer = Module.comElements.resultsContainer;
+        const newHyp = refData.element.cloneNode(true);
+        const newRes = document.createElement('div');
+        newRes.classList.add('results__block');
+
+        this.#setElements(newHyp, newRes);
+
+        this.#element.querySelector('#module-option-form_' + refData.id).setAttribute('id', 'module-option-form_' + this.#id);
+        [...this.#element.querySelectorAll('.form-change-trigger_' + refData.id)].forEach(el => {
+            el.classList.replace('form-change-trigger_' + refData.id, 'form-change-trigger_' + this.#id);
+            el.setAttribute('form', 'module-option-form_' + this.#id);
+        });
+        Module.comElements.parametersContainer.insertBefore(this.#element, refData.element.nextElementSibling);
+        Module.comElements.resultsContainer.insertBefore(this.#resultBlock, refData.resultBlock.nextElementSibling);
+    }
+
+    getAllData() {
+        const data = {};
+        data.id = this.#id;
+        data.data = Object.assign({}, this.#data);
+        data.power = this.#power;
+        data.resultsTableData = Object.deepCopy(this.#resultsTableData);
+        data.testType = this.#testType;
+        data.inputType = this.#inputType;
+        data.altHypTest = this.#altHypTest;
+        data.vars = Object.assign({}, this.#vars);
+        data.hypName = this.#hypName;
+        data.element = this.#element;
+        data.resultBlock = this.#resultBlock;
+        return data;
+    }
+
+    setName(name) {
+        this.#hypName = name;
+        this.#element.querySelector('.parameters__title').textContent = name;
+        this.#resultBlock.querySelector('.results__header').textContent = name;
     }
 
     static getName() {
@@ -77,6 +138,10 @@ export default class Module extends AbstractModule {
 
     getName() {
         return this.#hypName;
+    }
+
+    getElement() {
+        return this.#element;
     }
 
     getFormSheets() {
@@ -216,13 +281,10 @@ export default class Module extends AbstractModule {
         const name = 'Гипотеза ' + (this.#id + 1);
         const parametersContainer = Module.comElements.parametersContainer;
         const resultsContainer = Module.comElements.resultsContainer;
-        const mainHypSelect = Module.comElements.mainHypSelect;
         const newHyp = document.createElement('div');
         const newRes = document.createElement('div');
-        const newOption = document.createElement('option');
-        newHyp.classList.add('parameters__item', 'collapsible', 'grouping-var');
+        newHyp.classList.add('parameters__item', 'collapsible');
         newRes.classList.add('results__block');
-        newOption.setAttribute('value', this.#id);
         const htmlParam = `
         <label class="collapsible__head">
             <input class="collapsible__input" type="checkbox" checked>
@@ -230,6 +292,7 @@ export default class Module extends AbstractModule {
                 <div class="parameters__title-container">
                     <div class="collapsible__symbol"></div>
                     <h2 class="parameters__title">${name}</h2>
+                    <input class="parameters__title-input" type='text'>
                 </div>
                 <div class="parameters__extra-container">
                     <button title="Изменить название гипотезы"
@@ -254,17 +317,17 @@ export default class Module extends AbstractModule {
                         Тип ввода
                         <div class="option-block__list">
                             <label class="radio-line">
-                                <input class="main-radio form-change-trigger data-input-two" type="radio" name="input-type" value="data-input-two" form="module-option-form_${this.#id}"
+                                <input class="main-radio form-change-trigger form-change-trigger_${this.#id} data-input-two" type="radio" name="input-type" value="data-input-two" form="module-option-form_${this.#id}"
                                     checked>
                                 <span>Вычисление по данным (два столбца)</span>
                             </label>
                             <label class="radio-line">
-                                <input class="main-radio form-change-trigger data-input-group" type="radio" name="input-type" value="data-input-group" form="module-option-form_${this.#id}"
+                                <input class="main-radio form-change-trigger form-change-trigger_${this.#id} data-input-group" type="radio" name="input-type" value="data-input-group" form="module-option-form_${this.#id}"
                                     >
                                 <span>Вычисление по данным (группировка по переменной)</span>
                             </label>
                             <label class="radio-line">
-                                <input class="main-radio form-change-trigger manual-input-on" type="radio" name="input-type" value="manual" form="module-option-form_${this.#id}">
+                                <input class="main-radio form-change-trigger form-change-trigger_${this.#id} manual-input-on" type="radio" name="input-type" value="manual" form="module-option-form_${this.#id}">
                                 <span>Ввести величину эффекта</span>
                             </label>
                         </div>
@@ -274,11 +337,11 @@ export default class Module extends AbstractModule {
                         <div class="option-block__list">
                             <label class="input-line">
                                 Средняя разность (d):
-                                <input type="number" class="main-input main-input_number form-change-trigger" name="d" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="d" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
                             </label>
                             <label class="input-line">
                                 Стандартное отклонение (sd):
-                                <input type="number" class="main-input main-input_number form-change-trigger" name="sd" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="sd" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
                             </label>
                         </div>
                     </div>
@@ -287,11 +350,11 @@ export default class Module extends AbstractModule {
                         <div class="option-block__list">
                             <label class="input-line">
                                 <span>Вероятность успеха в 1-й выборке (&#961;<sub>1</sub>):</span>
-                                <input type="number" class="main-input main-input_number form-change-trigger" name="p1" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="p1" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
                             </label>
                             <label class="input-line">
                                 <span>Вероятность успеха во 2-й выборке (&#961;<sub>2</sub>):</span>
-                                <input type="number" class="main-input main-input_number form-change-trigger" name="p2" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="p2" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
                             </label>
                         </div>
                     </div>
@@ -369,19 +432,19 @@ export default class Module extends AbstractModule {
                                 Тест
                                 <div class="option-block__list option-block__test-type">
                                     <label class="radio-line">
-                                        <input class="main-radio form-change-trigger" type="radio"
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="test-type" value="fisher"
                                             form="module-option-form_${this.#id}" checked>
                                         <span>Точный тест Фишера</span>
                                     </label>
                                     <label class="radio-line">
-                                        <input class="main-radio form-change-trigger" type="radio"
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="test-type" value="mann"
                                             form="module-option-form_${this.#id}">
                                         <span>Манна-Уитни</span>
                                     </label>
                                     <label class="radio-line">
-                                        <input class="main-radio form-change-trigger" type="radio"
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="test-type" value="student"
                                             form="module-option-form_${this.#id}">
                                         <span>Стьюдента</span>
@@ -394,19 +457,19 @@ export default class Module extends AbstractModule {
                                 Проверка альтернативной гипотезы
                                 <div class="option-block__list">
                                     <label class="radio-line">
-                                        <input class="main-radio form-change-trigger" type="radio"
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="hyp-check" value="both"
                                             form="module-option-form_${this.#id}" checked>
                                         <span>Двусторонняя (M1 ≠ M2)</span>
                                     </label>
                                     <label class="radio-line">
-                                        <input class="main-radio form-change-trigger" type="radio"
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="hyp-check" value="right"
                                             form="module-option-form_${this.#id}">
                                         <span>Правосторонняя (M2 &#62; M1)</span>
                                     </label>
                                     <label class="radio-line">
-                                        <input class="main-radio form-change-trigger" type="radio"
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="hyp-check" value="left"
                                             form="module-option-form_${this.#id}">
                                         <span>Левосторонняя (M2 &#60; M1)</span>
@@ -419,10 +482,13 @@ export default class Module extends AbstractModule {
             </div>
         </div>`;
         newHyp.innerHTML = htmlParam;
-        newOption.textContent = name;
+        this.#setElements(newHyp, newRes);
+        this.#hypName = name;
         parametersContainer.appendChild(newHyp);
         resultsContainer.appendChild(newRes);
-        mainHypSelect.appendChild(newOption);
+    }
+
+    #setElements(newHyp, newRes) {
         this.#element = newHyp;
         this.#form = newHyp.querySelector('.module-option-form');
         this.#formSheets = [...newHyp.querySelectorAll('.sheet-form')];
@@ -431,8 +497,6 @@ export default class Module extends AbstractModule {
         this.#tableData.indepTable = newHyp.querySelector('.grouping-var__independent-table-body');
         this.#tableData.depTable = newHyp.querySelector('.grouping-var__dependent-table-body');
         this.#resultBlock = newRes;
-        this.#hypName = name;
-        return { newHyp, newRes };
     }
 
     setSettings() {
@@ -931,7 +995,7 @@ export default class Module extends AbstractModule {
                     </tbody >`;
         }
         const htmlRes = `
-        <h2>${name}</h2>
+        <h2 class="results__header">${name}</h2>
         <div class="results__block-inner">
             ${powerString}
             <p>Сравнение независимых выборок</p>
@@ -945,5 +1009,9 @@ export default class Module extends AbstractModule {
         </div > `;
 
         this.#resultBlock.innerHTML = htmlRes;
+    }
+
+    changeVisibilityResultsHtml(hide) {
+        this.#resultBlock.style.display = hide ? 'none' : '';
     }
 }

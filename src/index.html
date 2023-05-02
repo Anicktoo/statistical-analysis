@@ -77,7 +77,9 @@
                                         <div class="main-select">
                                             <select id="main-hypothesis" name="mainHypothesis"
                                                 class="main-input form-change-trigger" form="module-option-form_glob">
-                                                <option value="" disabled selected hidden>Выбрать гипотезу</option>
+                                                <option class='main-hypothesis__option_null' value="" disabled selected
+                                                    hidden>Выбрать гипотезу
+                                                </option>
                                                 <!-- <option value="-">-</option> -->
                                             </select>
                                         </div>
@@ -106,7 +108,7 @@
                 <div class="loader"></div>
                 <div class="results__container">
                     <div id="global-results" class="results__block">
-                        <h1 id="results-name">Результаты</h1>
+                        <h1 id="results-name" class="results__header">Результаты</h1>
                         <div class="results__block-inner">
                             <p>FWER: <span id="results-FWER">-</span> %</p>
                             <p>Количество проверяемых гипотез: <span id="results-number">0</span></p>

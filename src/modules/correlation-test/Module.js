@@ -5,12 +5,24 @@ export default class Module extends AbstractModule {
 
     static #name = 'Проверка корреляции';
     static #image = img;
+    static #moduleTypeId = null;
 
-    #alpha;
+    // constructor(id, reference = null) {
+    //     super();
+    //     this.#id = id;
 
-    // constructor() {
-    //     // const module = await import(condition ? './module1.js' : './module2.js');
+    //     if (reference) {
+    //         this.#makeCopy(reference);
+    //     }
     // }
+
+    static setModuleTypeId(id) {
+        Module.#moduleTypeId = id;
+    }
+
+    static getModuleTypeId() {
+        return Module.#moduleTypeId;
+    }
 
     static getName() {
         return this.#name;

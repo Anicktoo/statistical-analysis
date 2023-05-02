@@ -61,6 +61,10 @@ export default class AbstractModule {
         throw new Error('This method must be implemented');
     }
 
+    changeVisibilityResultsHtml(hide) {
+        throw new Error('This method must be implemented');
+    }
+
     //ABSTRACT ONLY
 
     static addSheetOptions(listOfSheets, selects) {

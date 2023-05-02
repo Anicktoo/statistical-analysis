@@ -1,8 +1,11 @@
 .results {
+    $result-width: 1000px;
     position: relative;
     flex-grow: 1;
     min-width: 0;
     background-color: $white;
+
+
 
     &__container {
         display: flex;
@@ -12,29 +15,38 @@
         height: 100%;
         gap: 56px;
         padding: 10px 24px 24px 24px;
+        max-width: $result-width + 48px;
+    }
+
+    &__header {
+        overflow-wrap: break-word;
         max-width: 100%;
     }
 
     &__block {
         display: flex;
         flex-direction: column;
-        min-width: max-content;
         gap: 24px;
+        min-width: $result-width;
+        max-width: $result-width;
+        flex-shrink: 1;
     }
 
     &__block-inner {
         display: flex;
         flex-direction: column;
         gap: 8px;
+        max-width: $result-width;
     }
 
     &__table {
         border-bottom: 2px solid $black;
         border-collapse: collapse;
-        max-width: max-content;
+        width: max-content;
+        max-width: 100%;
 
         th {
-
+            white-space: nowrap;
             border-top: 1px solid $black;
             border-bottom: 1px solid $black;
         }
@@ -42,12 +54,17 @@
         th,
         td {
             padding: 0 16px 0 16px;
-            white-space: nowrap;
-            // min-width: 100px;
             text-align: center;
             font-size: inherit;
             font-weight: inherit;
             font-style: inherit;
+        }
+
+        td {
+            white-space: normal;
+            word-wrap: break-word;
+            width: max-content;
+            max-width: $result-width / 5;
         }
 
         caption {

@@ -16,6 +16,12 @@ body {
     line-height: $line-height;
 }
 
+@mixin h2-text {
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 27px;
+}
+
 h1 {
     font-weight: 700;
     font-size: 24px;
@@ -23,9 +29,7 @@ h1 {
 }
 
 h2 {
-    font-weight: 700;
-    font-size: 20px;
-    line-height: 27px;
+    @include h2-text;
 }
 
 b {

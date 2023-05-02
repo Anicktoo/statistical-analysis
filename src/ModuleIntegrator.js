@@ -14,17 +14,18 @@ export default class ModuleIntegrator {
         mainHypId: undefined,
         power: undefined,
         hypCounter: 0,
+        unhiddenCounter: 0,
         preciseSampleSize: undefined,
         sampleSize: undefined,
         update: null,
 
         getAlpha(asString = true) {
-            if (this.hypCounter) {
+            if (this.unhiddenCounter) {
                 if (asString) {
-                    return Math.roundGOST(this.FWER / this.hypCounter);
+                    return Math.roundGOST(this.FWER / this.unhiddenCounter);
                 }
                 else {
-                    return this.FWER / this.hypCounter;
+                    return this.FWER / this.unhiddenCounter;
                 }
             }
             else {
@@ -35,6 +36,18 @@ export default class ModuleIntegrator {
             const main = ModuleIntegrator.hypotheses[this.mainHypId];
             return main && main.hyp ? main.hyp.getName() : '-';
         },
+        createNewHypOption(id, name) {
+            const newOption = document.createElement('option');
+            newOption.setAttribute('value', id);
+            newOption.classList.add('main-hypothesis__option_' + id);
+            newOption.textContent = name;
+            UIControls.mainHypSelect.appendChild(newOption);
+        },
+        updateHypOption(id, name) {
+            const newOption = UIControls.mainHypSelect.querySelector('.main-hypothesis__option_' + id);
+            if (newOption)
+                newOption.textContent = name;
+        }
     }
 
 
@@ -52,6 +65,7 @@ export default class ModuleIntegrator {
         const moduleListElement = UIControls.moduleListElement;
 
         for (let i = 0; i < modules.length; i++) {
+            modules[i].setModuleTypeId(i);
             const moduleName = modules[i].getName();
             const moduleImage = modules[i].getImage();
             moduleListElement.innerHTML += `
@@ -70,23 +84,31 @@ export default class ModuleIntegrator {
         ModuleIntegrator.setSettings('glob', UIControls.parametersGlobItem.querySelector('form'));
     }
 
-    static addHypothesis(hypTypeId) {
+    //add new hypothesis by type id and if needed to make clone with reference Hyp
+    static addHypothesis(hypTypeId, refHyp = null) {
         const globalSettings = ModuleIntegrator.globalSettings;
-        const newHyp = new ModuleIntegrator.modules[hypTypeId](globalSettings.hypCounter);
+        const newHyp = new ModuleIntegrator.modules[hypTypeId](globalSettings.hypCounter, refHyp);
         ModuleIntegrator.hypotheses.push({ hyp: newHyp, update: null });
-        const newEls = newHyp.createHTML();
+        if (!refHyp) {
+            newHyp.createHTML();
+        }
+        const newEl = newHyp.getElement();
+        globalSettings.createNewHypOption(globalSettings.hypCounter, newHyp.getName());
         AbstractModule.addSheetOptions(DataControls.getListOfSheets(), newHyp.getSheetSelects());
         ModuleIntegrator.refreshVarsOfHyp(globalSettings.hypCounter)
-        UIControls.addModuleFormListeners(globalSettings.hypCounter, newEls.newHyp, newHyp.addListeners.bind(newHyp, newEls.newHyp));
-        ModuleIntegrator.setSettings(globalSettings.hypCounter);
+        UIControls.addModuleFormListeners(globalSettings.hypCounter, newEl, newHyp.addListeners.bind(newHyp, newEl));
 
-        if (ModuleIntegrator.hypotheses.length === 1) {
+        if (globalSettings.unhiddenCounter === 0) {
             globalSettings.mainHypId = globalSettings.hypCounter;
             UIControls.mainHypSelect.lastElementChild.selected = true;
         }
         globalSettings.hypCounter++;
+        globalSettings.unhiddenCounter++;
+
+        ModuleIntegrator.setSettings('glob');
     }
 
+    //add options to sheet select of all hypotheses with sheet obj and bool (should all hyp refresh vars?) 
     static optionListAdd(newSheet, optionsEmpty = false) {
         const hypotheses = ModuleIntegrator.hypotheses;
         for (let i = 0; i < hypotheses.length; i++) {
@@ -163,7 +185,7 @@ export default class ModuleIntegrator {
 
         if (globalSettings.update) {
             ModuleIntegrator.setGlobalSettings();
-            if (globalSettings.hypCounter) {
+            if (globalSettings.unhiddenCounter) {
                 ModuleIntegrator.setMainSettings();
             }
             else {
@@ -187,7 +209,7 @@ export default class ModuleIntegrator {
         for (let i = 0; i < hypotheses.length; i++) {
             const { hyp, update } = hypotheses[i];
 
-            if ((updateAllResults || update) && hyp !== mainHyp.hyp) {
+            if ((updateAllResults || update) && hyp !== mainHyp.hyp && !hyp.hidden) {
                 console.log('norm ' + i);
                 hyp.setSettings();
                 hyp.setStatPower(alpha, globalSettings.sampleSize);
@@ -227,12 +249,76 @@ export default class ModuleIntegrator {
 
         UIControls.resName.textContent = globalSettings.name;
         UIControls.resFwer.textContent = Number.resultForm(globalSettings.FWER);
-        UIControls.resNumber.textContent = globalSettings.hypCounter;
+        UIControls.resNumber.textContent = globalSettings.unhiddenCounter;
         UIControls.resImportance.textContent = globalSettings.getAlpha();
         UIControls.resMainHyp.textContent = globalSettings.getMainHypName();
         UIControls.resPower.textContent = Number.resultForm(globalSettings.power);
         UIControls.resSampleSizePrecise.textContent = Number.resultForm(globalSettings.preciseSampleSize, false);
         UIControls.resSampleSize.textContent = Number.resultForm(globalSettings.sampleSize);
+    }
+
+    //extra functions 
+
+    static hideUnhideHyp(id) {
+        const hypotheses = ModuleIntegrator.hypotheses;
+        const hyp = hypotheses[id];
+        const globalSettings = ModuleIntegrator.globalSettings;
+        const optionEl = UIControls.mainHypSelect.querySelector('.main-hypothesis__option_' + id);
+        if (hyp.hidden) {
+            unhide();
+        }
+        else {
+            hide();
+        }
+        ModuleIntegrator.setSettings('glob');
+
+        function hide() {
+            optionEl.disabled = true;
+            globalSettings.unhiddenCounter--;
+            hyp.hidden = true;
+            if (id === globalSettings.mainHypId) {
+                optionEl.selected = false;
+                if (globalSettings.unhiddenCounter === 0) {
+                    globalSettings.mainHypId = null;
+                    UIControls.mainHypSelectNullOption.selected = true;
+                }
+                else {
+                    globalSettings.mainHypId = hypotheses.findIndex((el) => !el.hidden);
+                    UIControls.mainHypSelect.querySelector('.main-hypothesis__option_' + globalSettings.mainHypId).selected = true;
+                }
+            }
+
+            hyp.hyp.changeVisibilityResultsHtml(true);
+        }
+
+        function unhide() {
+            optionEl.disabled = false;
+
+            if (globalSettings.unhiddenCounter === 0) {
+                globalSettings.mainHypId = id;
+                optionEl.selected = true;
+            }
+
+            globalSettings.unhiddenCounter++;
+            hyp.hidden = false;
+
+            hyp.hyp.changeVisibilityResultsHtml(false);
+        }
+    }
+
+    static nameChange(id, name) {
+        const hyp = ModuleIntegrator.hypotheses[id];
+        if (hyp) {
+            hyp.hyp.setName(name);
+            ModuleIntegrator.globalSettings.updateHypOption(id, name);
+        }
+    }
+
+    static duplicateHyp(id) {
+        const hyp = ModuleIntegrator.hypotheses[id];
+        if (hyp) {
+            ModuleIntegrator.addHypothesis(hyp.hyp.constructor.getModuleTypeId(), hyp.hyp);
+        }
     }
 }
 

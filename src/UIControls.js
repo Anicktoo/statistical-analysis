@@ -27,6 +27,7 @@ class UIControls {
     static FWERInput;
     static powerInput;
     static mainHypSelect;
+    static mainHypSelectNullOption;
 
     static resizeBarsEl = [];
     static results;
@@ -110,6 +111,7 @@ class UIControls {
         UIControls.FWERInput = UIControls.parametersGlobItem.querySelector('#FWER-input');
         UIControls.powerInput = UIControls.parametersGlobItem.querySelector('#power-input');
         UIControls.mainHypSelect = UIControls.parametersContainer.querySelector('#main-hypothesis');
+        UIControls.mainHypSelectNullOption = UIControls.mainHypSelect.querySelector('.main-hypothesis__option_null');
 
         UIControls.modalVarType = document.querySelector('.modal-var-types');
         UIControls.varTypesForm = UIControls.modalVarType.querySelector('#var-type-form');
@@ -349,8 +351,12 @@ class UIControls {
             ModuleIntegrator.setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
         }));
 
+        if (id === 'glob') {
+            return;
+        }
+
         const elementFormSheets = [...element.querySelectorAll('.sheet-form')];
-        elementFormSheets?.forEach(el => {
+        elementFormSheets.forEach(el => {
             el.addEventListener('change', () => {
                 // ModuleIntegrator.setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
                 ModuleIntegrator.refreshVarsOfHyp(id, el);
@@ -370,20 +376,20 @@ class UIControls {
         manualInput?.addEventListener('click', () => {
             const testName = testTypeBlock.querySelector('input:checked').value;
             const manualEllement = element.querySelector(`.option-block__${testName}`);
-            manualEllement?.classList.remove('option-block_hidden');
-            tableTwo.classList.add('option-block_hidden');
-            tableGroup.classList.add('option-block_hidden');
+            manualEllement.classList.remove('option-block_hidden');
+            tableTwo?.classList.add('option-block_hidden');
+            tableGroup?.classList.add('option-block_hidden');
         });
 
         dataInputTwo?.addEventListener('click', () => {
             hideAllManualOptionBlocks();
-            tableGroup.classList.add('option-block_hidden');
+            tableGroup?.classList.add('option-block_hidden');
             tableTwo.classList.remove('option-block_hidden');
         });
 
         dataInputGroup?.addEventListener('click', () => {
             hideAllManualOptionBlocks();
-            tableTwo.classList.add('option-block_hidden');
+            tableTwo?.classList.add('option-block_hidden');
             tableGroup.classList.remove('option-block_hidden');
         });
 
@@ -400,15 +406,68 @@ class UIControls {
             });
         }
 
+        function hideAllManualOptionBlocks() {
+            manualEllements?.forEach((el) => {
+                el.classList.add('option-block_hidden');
+            });
+        }
+
+        //unique listeners
         if (moduleCallbackFunction) {
             moduleCallbackFunction();
         }
 
-        function hideAllManualOptionBlocks() {
-            manualEllements.forEach((el) => {
-                el.classList.add('option-block_hidden');
-            });
+        //extra
+
+        //hide
+
+        const hideBtn = element.querySelector('.parameters__hide-button').querySelector('input');
+        hideBtn.addEventListener('click', (e) => {
+            ModuleIntegrator.hideUnhideHyp(id);
+        });
+
+
+
+        //rename
+
+        const renamebtn = element.querySelector('.parameters__edit-button');
+        const elementHeader = element.querySelector('.parameters__title');
+        const elementHeaderInput = element.querySelector('.parameters__title-input');
+        elementHeaderInput.value = elementHeader.textContent;
+        const focusListener = function () {
+            submitNewName();
         }
+        const enterListener = function (e) {
+            if (e.key === 'Enter')
+                submitNewName();
+        }
+
+        renamebtn.addEventListener('click', () => {
+            elementHeader.style.display = 'none';
+            elementHeaderInput.style.display = 'block';
+            elementHeaderInput.focus();
+            elementHeaderInput.addEventListener('focusout', focusListener);
+            elementHeaderInput.addEventListener('keypress', enterListener);
+        });
+
+        function submitNewName() {
+            if (elementHeaderInput.value.trim() === '') {
+                UIControls.showError(elementHeaderInput, 'Заполните это поле');
+                return;
+            }
+            elementHeaderInput.removeEventListener('focusout', focusListener);
+            elementHeaderInput.removeEventListener('keypress', enterListener);
+            elementHeader.style.display = 'inline';
+            elementHeaderInput.style.display = 'none';
+            ModuleIntegrator.nameChange(id, elementHeaderInput.value);
+        }
+
+        //dublicate
+
+        const dupbtn = element.querySelector('.parameters__duplicate-button');
+        dupbtn.addEventListener('click', (e) => {
+            ModuleIntegrator.duplicateHyp(id);
+        });
     }
 
     // COMMON FUNCTIONS //
@@ -522,14 +581,25 @@ class UIControls {
 
     static showError(el, errorText) {
         const rect = el.getBoundingClientRect();
-        const elX = rect.x;
-        const elY = rect.y;
-        const elW = rect.width;
-        const elH = rect.height;
-        UIControls.errorElement.style.left = elX + 'px';
-        UIControls.errorElement.style.top = elY + 'px';
-        UIControls.errorElement.style.width = elW + 'px';
-        UIControls.errorElement.style.height = elH + 'px';
+        const x = countCoord((rect.x + rect.width / 2), window.innerWidth);
+        const y = countCoord((rect.y + rect.height), window.innerHeight);
+        function countCoord(c, max, gap = 10) {
+            if (c > gap) {
+                const realMax = max - gap;
+                if (c < realMax) {
+                    return c;
+                }
+                else {
+                    return realMax;
+                }
+            }
+            else {
+                return gap;
+            }
+        }
+
+        UIControls.errorElement.style.left = x + 'px';
+        UIControls.errorElement.style.top = y + 'px';
         UIControls.errorElement.setCustomValidity(errorText);
         UIControls.errorElement.reportValidity();
     }
