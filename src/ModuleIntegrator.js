@@ -47,6 +47,18 @@ export default class ModuleIntegrator {
             const newOption = UIControls.mainHypSelect.querySelector('.main-hypothesis__option_' + id);
             if (newOption)
                 newOption.textContent = name;
+        },
+        deleteHypOption(id) {
+            const optionToDelete = UIControls.mainHypSelect.querySelector('.main-hypothesis__option_' + id);
+            if (optionToDelete)
+                UIControls.mainHypSelect.removeChild(optionToDelete);
+            for (let i = id + 1; i < this.hypCounter; i++) {
+                const el = UIControls.mainHypSelect.querySelector('.main-hypothesis__option_' + i);
+                if (el) {
+                    el.setAttribute('value', i - 1);
+                    el.classList.replace('main-hypothesis__option_' + i, 'main-hypothesis__option_' + (i - 1));
+                }
+            }
         }
     }
 
@@ -80,7 +92,7 @@ export default class ModuleIntegrator {
         }
 
         UIControls.addModuleBtnsListeners();
-        UIControls.addModuleFormListeners('glob', UIControls.parametersGlobItem);
+        UIControls.addModuleFormListeners(UIControls.parametersGlobItem, null, true);
         ModuleIntegrator.setSettings('glob', UIControls.parametersGlobItem.querySelector('form'));
     }
 
@@ -96,7 +108,7 @@ export default class ModuleIntegrator {
         globalSettings.createNewHypOption(globalSettings.hypCounter, newHyp.getName());
         AbstractModule.addSheetOptions(DataControls.getListOfSheets(), newHyp.getSheetSelects());
         ModuleIntegrator.refreshVarsOfHyp(globalSettings.hypCounter)
-        UIControls.addModuleFormListeners(globalSettings.hypCounter, newEl, newHyp.addListeners.bind(newHyp, newEl));
+        UIControls.addModuleFormListeners(newEl, newHyp.addListeners.bind(newHyp, newEl));
 
         if (globalSettings.unhiddenCounter === 0) {
             globalSettings.mainHypId = globalSettings.hypCounter;
@@ -110,9 +122,8 @@ export default class ModuleIntegrator {
 
     //add options to sheet select of all hypotheses with sheet obj and bool (should all hyp refresh vars?) 
     static optionListAdd(newSheet, optionsEmpty = false) {
-        const hypotheses = ModuleIntegrator.hypotheses;
-        for (let i = 0; i < hypotheses.length; i++) {
-            AbstractModule.addSheetOptions([newSheet], hypotheses[i].hyp.getSheetSelects());
+        for (let i = 0; i < ModuleIntegrator.globalSettings.hypCounter; i++) {
+            AbstractModule.addSheetOptions([newSheet], ModuleIntegrator.hypotheses[i].hyp.getSheetSelects());
             if (optionsEmpty) {
                 ModuleIntegrator.refreshVarsOfHyp(i);
             }
@@ -127,9 +138,9 @@ export default class ModuleIntegrator {
         else {
             formElements = ModuleIntegrator.hypotheses[hypID].hyp.getFormSheets();
         }
-        formElements.forEach(el => {
-            const sheetId = new FormData(el).get('sheet-select');
-            ModuleIntegrator.hypotheses[hypID].hyp.displayVarsOfSheet(sheetId);
+        formElements.forEach(element => {
+            const curSheetId = Number(new FormData(element).get('sheet-select'));
+            ModuleIntegrator.hypotheses[hypID].hyp.displayVarsOfSheet(curSheetId, element.dataset.type);
         })
     }
 
@@ -142,12 +153,12 @@ export default class ModuleIntegrator {
                 el.hyp.updateSelectedVarsVisual(sheetId);
             }
 
-            const formSheets = el.hyp.getFormSheets();
+            const formElements = el.hyp.getFormSheets();
 
-            formSheets.forEach((element) => {
-                if (new FormData(element).get('sheet-select') == sheetId) {
-                    el.hyp.displayVarsOfSheet(sheetId);
-                }
+            formElements.forEach((element) => {
+                const curSheetId = Number(new FormData(element).get('sheet-select'));
+                if (curSheetId === sheetId)
+                    el.hyp.displayVarsOfSheet(curSheetId, element.dataset.type);
             });
         });
 
@@ -206,11 +217,10 @@ export default class ModuleIntegrator {
         }
 
         const alpha = globalSettings.getAlpha(false);
-        for (let i = 0; i < hypotheses.length; i++) {
+        for (let i = 0; i < ModuleIntegrator.globalSettings.hypCounter; i++) {
             const { hyp, update } = hypotheses[i];
 
             if ((updateAllResults || update) && hyp !== mainHyp.hyp && !hyp.hidden) {
-                console.log('norm ' + i);
                 hyp.setSettings();
                 hyp.setStatPower(alpha, globalSettings.sampleSize);
                 hypotheses[i].update = false;
@@ -319,6 +329,43 @@ export default class ModuleIntegrator {
         if (hyp) {
             ModuleIntegrator.addHypothesis(hyp.hyp.constructor.getModuleTypeId(), hyp.hyp);
         }
+    }
+
+    static deleteHyp(id) {
+        const hyp = ModuleIntegrator.hypotheses[id];
+        if (!hyp) {
+            return;
+        }
+        const globalSettings = ModuleIntegrator.globalSettings;
+        const optionEl = UIControls.mainHypSelect.querySelector('.main-hypothesis__option_' + id);
+        ModuleIntegrator.globalSettings.deleteHypOption(id);
+
+        globalSettings.hypCounter--;
+        if (!hyp.hidden) {
+            globalSettings.unhiddenCounter--;
+        }
+
+        hyp.hyp.deleteSelf();
+        ModuleIntegrator.hypotheses[id] = null;
+
+        for (let i = id; i < globalSettings.hypCounter; i++) {
+            ModuleIntegrator.hypotheses[i] = ModuleIntegrator.hypotheses[i + 1];
+            ModuleIntegrator.hypotheses[i].hyp.setId(i);
+        }
+
+        ModuleIntegrator.hypotheses = ModuleIntegrator.hypotheses.slice(0, -1);
+
+        optionEl.selected = false;
+        if (globalSettings.unhiddenCounter === 0) {
+            globalSettings.mainHypId = null;
+            UIControls.mainHypSelectNullOption.selected = true;
+        }
+        else {
+            globalSettings.mainHypId = ModuleIntegrator.hypotheses.findIndex((el) => !el.hidden);
+            UIControls.mainHypSelect.querySelector('.main-hypothesis__option_' + globalSettings.mainHypId).selected = true;
+        }
+
+        ModuleIntegrator.setSettings('glob');
     }
 }
 

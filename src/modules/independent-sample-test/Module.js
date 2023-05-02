@@ -71,6 +71,11 @@ export default class Module extends AbstractModule {
         }
     }
 
+    deleteSelf() {
+        Module.comElements.parametersContainer.removeChild(this.#element);
+        Module.comElements.resultsContainer.removeChild(this.#resultBlock);
+    }
+
     static setModuleTypeId(id) {
         Module.#moduleTypeId = id;
     }
@@ -97,7 +102,9 @@ export default class Module extends AbstractModule {
 
         this.#setElements(newHyp, newRes);
 
-        this.#element.querySelector('#module-option-form_' + refData.id).setAttribute('id', 'module-option-form_' + this.#id);
+        const optFormEl = this.#element.querySelector('#module-option-form_' + refData.id)
+        optFormEl.setAttribute('id', 'module-option-form_' + this.#id);
+        optFormEl.dataset.id = this.#id;
         [...this.#element.querySelectorAll('.form-change-trigger_' + refData.id)].forEach(el => {
             el.classList.replace('form-change-trigger_' + refData.id, 'form-change-trigger_' + this.#id);
             el.setAttribute('form', 'module-option-form_' + this.#id);
@@ -134,6 +141,18 @@ export default class Module extends AbstractModule {
 
     static getImage() {
         return this.#image;
+    }
+
+    setId(id) {
+        const oldId = this.#id;
+        const optFormEl = this.#element.querySelector('#module-option-form_' + oldId)
+        optFormEl.setAttribute('id', 'module-option-form_' + id);
+        optFormEl.dataset.id = id;
+        [...this.#element.querySelectorAll('.form-change-trigger_' + oldId)].forEach(el => {
+            el.classList.replace('form-change-trigger_' + oldId, 'form-change-trigger_' + id);
+            el.setAttribute('form', 'module-option-form_' + id);
+        });
+        this.#id = id;
     }
 
     getName() {
@@ -204,26 +223,29 @@ export default class Module extends AbstractModule {
 
     }
 
-    displayVarsOfSheet(sheetId) {
+    displayVarsOfSheet(sheetId, type) {
         const vars = DataControls.getVarsBySheetId(sheetId);
         if (!vars)
             return;
-        let tableBody = this.#element.querySelector('.two-column-var__table-body');
-        const tableSecondItem = this.#tableData.pair;
+
+        let tableBody;
         let arrOfIds = [];
-        arrOfIds.push(tableSecondItem.firstElementChild?.dataset.varId);
-        arrOfIds.push(tableSecondItem.lastElementChild?.dataset.varId);
 
-        tableBody.innerHTML = createElementsStr();
-
-        tableBody = this.#element.querySelector('.grouping-var__table-body');
-        const dep = this.#tableData.depTable.firstElementChild;
-        const indep = this.#tableData.indepTable.firstElementChild;
-        arrOfIds = [];
-        arrOfIds.push(dep?.dataset.varId);
-        arrOfIds.push(indep?.dataset.varId);
-
-        tableBody.innerHTML = createElementsStr();
+        if (type === 'two-column-var') {
+            tableBody = this.#element.querySelector('.two-column-var__table-body');
+            const tableSecondItem = this.#tableData.pair;
+            arrOfIds.push(tableSecondItem.firstElementChild?.dataset.varId);
+            arrOfIds.push(tableSecondItem.lastElementChild?.dataset.varId);
+            tableBody.innerHTML = createElementsStr();
+        }
+        else if (type === 'grouping-var') {
+            tableBody = this.#element.querySelector('.grouping-var__table-body');
+            const dep = this.#tableData.depTable.firstElementChild;
+            const indep = this.#tableData.indepTable.firstElementChild;
+            arrOfIds.push(dep?.dataset.varId);
+            arrOfIds.push(indep?.dataset.varId);
+            tableBody.innerHTML = createElementsStr();
+        }
 
         function createElementsStr() {
             let strBody = '';
@@ -310,7 +332,7 @@ export default class Module extends AbstractModule {
         </label>
         <div class="collapsible__content">
             <div class="parameters__content">
-                <form id="module-option-form_${this.#id}" class="module-option-form"></form>
+                <form id="module-option-form_${this.#id}" class="module-option-form" data-id=${this.#id}></form>
                 <div class="option-block">
                     <p>Метод проверки: Сравнение независимых выборок</p>
                     <div class="option-block__sub">
@@ -362,7 +384,7 @@ export default class Module extends AbstractModule {
                     <div class="option-block__tables two-column-var">
                         <div class="var-table">
                             <div class="var-table__header">
-                                <form class="sheet-form">
+                                <form class="sheet-form" data-type="two-column-var">
                                     <div class="main-select">
                                        <select class="main-input two-column-var__sheet-select sheet-select" name="sheet-select"></select>
                                     </div>
@@ -389,7 +411,7 @@ export default class Module extends AbstractModule {
                     <div class="option-block__tables grouping-var option-block_hidden">
                         <div class="var-table">
                             <div class="var-table__header">
-                                <form class="sheet-form">
+                                <form class="sheet-form" data-type="grouping-var">
                                     <div class="main-select">
                                         <select class="main-input grouping-var__sheet-select sheet-select"
                                             name="sheet-select"></select>
@@ -799,8 +821,6 @@ export default class Module extends AbstractModule {
 
         const n = z ** 2 * p0 * (1 - p0) / (2 * (p1 - p0) ** 2);
 
-        console.log(n);
-
         const N = Math.ceil(n) * 2;
 
         if (N === undefined || Number.isNaN(N)) {
@@ -859,8 +879,6 @@ export default class Module extends AbstractModule {
 
         firstDataColumn = getColumnOfAdaptedVals(data1, var1);
         secondDataColumn = getColumnOfAdaptedVals(data2, var2);
-
-        console.log(firstDataColumn, secondDataColumn);
 
         countItemsInFirstGroup(firstDataColumn, 0);
         countItemsInFirstGroup(secondDataColumn, 1);

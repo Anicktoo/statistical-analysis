@@ -344,22 +344,25 @@ class UIControls {
         });
     }
 
-    static addModuleFormListeners(id, element, moduleCallbackFunction) {
+    static addModuleFormListeners(element, moduleCallbackFunction, isGlob) {
         const elementFormMain = element.querySelector('.module-option-form');
         const triggers = [...element.querySelectorAll('.form-change-trigger')];
-        triggers.forEach(el => el.addEventListener('change', () => {
-            ModuleIntegrator.setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
-        }));
 
-        if (id === 'glob') {
+        if (isGlob) {
+            triggers.forEach(el => el.addEventListener('change', () => {
+                ModuleIntegrator.setSettings('glob', elementFormMain, elementFormMain.querySelector('.target-table-data'));
+            }));
             return;
         }
+
+        triggers.forEach(el => el.addEventListener('change', () => {
+            ModuleIntegrator.setSettings(getId(element), elementFormMain, elementFormMain.querySelector('.target-table-data'));
+        }));
 
         const elementFormSheets = [...element.querySelectorAll('.sheet-form')];
         elementFormSheets.forEach(el => {
             el.addEventListener('change', () => {
-                // ModuleIntegrator.setSettings(id, elementFormMain, elementFormMain.querySelector('.target-table-data'));
-                ModuleIntegrator.refreshVarsOfHyp(id, el);
+                ModuleIntegrator.refreshVarsOfHyp(getId(element), el);
             });
         });
 
@@ -423,7 +426,7 @@ class UIControls {
 
         const hideBtn = element.querySelector('.parameters__hide-button').querySelector('input');
         hideBtn.addEventListener('click', (e) => {
-            ModuleIntegrator.hideUnhideHyp(id);
+            ModuleIntegrator.hideUnhideHyp(getId(element));
         });
 
 
@@ -459,15 +462,26 @@ class UIControls {
             elementHeaderInput.removeEventListener('keypress', enterListener);
             elementHeader.style.display = 'inline';
             elementHeaderInput.style.display = 'none';
-            ModuleIntegrator.nameChange(id, elementHeaderInput.value);
+            ModuleIntegrator.nameChange(getId(element), elementHeaderInput.value);
         }
 
         //dublicate
 
         const dupbtn = element.querySelector('.parameters__duplicate-button');
-        dupbtn.addEventListener('click', (e) => {
-            ModuleIntegrator.duplicateHyp(id);
+        dupbtn.addEventListener('click', () => {
+            ModuleIntegrator.duplicateHyp(getId(element));
         });
+
+        //delete 
+
+        const deleteBtn = element.querySelector('.parameters__delete-button');
+        deleteBtn.addEventListener('click', () => {
+            ModuleIntegrator.deleteHyp(getId(element));
+        });
+
+        function getId(el) {
+            return Number(el.querySelector('.module-option-form').dataset.id);
+        }
     }
 
     // COMMON FUNCTIONS //
