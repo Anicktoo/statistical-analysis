@@ -71,19 +71,25 @@ export default class Module extends AbstractModule {
         }
     }
 
-    deleteSelf() {
-        Module.comElements.parametersContainer.removeChild(this.#element);
-        Module.comElements.resultsContainer.removeChild(this.#resultBlock);
-    }
-
-
-
     static setModuleTypeId(id) {
         Module.#moduleTypeId = id;
     }
 
     static getModuleTypeId() {
         return Module.#moduleTypeId;
+    }
+
+    static getName() {
+        return Module.#name;
+    }
+
+    static getImage() {
+        return Module.#image;
+    }
+
+    deleteSelf() {
+        Module.comElements.parametersContainer.removeChild(this.#element);
+        Module.comElements.resultsContainer.removeChild(this.#resultBlock);
     }
 
     #makeCopy(reference) {
@@ -130,14 +136,6 @@ export default class Module extends AbstractModule {
         data.element = this.#element;
         data.resultBlock = this.#resultBlock;
         return data;
-    }
-
-    static getName() {
-        return this.#name;
-    }
-
-    static getImage() {
-        return this.#image;
     }
 
     setId(id) {
@@ -745,14 +743,9 @@ export default class Module extends AbstractModule {
         this.#resultsTableData.student.d = d;
         this.#resultsTableData.student.sd = sd;
 
-        if (d === 0) {
-            return Infinity;
-            // throw new Error('Средняя разность равна нулю. Проверьте, что сравниваются разные наборы данных');
-        }
-
         const n = (z * sd / d) ** 2 + ((zAlpha ** 2) / 2);
 
-        if (n === undefined || Number.isNaN(n)) {
+        if (n === undefined || typeof n !== 'number') {
             throw new Error('Ошибка расчета данных');
         }
 
@@ -780,26 +773,19 @@ export default class Module extends AbstractModule {
         this.#resultsTableData.student.d = d;
         this.#resultsTableData.student.sd = sd;
 
-        if (sd === 0) {
-            this.#resultsTableData.z = Infinity;
-            return 0;
+        z = (Math.sqrt(n - ((zAlpha ** 2) / 2)) * d) / sd;
+        if (z > 0) {
+            z *= -1;
         }
-        else {
-            z = (Math.sqrt(n - ((zAlpha ** 2) / 2)) * d) / sd;
-            if (z > 0) {
-                z *= -1;
-            }
-            this.#resultsTableData.z = z;
-            const zB = z - zAlpha;
-            const power = 100 - Math.normdist(zB);
+        this.#resultsTableData.z = z;
+        const zB = z - zAlpha;
+        const power = 100 - Math.normdist(zB);
 
-            if (power === undefined || Number.isNaN(power)) {
-                throw new Error('Ошибка расчета данных');
-            }
-
-
-            return power;
+        if (power === undefined || typeof power !== 'number') {
+            throw new Error('Ошибка расчета данных');
         }
+
+        return power;
     }
 
     #signTest(alpha, power, data1, data2) {
@@ -826,13 +812,9 @@ export default class Module extends AbstractModule {
         this.#resultsTableData.sign.p1 = p1;
         this.#resultsTableData.sign.p2 = p2;
 
-        if (p0 === 1 || p1 === 0.5) {
-            return Infinity
-        }
-
         const n = (z ** 2) / (4 * (1 - p0) * ((p1 - 0.5) ** 2));
 
-        if (n === undefined || Number.isNaN(n)) {
+        if (n === undefined || typeof n !== 'number') {
             throw new Error('Ошибка расчета данных');
         }
 
@@ -869,10 +851,9 @@ export default class Module extends AbstractModule {
         const zB = z - zAlpha;
         const power = 100 - Math.normdist(zB);
 
-        if (power === undefined || Number.isNaN(power)) {
+        if (power === undefined || typeof power !== 'number') {
             throw new Error('Ошибка расчета данных');
         }
-
         return power;
     }
 
@@ -945,10 +926,10 @@ export default class Module extends AbstractModule {
         else if (this.#inputType === 'data-input-two') {
             inputTypeHeader = `
             <th>
-                M1
+                Выборка 1
             </th>
             <th>
-                M2
+                Выборка 2
             </th>`;
         }
         else {

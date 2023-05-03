@@ -5,6 +5,14 @@ export default class AbstractModule {
             throw new Error("Can't create an instance of an abstract class");
     }
 
+    static setModuleTypeId(id) {
+        throw new Error('This method must be implemented');
+    }
+
+    static getModuleTypeId() {
+        throw new Error('This method must be implemented');
+    }
+
     static getName() {
         throw new Error('This method must be implemented');
     }
@@ -13,15 +21,36 @@ export default class AbstractModule {
         throw new Error('This method must be implemented');
     }
 
+    deleteSelf() {
+        throw new Error('This method must be implemented');
+    }
+
+    getAllData() {
+        throw new Error('This method must be implemented');
+
+    }
+
+    setName(name) {
+        throw new Error('This method must be implemented');
+    }
+
+    setId(id) {
+        throw new Error('This method must be implemented');
+    }
+
     getName() {
         throw new Error('This method must be implemented');
     }
 
-    getFormSheet() {
+    getElement() {
         throw new Error('This method must be implemented');
     }
 
-    getSheetSelect() {
+    getFormSheets() {
+        throw new Error('This method must be implemented');
+    }
+
+    getSheetSelects() {
         throw new Error('This method must be implemented');
     }
 
@@ -29,7 +58,7 @@ export default class AbstractModule {
         throw new Error('This method must be implemented');
     }
 
-    displayVarsOfSheet(sheetId) {
+    displayVarsOfSheet(sheetId, type) {
         throw new Error('This method must be implemented');
     }
 

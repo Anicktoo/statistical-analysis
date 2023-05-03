@@ -74,6 +74,10 @@ Math.stddiv.s = function (array) {
     return Math.sqrt(array.map(x => ((x - mean) ** 2)).reduce((a, b) => a + b) / (n - 1))
 }
 
+Math.fisher = function (number) {
+    return 0.5 * Math.log((1 + number) / (1 - number));
+}
+
 Number.resultForm = function (n, noRound) {
     return typeof n === 'number' && !Number.isNaN(n) ? (noRound ? n : Math.roundGOST(n, 2)) : '-';
 }
@@ -118,5 +122,45 @@ Math.roundGOST = function (num) {
         else {
             return tempAnswer;
         }
+    }
+}
+
+//Возможно нужно ранжировать значения обоих выборок как одной
+Math.rank = {};
+Math.rank.avg = function (array, getRankFunc) {
+    const obj = {
+        get(i) {
+            if (this[i])
+                return this[i].avg;
+        }
+    };
+    for (let el of array) {
+        if (obj[el]) {
+            obj[el].count++;
+        }
+        else {
+            obj[el] = {
+                avg: el.getRankFunc(),
+                count: 1
+            }
+        }
+    }
+    let curRank = 0;
+    let nextRank = 1;
+    let curKey = getKeyByValue(obj, curRank);
+    let nextKey = getKeyByValue(obj, nextRank);
+    while (curKey !== undefined) {
+        obj[key].avg = obj[key].avg + obj[key].count * 0.5 - 0.5;
+        obj[nextKey].avg += obj[key].count - 1;
+        curRank = nextRank;
+        nextRank = nextRank + 1;
+        curKey = nextKey;
+        nextKey = getKeyByValue(obj, nextRank);
+    }
+
+    return obj;
+
+    function getKeyByValue(object, value) {
+        return Object.keys(object).find(key => object[key] === value);
     }
 }

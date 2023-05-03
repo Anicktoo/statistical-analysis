@@ -14,7 +14,7 @@ export default class Module extends AbstractModule {
         resultsContainer: document.querySelector('.results__container'),
     }
     static testText = {
-        'fisher': 'Точный тест фишера',
+        'fisher': 'Точный тест Фишера',
         'mann': 'Тест Манна-Уитни',
         'student': 'Независимый тест Стьюдента'
     }
@@ -71,16 +71,25 @@ export default class Module extends AbstractModule {
         }
     }
 
-    deleteSelf() {
-        Module.comElements.parametersContainer.removeChild(this.#element);
-        Module.comElements.resultsContainer.removeChild(this.#resultBlock);
-    }
-
     static setModuleTypeId(id) {
         Module.#moduleTypeId = id;
     }
+
     static getModuleTypeId() {
         return Module.#moduleTypeId;
+    }
+
+    static getName() {
+        return Module.#name;
+    }
+
+    static getImage() {
+        return Module.#image;
+    }
+
+    deleteSelf() {
+        Module.comElements.parametersContainer.removeChild(this.#element);
+        Module.comElements.resultsContainer.removeChild(this.#resultBlock);
     }
 
     #makeCopy(reference) {
@@ -133,14 +142,6 @@ export default class Module extends AbstractModule {
         this.#hypName = name;
         this.#element.querySelector('.parameters__title').textContent = name;
         this.#resultBlock.querySelector('.results__header').textContent = name;
-    }
-
-    static getName() {
-        return this.#name;
-    }
-
-    static getImage() {
-        return this.#image;
     }
 
     setId(id) {
@@ -398,7 +399,7 @@ export default class Module extends AbstractModule {
                             </div>
                         </div>
                         <div class="var-table">
-                            <div class="var-table__header">Парные переменные</div>
+                            <div class="var-table__header">Сравниваемые переменные</div>
                             <div class="var-table__body two-column-var__table-body">
                                 <div class="two-column-var__item target-table-data">
                                 </div>
@@ -716,80 +717,12 @@ export default class Module extends AbstractModule {
         }
     }
 
-    //!
     #studentTest(alpha, power, data1, data2) {
-        // let d, sd;
-        // const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
-        // const z = this.getZ(zAlpha, power);
-        // if (this.#inputType === 'manual') {
-        //     d = this.#resultsTableData.student.d;
-        //     sd = this.#resultsTableData.student.sd;
-        // }
-        // else {
-        //     const differences = this.#data.first.map((el, i) => {
-        //         if (el === '' || this.#data.second[i] === '')
-        //             throw new Error('Невозможно обработать набор данных, имеются пропущенные значения')
-        //         return el - this.#data.second[i];
-        //     });
-        //     d = Math.abs(Math.mean(differences));
-        //     sd = Math.stddiv.s(differences);
-        // }
-        // if (d === 0) {
-        //     throw new Error('Средняя разность равна нулю. Проверьте, что сравниваются разные наборы данных')
-        // }
 
-        // const n = (z * sd / d) ** 2 + ((zAlpha ** 2) / 2);
-
-        // if (n === undefined || Number.isNaN(n)) {
-        //     throw new Error('Ошибка расчета данных');
-        // }
-
-        // this.#resultsTableData.z = z;
-        // this.#resultsTableData.student.d = d;
-        // this.#resultsTableData.student.sd = sd;
-
-        // return n;
     }
 
-    //!
     #studentTestInv(alpha, n) {
-        // let d, sd;
-        // const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
 
-        // if (this.#inputType === 'manual') {
-        //     d = this.#resultsTableData.student.d;
-        //     sd = this.#resultsTableData.student.sd;
-        // }
-        // else {
-        //     const differences = this.#data.first.map((el, i) => {
-        //         if (el === '' || this.#data.second[i] === '')
-        //             throw new Error('Невозможно обработать набор данных, имеются пропущенные значения')
-        //         return el - this.#data.second[i];
-        //     });
-        //     d = Math.abs(Math.mean(differences));
-        //     sd = Math.stddiv.s(differences);
-        // }
-
-        // if (d === 0) {
-        //     throw new Error('Средняя разность равна нулю. Проверьте, что сравниваются разные наборы данных')
-        // }
-
-        // let z = (Math.sqrt(n - ((zAlpha ** 2) / 2)) * d) / sd * -1;
-        // if (z > 0) {
-        //     z *= -1;
-        // }
-        // const zB = z - zAlpha;
-        // const power = 100 - Math.normdist(zB);
-
-        // if (power === undefined || Number.isNaN(power)) {
-        //     throw new Error('Ошибка расчета данных');
-        // }
-
-        // this.#resultsTableData.z = z;
-        // this.#resultsTableData.student.d = d;
-        // this.#resultsTableData.student.sd = sd;
-
-        // return power;
     }
 
     #fisherTest(alpha, power, data1, data2) {
@@ -815,15 +748,11 @@ export default class Module extends AbstractModule {
         this.#resultsTableData.fisher.p1 = p1;
         this.#resultsTableData.fisher.p2 = p2;
 
-        if (p1 === p0) {
-            return Infinity;
-        }
-
         const n = z ** 2 * p0 * (1 - p0) / (2 * (p1 - p0) ** 2);
 
         const N = Math.ceil(n) * 2;
 
-        if (N === undefined || Number.isNaN(N)) {
+        if (n === undefined || typeof n !== 'number') {
             throw new Error('Ошибка расчета данных');
         }
 
@@ -851,11 +780,6 @@ export default class Module extends AbstractModule {
         this.#resultsTableData.fisher.p1 = p1;
         this.#resultsTableData.fisher.p2 = p2;
 
-        if (p0 === 1 || p0 === 0) {
-            this.#resultsTableData.z = Infinity;
-            return 0;
-        }
-
         let z = Math.sqrt((2 * n * (p1 - p0) ** 2) / (2 * p0 * (1 - p0)));
         if (z > 0) {
             z *= -1;
@@ -864,7 +788,7 @@ export default class Module extends AbstractModule {
         const zB = z - zAlpha;
         const power = 100 - Math.normdist(zB);
 
-        if (power === undefined || Number.isNaN(power)) {
+        if (power === undefined || typeof power !== 'number') {
             throw new Error('Ошибка расчета данных');
         }
 
@@ -921,10 +845,10 @@ export default class Module extends AbstractModule {
         else if (this.#inputType === 'data-input-two') {
             inputTypeHeader = `
             <th>
-                M1
+                Выборка 1
             </th>
             <th>
-                M2
+                Выборка 2
             </th>`;
         }
         else {
