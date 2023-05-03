@@ -9,10 +9,6 @@ export default class Module extends AbstractModule {
     static #name = 'Проверка корреляции';
     static #image = img;
     static #moduleTypeId = null;
-    static comElements = {
-        parametersContainer: document.querySelector('.parameters__container'),
-        resultsContainer: document.querySelector('.results__container'),
-    }
     static testText = {
         'pearson': 'Тест Пирсона',
         'spearman': 'Тест Спирмена'
@@ -84,8 +80,8 @@ export default class Module extends AbstractModule {
     }
 
     deleteSelf() {
-        Module.comElements.parametersContainer.removeChild(this.#element);
-        Module.comElements.resultsContainer.removeChild(this.#resultBlock);
+        UIControls.parametersContainer.removeChild(this.#element);
+        UIControls.resultsContainer.removeChild(this.#resultBlock);
     }
 
     #makeCopy(reference) {
@@ -99,8 +95,8 @@ export default class Module extends AbstractModule {
         this.#vars = refData.vars;
         this.#hypName = refData.hypName;
 
-        const parametersContainer = Module.comElements.parametersContainer;
-        const resultsContainer = Module.comElements.resultsContainer;
+        const parametersContainer = UIControls.parametersContainer;
+        const resultsContainer = UIControls.resultsContainer;
         const newHyp = refData.element.cloneNode(true);
         const newRes = document.createElement('div');
         newRes.classList.add('results__block');
@@ -114,8 +110,8 @@ export default class Module extends AbstractModule {
             el.classList.replace('form-change-trigger_' + refData.id, 'form-change-trigger_' + this.#id);
             el.setAttribute('form', 'module-option-form_' + this.#id);
         });
-        Module.comElements.parametersContainer.insertBefore(this.#element, refData.element.nextElementSibling);
-        Module.comElements.resultsContainer.insertBefore(this.#resultBlock, refData.resultBlock.nextElementSibling);
+        UIControls.parametersContainer.insertBefore(this.#element, refData.element.nextElementSibling);
+        UIControls.resultsContainer.insertBefore(this.#resultBlock, refData.resultBlock.nextElementSibling);
     }
 
     getAllData() {
@@ -298,8 +294,8 @@ export default class Module extends AbstractModule {
 
     createHTML() {
         const name = 'Гипотеза ' + (this.#id + 1);
-        const parametersContainer = Module.comElements.parametersContainer;
-        const resultsContainer = Module.comElements.resultsContainer;
+        const parametersContainer = UIControls.parametersContainer;
+        const resultsContainer = UIControls.resultsContainer;
         const newHyp = document.createElement('div');
         const newRes = document.createElement('div');
         newHyp.classList.add('parameters__item', 'collapsible');

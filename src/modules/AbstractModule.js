@@ -1,5 +1,10 @@
 export default class AbstractModule {
 
+    static comElements = {
+        parametersContainer: document.querySelector('.parameters__container'),
+        resultsContainer: document.querySelector('.results__container'),
+    }
+
     constructor() {
         if (AbstractModule === new.target)
             throw new Error("Can't create an instance of an abstract class");

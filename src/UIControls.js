@@ -7,11 +7,12 @@ class UIControls {
     static moduleListElement;
     static modulesItems = [];
     static burgerMenu;
-    static burgerMenuInput
+    static burgerMenuInput;
     static fadeScreen;
     static menuBtns = [];
-    static csvUploadBtn
-    static settingsForm
+    static csvUploadBtn;
+    static exportBtn;
+    static settingsForm;
     static dataContainer;
     static dataTable;
     static dataFooter;
@@ -87,6 +88,7 @@ class UIControls {
         UIControls.menuBtns = [...document.querySelectorAll('.sidebar__item')];
 
         UIControls.csvUploadBtn = document.getElementById('csvUpload');
+        UIControls.exportBtn = document.getElementById('export-results');
         UIControls.settingsForm = document.getElementById('settings-form');
 
         UIControls.calculationWindow = document.querySelector('.calculation-window');
@@ -136,6 +138,7 @@ class UIControls {
         UIControls.addModalSettingsListener();
         UIControls.addModalVarChooseListener();
         UIControls.addCsvUploadListeners();
+        UIControls.addExportBtnListeners();
     }
 
     static initNewSheetControls() {
@@ -144,7 +147,6 @@ class UIControls {
     }
 
     static initNewSheetElements() {
-        // UIControls.dataTable = UIControls.dataContainer.querySelector('.data__table_shown'); //???????????
         UIControls.dataFooterElements.new = [...UIControls.dataFooter.querySelectorAll('.footer__item_new')];
         UIControls.varIcons.new = [...UIControls.dataContainer.querySelectorAll('.data__var-icon_new')];
         UIControls.dataSettingsBtns.new = [...UIControls.dataContainer.querySelectorAll('.dataSettingsBtn_new')];
@@ -177,6 +179,13 @@ class UIControls {
 
         UIControls.csvUploadBtn.addEventListener('change', (event) => {
             DataControls.readSingleFile(event);
+            UIControls.toggleMenu();
+        });
+    }
+
+    static addExportBtnListeners() {
+        UIControls.exportBtn.addEventListener('click', () => {
+            ModuleIntegrator.exportResults();
             UIControls.toggleMenu();
         });
     }

@@ -367,5 +367,157 @@ export default class ModuleIntegrator {
 
         ModuleIntegrator.setSettings('glob');
     }
+
+    static exportResults() {
+        const resultsBlock = UIControls.resultsContainer;
+        const htmlString = getHtmlString(resultsBlock);
+
+        const blob = new Blob([htmlString], { type: 'text/html' });
+
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.download = `${ModuleIntegrator.globalSettings.name}.html`;
+        link.href = url;
+        link.click();
+
+        URL.revokeObjectURL(url);
+
+        function getHtmlString(resultsBlock) {
+            return `
+            <html>
+              <head>
+                <style>
+                    body,
+                    h1,
+                    h2,
+                    h3,
+                    h4,
+                    p,
+                    ul[class],
+                    ol[class],
+                    li,
+                    figure,
+                    figcaption,
+                    fieldset,
+                    blockquote,
+                    dl,
+                    dd {
+                        margin: 0;
+                    }
+                    body {
+                        font-family: "Open Sans", sans-serif;
+                        color: #000000;
+                        font-weight: 400;
+                        font-size: 14px;
+                        line-height: 19px;
+                        min-height: 100vh;
+                        scroll-behavior: smooth;
+                        text-rendering: optimizeSpeed;
+                    }
+
+                    p, th , td {
+                        color: #000000;
+                        font-weight: 400;
+                        font-size: 14px;
+                        line-height: 19px;
+                    }
+                    
+                    h1 {
+                        font-weight: 700;
+                        font-size: 24px;
+                        line-height: 33px;
+                    }
+                    
+                    h2 {
+                        font-weight: 700;
+                        font-size: 20px;
+                        line-height: 27px;
+                    }
+                    
+                    b {
+                        font-weight: 600;
+                        font-size: 14px;
+                        line-height: 19px;
+                    }
+                    
+                    small {
+                        font-weight: 400;
+                        font-size: 12px;
+                        line-height: 16px;
+                    }
+
+                    .results__container {
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
+                        gap: 56px;
+                        padding: 10px 24px 24px 24px;
+                        max-width: 1048px;
+
+                        font-weight: 400;
+                        font-size: 14px;
+                    }
+
+                    .results__header {
+                        overflow-wrap: break-word;
+                        max-width: 100%;
+                    }
+
+                    .results__block {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 24px;
+                        min-width: 1000px;
+                        max-width: 1000px;
+                        flex-shrink: 1;
+                    }
+                
+                    .results__block-inner {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+                        max-width: 1000px;
+                    }
+                
+                    .results__table {
+                        border-bottom: 2px solid #000000;
+                        border-collapse: collapse;
+                        width: max-content;
+                        max-width: 100%;
+                    }
+
+                    .results__table th {
+                        white-space: nowrap;
+                        border-top: 1px solid #000000;
+                        border-bottom: 1px solid #000000;
+                    }
+            
+                    .results__table th,
+                    .results__table td {
+                        padding: 0 16px 0 16px;
+                        text-align: center;
+                    }
+            
+                    .results__table td {
+                        white-space: normal;
+                        word-wrap: break-word;
+                        width: max-content;
+                        max-width: 200px;
+                    }
+            
+                    .results__table caption {
+                        caption-side: bottom;
+                        text-align: left;
+                    }
+                </style>
+              </head>
+              <body>
+                ${resultsBlock.outerHTML}
+              </body>
+            </html>
+          `;
+        }
+    }
 }
 
