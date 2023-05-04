@@ -1,13 +1,31 @@
-import img from './img/moduleIndependent.png';
-import ModuleIntegrator from '@/ModuleIntegrator';
-import DataControls from '@data/DataControls';
-import AbstractModule from '@modules/AbstractModule';
-import Var from '@data/Var';
+"use strict";
+(self["webpackChunk"] = self["webpackChunk"] || []).push([["modules_independent-sample-test_Module_js"],{
 
-export default class Module extends AbstractModule {
+/***/ "./modules/independent-sample-test/Module.js":
+/*!***************************************************!*\
+  !*** ./modules/independent-sample-test/Module.js ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Module)
+/* harmony export */ });
+/* harmony import */ var _img_moduleIndependent_png__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./img/moduleIndependent.png */ "./modules/independent-sample-test/img/moduleIndependent.png");
+/* harmony import */ var _ModuleIntegrator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/ModuleIntegrator */ "./ModuleIntegrator.js");
+/* harmony import */ var _data_DataControls__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @data/DataControls */ "./data/DataControls.js");
+/* harmony import */ var _modules_AbstractModule__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @modules/AbstractModule */ "./modules/AbstractModule.js");
+/* harmony import */ var _data_Var__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @data/Var */ "./data/Var.js");
+
+
+
+
+
+
+class Module extends _modules_AbstractModule__WEBPACK_IMPORTED_MODULE_3__["default"] {
 
     static #name = 'Сравнение независимых выборок';
-    static #image = img;
+    static #image = _img_moduleIndependent_png__WEBPACK_IMPORTED_MODULE_0__;
     static #moduleTypeId = null;
     static testText = {
         'fisher': 'Точный тест Фишера',
@@ -57,9 +75,6 @@ export default class Module extends AbstractModule {
         depTable: undefined
     };
     #resultBlock;
-    #switch;
-    #switch1;
-    #switch2;
 
     constructor(id, reference = null) {
         super();
@@ -183,10 +198,6 @@ export default class Module extends AbstractModule {
         const depTable = element.querySelector('.grouping-var__dependent-table-body');
         const indepTable = element.querySelector('.grouping-var__independent-table-body');
 
-        this.#switch = switch0;
-        this.#switch1 = switch1;
-        this.#switch2 = switch2;
-
         const insertChild = (item, toTable) => {
             const nextChild = toTable.querySelector('.var-table__anchor_' + item.dataset.varId);
             if (nextChild) {
@@ -196,11 +207,11 @@ export default class Module extends AbstractModule {
 
         const callSettings = () => {
             if ((depTable.firstElementChild && indepTable.firstElementChild) || tableData.children.length === 2) {
-                ModuleIntegrator.setSettings(this.#id);
+                _ModuleIntegrator__WEBPACK_IMPORTED_MODULE_1__["default"].setSettings(this.#id);
             }
         }
 
-        const swapItem = function (firstTable, secondTable, maxItemsInSecondTable, switchEl) {
+        const swapItem = function (firstTable, secondTable, maxItemsInSecondTable) {
             const checkedInput = firstTable.querySelector('input:checked') || secondTable.querySelector('input:checked');
             if (!checkedInput)
                 return;
@@ -209,7 +220,6 @@ export default class Module extends AbstractModule {
             if (parentOfItem.isSameNode(secondTable)) {
                 parentOfItem.removeChild(checkedItem);
                 insertChild(checkedItem, firstTable);
-                switchEl.classList.replace('switch-button_left', 'switch-button_right');
             }
             else {
                 if (secondTable.children.length === maxItemsInSecondTable) {
@@ -217,20 +227,19 @@ export default class Module extends AbstractModule {
                 }
                 parentOfItem.removeChild(checkedItem);
                 secondTable.appendChild(checkedItem);
-                switchEl.classList.replace('switch-button_right', 'switch-button_left');
             }
 
             callSettings();
         }
 
-        switch0.addEventListener('click', swapItem.bind(this, firstTable, tableData, 2, switch0));
-        switch1.addEventListener('click', swapItem.bind(this, leftTable, depTable, 1, switch1));
-        switch2.addEventListener('click', swapItem.bind(this, leftTable, indepTable, 1, switch2));
+        switch0.addEventListener('click', swapItem.bind(this, firstTable, tableData, 2));
+        switch1.addEventListener('click', swapItem.bind(this, leftTable, depTable, 1));
+        switch2.addEventListener('click', swapItem.bind(this, leftTable, indepTable, 1));
 
     }
 
     displayVarsOfSheet(sheetId, type) {
-        const vars = DataControls.getVarsBySheetId(sheetId);
+        const vars = _data_DataControls__WEBPACK_IMPORTED_MODULE_2__["default"].getVarsBySheetId(sheetId);
         if (!vars)
             return;
 
@@ -243,19 +252,6 @@ export default class Module extends AbstractModule {
             arrOfIds.push(tableSecondItem.firstElementChild?.dataset.varId);
             arrOfIds.push(tableSecondItem.lastElementChild?.dataset.varId);
             tableBody.innerHTML = createElementsStr();
-            const switchChange = (el) => {
-                const var1 = this.#tableData.pair.firstElementChild;
-                const var2 = this.#tableData.pair.lastElementChild;
-                if (var1?.dataset.varId !== el.dataset.varId && var2?.dataset.varId !== el.dataset.varId) {
-                    this.#switch.classList.replace('switch-button_left', 'switch-button_right');
-                }
-                else {
-                    this.#switch.classList.replace('switch-button_right', 'switch-button_left');
-                }
-            }
-            [...tableBody.querySelectorAll('.var-table__item')].forEach(el =>
-                el.querySelector('input').addEventListener('change', switchChange.bind(this, el))
-            );
         }
         else if (type === 'grouping-var') {
             tableBody = this.#element.querySelector('.grouping-var__table-body');
@@ -264,21 +260,6 @@ export default class Module extends AbstractModule {
             arrOfIds.push(dep?.dataset.varId);
             arrOfIds.push(indep?.dataset.varId);
             tableBody.innerHTML = createElementsStr();
-            const switchChange = (el) => {
-                if (this.#tableData.indepTable.firstElementChild?.dataset.varId === el.dataset.varId) {
-                    this.#switch2.classList.replace('switch-button_right', 'switch-button_left');
-                }
-                else if (this.#tableData.depTable.firstElementChild?.dataset.varId === el.dataset.varId) {
-                    this.#switch1.classList.replace('switch-button_right', 'switch-button_left');
-                }
-                else {
-                    this.#switch1.classList.replace('switch-button_left', 'switch-button_right');
-                    this.#switch2.classList.replace('switch-button_left', 'switch-button_right');
-                }
-            }
-            [...tableBody.querySelectorAll('.var-table__item')].forEach(el =>
-                el.querySelector('input').addEventListener('change', switchChange.bind(this, el))
-            );
         }
 
         function createElementsStr() {
@@ -316,7 +297,7 @@ export default class Module extends AbstractModule {
                 if (el) {
                     const ids = el.dataset.varId.split('_');
                     if (ids[1] == sheetId) {
-                        const v = DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
+                        const v = _data_DataControls__WEBPACK_IMPORTED_MODULE_2__["default"].getVarBySheetIdAndVarId(ids[1], ids[2]);
                         const elImg = el.querySelector('img');
                         el.querySelector('span').innerHTML = v.getName();
                         elImg.setAttribute('src', v.getImg());
@@ -346,7 +327,7 @@ export default class Module extends AbstractModule {
             <input class="collapsible__input" type="checkbox" checked>
             <div class="parameters__head">
                 <div class="parameters__title-container">
-                    <div class="collapsible__symbol collapsible__symbol_checked"></div>
+                    <div class="collapsible__symbol"></div>
                     <h2 class="parameters__title">${name}</h2>
                     <input class="parameters__title-input" type='text'>
                 </div>
@@ -364,7 +345,7 @@ export default class Module extends AbstractModule {
                 </div>
             </div>
         </label>
-        <div class="collapsible__content collapsible__content_checked">
+        <div class="collapsible__content">
             <div class="parameters__content">
                 <form id="module-option-form_${this.#id}" class="module-option-form" data-id=${this.#id}></form>
                 <div class="option-block">
@@ -615,8 +596,8 @@ export default class Module extends AbstractModule {
             if (validTableData) {
                 selectedVars.forEach(el => {
                     const ids = el.dataset.varId.split('_');
-                    data.push(DataControls.getDataBySheetAndVarId(ids[1], ids[2]).slice(1));
-                    vars.push(DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]));
+                    data.push(_data_DataControls__WEBPACK_IMPORTED_MODULE_2__["default"].getDataBySheetAndVarId(ids[1], ids[2]).slice(1));
+                    vars.push(_data_DataControls__WEBPACK_IMPORTED_MODULE_2__["default"].getVarBySheetIdAndVarId(ids[1], ids[2]));
                 });
                 this.#data.first = data[0];
                 this.#data.second = data[1];
@@ -675,7 +656,7 @@ export default class Module extends AbstractModule {
             else {
                 errorElement = this.#tableData.indepTable;
 
-                if (secondVarName !== Var.Binary.name) {
+                if (secondVarName !== _data_Var__WEBPACK_IMPORTED_MODULE_4__["default"].Binary.name) {
                     UIControls.showError(errorElement, 'Переменная для группировки должна быть дихотомического типа');
                     return;
                 }
@@ -713,8 +694,8 @@ export default class Module extends AbstractModule {
         try {
             switch (this.#testType) {
                 case 'student': {
-                    if (this.#inputType !== 'manual' && firstVarName !== Var.Continues.name) {
-                        throw new Error(errorText([Var.Continues.ruName]));
+                    if (this.#inputType !== 'manual' && firstVarName !== _data_Var__WEBPACK_IMPORTED_MODULE_4__["default"].Continues.name) {
+                        throw new Error(errorText([_data_Var__WEBPACK_IMPORTED_MODULE_4__["default"].Continues.ruName]));
                     }
                     if (isInv) {
                         returnValue = this.#studentTestInv(alpha, arg, data1, data2);
@@ -725,8 +706,8 @@ export default class Module extends AbstractModule {
                     break;
                 }
                 case 'fisher': {
-                    if (this.#inputType !== 'manual' && firstVarName !== Var.Binary.name) {
-                        throw new Error(errorText([Var.Binary.ruName]));
+                    if (this.#inputType !== 'manual' && firstVarName !== _data_Var__WEBPACK_IMPORTED_MODULE_4__["default"].Binary.name) {
+                        throw new Error(errorText([_data_Var__WEBPACK_IMPORTED_MODULE_4__["default"].Binary.ruName]));
                     }
                     if (isInv) {
                         returnValue = this.#fisherTestInv(alpha, arg, data1, data2);
@@ -990,3 +971,18 @@ export default class Module extends AbstractModule {
         this.#resultBlock.style.display = hide ? 'none' : '';
     }
 }
+
+/***/ }),
+
+/***/ "./modules/independent-sample-test/img/moduleIndependent.png":
+/*!*******************************************************************!*\
+  !*** ./modules/independent-sample-test/img/moduleIndependent.png ***!
+  \*******************************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = __webpack_require__.p + "cd9285569f05521af3fc.png";
+
+/***/ })
+
+}]);
+//# sourceMappingURL=modules_independent-sample-test_Module_js.js.map

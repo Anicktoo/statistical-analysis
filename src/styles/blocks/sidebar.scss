@@ -11,6 +11,10 @@
     border-right: 1px solid $stroke-grey;
     transition: translate $animation-timing;
 
+    &_checked {
+        translate: 0;
+    }
+
     &__inner {
         padding: 4px;
     }

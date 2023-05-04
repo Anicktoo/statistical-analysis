@@ -28,15 +28,7 @@
         }
     }
 
-    &__var-choose {
-        &:has(.modal-var-types__rang:checked)~.modal-var-types__rang-settings {
-            display: block;
-        }
-
-        &:has(.modal-var-types__binary:checked)~.modal-var-types__binary-settings {
-            display: block;
-        }
-    }
+    &__var-choose {}
 
     &__item {
         display: flex;
@@ -72,7 +64,6 @@
         width: 100%;
         min-height: 16vh;
         max-height: 16vh;
-        // resize: vertical;
         height: 100%;
     }
 
@@ -128,10 +119,6 @@
 
         &:first-child {
             order: 1;
-        }
-
-        &:nth-child(2):has(input:checked)~.modal-var-types__switch-container>.switch-button {
-            rotate: 180deg;
         }
     }
 

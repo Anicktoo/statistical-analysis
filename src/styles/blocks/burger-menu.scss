@@ -14,9 +14,7 @@
         gap: $burger-gap;
         width: max-content;
 
-        &::after,
-        &::before,
-        input {
+        * {
             content: '';
             width: $bar-width;
             height: $bar-height;
@@ -34,21 +32,21 @@
             pointer-events: none;
         }
 
-        &:has(input:checked)::before {
-            rotate: 45deg;
-            width: $x-width;
-            translate: 0 $bar-height / -2;
-        }
-
-        &:has(input:checked)::after {
-            rotate: -45deg;
-            width: $x-width;
-            translate: 0 $bar-height / 2;
-        }
-
         input:checked {
             opacity: 0;
             width: 0;
         }
+    }
+
+    &__line-up_checked {
+        rotate: 45deg;
+        width: $x-width;
+        translate: 0 $bar-height / -2;
+    }
+
+    &__line-down_checked {
+        rotate: -45deg;
+        width: $x-width;
+        translate: 0 $bar-height / 2;
     }
 }

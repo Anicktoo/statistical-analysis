@@ -8,7 +8,10 @@ class UIControls {
     static modulesItems = [];
     static burgerMenu;
     static burgerMenuInput;
+    static burgerUpLine;
+    static burgerDownLine;
     static fadeScreen;
+    static sidebar;
     static menuBtns = [];
     static csvUploadBtn;
     static exportBtn;
@@ -84,6 +87,9 @@ class UIControls {
         UIControls.footerList = UIControls.dataContainer.querySelector('.footer__list');
         UIControls.burgerMenu = document.querySelector('.burger-menu');
         UIControls.burgerMenuInput = UIControls.burgerMenu.querySelector('#burger-menu__input');
+        UIControls.burgerUpLine = UIControls.burgerMenu.querySelector('.burger-menu__line-up');
+        UIControls.burgerDownLine = UIControls.burgerMenu.querySelector('.burger-menu__line-down');
+        UIControls.sidebar = document.querySelector('.sidebar');
         UIControls.fadeScreen = document.querySelector('.fade');
         UIControls.menuBtns = [...document.querySelectorAll('.sidebar__item')];
 
@@ -196,7 +202,7 @@ class UIControls {
         });
 
         function mousedown(e) {
-
+            e.preventDefault();
             window.addEventListener('mousemove', mousemove);
             window.addEventListener('mouseup', mouseup);
 
@@ -204,8 +210,8 @@ class UIControls {
             const startWidth = UIControls.calculationWindow.offsetWidth;
 
 
-            function mousemove(event) {
-                event.preventDefault();
+            function mousemove(e) {
+                e.preventDefault();
                 UIControls.calculationWindow.style.width = (startWidth - (event.clientX - startX)) + 'px';
             }
 
@@ -279,6 +285,27 @@ class UIControls {
             event.stopPropagation();
         });
 
+        const varTypeInputs = [...UIControls.modalVarType.querySelectorAll('.modal-var-types__item-input')];
+        const rangInput = UIControls.modalVarType.querySelector('.modal-var-types__rang');
+        const rangSettings = UIControls.modalVarType.querySelector('.modal-var-types__rang-settings');
+        const binInput = UIControls.modalVarType.querySelector('.modal-var-types__binary');
+        const binSettings = UIControls.modalVarType.querySelector('.modal-var-types__binary-settings');
+
+        varTypeInputs.forEach(el => el.addEventListener('click', () => {
+            if (el.isSameNode(binInput)) {
+                binSettings.style.display = 'block';
+            }
+            else {
+                binSettings.style.display = 'none';
+            }
+            if (el.isSameNode(rangInput)) {
+                rangSettings.style.display = 'block';
+            }
+            else {
+                rangSettings.style.display = 'none';
+            }
+        }));
+
         UIControls.varTypesLevelControls.up.addEventListener('click', () => { moveLabel(false) });
         UIControls.varTypesLevelControls.down.addEventListener('click', () => { moveLabel(true) });
         UIControls.varTypesSwitchBtn.addEventListener('click', switchLabel);
@@ -314,11 +341,12 @@ class UIControls {
 
             if (curTableBody.isSameNode(UIControls.binTables[0])) {
                 insertChild(UIControls.binTables[1]);
+                UIControls.varTypesSwitchBtn.classList.replace('switch-button_right', 'switch-button_left');
             }
             else {
                 insertChild(UIControls.binTables[0]);
+                UIControls.varTypesSwitchBtn.classList.replace('switch-button_left', 'switch-button_right');
             }
-
         }
         function moveLabel(isDown) {
             const rangTable = UIControls.rangTable;
@@ -356,6 +384,14 @@ class UIControls {
     static addModuleFormListeners(element, moduleCallbackFunction, isGlob) {
         const elementFormMain = element.querySelector('.module-option-form');
         const triggers = [...element.querySelectorAll('.form-change-trigger')];
+        const collapsibleInput = element.querySelector('.collapsible__input');
+        const collapsibleSymbol = element.querySelector('.collapsible__symbol');
+        const collapsibleContent = element.querySelector('.collapsible__content');
+
+        collapsibleInput.addEventListener('click', () => {
+            collapsibleSymbol.classList.toggle('collapsible__symbol_checked');
+            collapsibleContent.classList.toggle('collapsible__content_checked');
+        });
 
         if (isGlob) {
             triggers.forEach(el => el.addEventListener('change', () => {
@@ -433,8 +469,14 @@ class UIControls {
 
         //hide
 
-        const hideBtn = element.querySelector('.parameters__hide-button').querySelector('input');
-        hideBtn.addEventListener('click', (e) => {
+        const hideBtn = element.querySelector('.parameters__hide-button');
+        const hideInput = hideBtn.querySelector('input');
+        const content = element.querySelector('.parameters__content');
+        const titleContainer = element.querySelector('.parameters__title-container');
+        hideInput.addEventListener('click', () => {
+            content.classList.toggle('parameters__content_hidden');
+            titleContainer.classList.toggle('parameters__title-container_hidden');
+            hideBtn.classList.toggle('parameters__hide-button_hidden');
             ModuleIntegrator.hideUnhideHyp(getId(element));
         });
 
@@ -517,12 +559,18 @@ class UIControls {
             fadeIn();
 
         function fadeIn() {
+            UIControls.sidebar.classList.add('sidebar_checked');
+            UIControls.burgerUpLine.classList.add('burger-menu__line-up_checked');
+            UIControls.burgerDownLine.classList.add('burger-menu__line-down_checked');
             UIControls.fadeScreen.style['z-index'] = '1';
             UIControls.burgerMenuInput.checked = true;
             UIControls.fadeScreen.style.opacity = '1';
         }
 
         function fadeOut() {
+            UIControls.sidebar.classList.remove('sidebar_checked');
+            UIControls.burgerUpLine.classList.remove('burger-menu__line-up_checked');
+            UIControls.burgerDownLine.classList.remove('burger-menu__line-down_checked');
             UIControls.fadeScreen.style['z-index'] = '-1';
             UIControls.burgerMenuInput.checked = false;
             UIControls.fadeScreen.style.opacity = '0';

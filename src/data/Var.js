@@ -2,7 +2,6 @@ import nominalImg from '@img/table/scaleNominal.png';
 import continuesImg from '@img/table/scaleContinues.png';
 import binaryImg from '@img/table/scaleBinary.png';
 import rangImg from '@img/table/scaleRang.png';
-// import UIControls from '../UIControls';
 
 export default class Var {
     static Binary = {
@@ -105,9 +104,7 @@ export default class Var {
         name.value = this.#name;
         name.setAttribute('value', this.#name);
 
-        varChooseInputs.forEach(element => {
-            element.checked = element.value === this.#typeName;
-        });
+
         if (!this.#onlyNumbers) {
             continuesLabel.classList.add('radio-line_disabled');
             continuesLabel.firstElementChild.disabled = true;
@@ -161,6 +158,24 @@ export default class Var {
         binBodies[0].innerHTML = str1;
         binBodies[1].innerHTML = str2;
 
+        binBodies.forEach(binEl => [...binEl.querySelectorAll('.var-table__item')].forEach(el =>
+            el.querySelector('input').addEventListener('change', switchChange.bind(this, el))
+        ));
+
+        varChooseInputs.forEach(element => {
+            if (element.value === this.#typeName) {
+                element.click();
+            }
+        });
+
+        function switchChange(el) {
+            if (binBodies[1].isSameNode(el.parentElement)) {
+                UIControls.varTypesSwitchBtn.classList.replace('switch-button_right', 'switch-button_left');
+            }
+            else {
+                UIControls.varTypesSwitchBtn.classList.replace('switch-button_left', 'switch-button_right');
+            }
+        }
     }
 
     //returns 0 if zero group, 1 if in first, -1 if val is not in the set 

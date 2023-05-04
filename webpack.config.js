@@ -69,7 +69,13 @@ module.exports = {
         compress: true,
         port: 4200,
         hot: isDev,
-        open: true,
+        open:
+        {
+            app:
+            {
+                name: 'firefox'
+            }
+        }
     },
     devtool: isDev ? 'source-map' : undefined,
     plugins: [

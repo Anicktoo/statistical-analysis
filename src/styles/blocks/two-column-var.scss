@@ -1,9 +1,5 @@
 .two-column-var {
 
-    &:has(.target-table-data input:checked) .switch-button {
-        rotate: 180deg;
-    }
-
     &__sheet-select {
         width: 100%;
     }

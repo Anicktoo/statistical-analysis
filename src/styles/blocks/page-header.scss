@@ -13,8 +13,4 @@
         width: 58px;
         height: 100%;
     }
-
-    &:has(.burger-menu__content input:checked)+.sidebar {
-        translate: 0;
-    }
 }

@@ -53,6 +53,9 @@ export default class Module extends AbstractModule {
         depTable: undefined
     };
     #resultBlock;
+    #switch;
+    #switch1;
+    #switch2;
 
     constructor(id, reference = null) {
         super();
@@ -176,6 +179,10 @@ export default class Module extends AbstractModule {
         const depTable = element.querySelector('.grouping-var__dependent-table-body');
         const indepTable = element.querySelector('.grouping-var__independent-table-body');
 
+        this.#switch = switch0;
+        this.#switch1 = switch1;
+        this.#switch2 = switch2;
+
         const insertChild = (item, toTable) => {
             const nextChild = toTable.querySelector('.var-table__anchor_' + item.dataset.varId);
             if (nextChild) {
@@ -189,7 +196,7 @@ export default class Module extends AbstractModule {
             }
         }
 
-        const swapItem = function (firstTable, secondTable, maxItemsInSecondTable) {
+        const swapItem = function (firstTable, secondTable, maxItemsInSecondTable, switchEl) {
             const checkedInput = firstTable.querySelector('input:checked') || secondTable.querySelector('input:checked');
             if (!checkedInput)
                 return;
@@ -198,6 +205,7 @@ export default class Module extends AbstractModule {
             if (parentOfItem.isSameNode(secondTable)) {
                 parentOfItem.removeChild(checkedItem);
                 insertChild(checkedItem, firstTable);
+                switchEl.classList.replace('switch-button_left', 'switch-button_right');
             }
             else {
                 if (secondTable.children.length === maxItemsInSecondTable) {
@@ -205,14 +213,15 @@ export default class Module extends AbstractModule {
                 }
                 parentOfItem.removeChild(checkedItem);
                 secondTable.appendChild(checkedItem);
+                switchEl.classList.replace('switch-button_right', 'switch-button_left');
             }
 
             callSettings();
         }
 
-        switch0.addEventListener('click', swapItem.bind(this, firstTable, tableData, 2));
-        switch1.addEventListener('click', swapItem.bind(this, leftTable, depTable, 1));
-        switch2.addEventListener('click', swapItem.bind(this, leftTable, indepTable, 1));
+        switch0.addEventListener('click', swapItem.bind(this, firstTable, tableData, 2, switch0));
+        switch1.addEventListener('click', swapItem.bind(this, leftTable, depTable, 1, switch1));
+        switch2.addEventListener('click', swapItem.bind(this, leftTable, indepTable, 1, switch2));
 
     }
 
@@ -230,6 +239,19 @@ export default class Module extends AbstractModule {
             arrOfIds.push(tableSecondItem.firstElementChild?.dataset.varId);
             arrOfIds.push(tableSecondItem.lastElementChild?.dataset.varId);
             tableBody.innerHTML = createElementsStr();
+            const switchChange = (el) => {
+                const var1 = this.#tableData.pair.firstElementChild;
+                const var2 = this.#tableData.pair.lastElementChild;
+                if (var1?.dataset.varId !== el.dataset.varId && var2?.dataset.varId !== el.dataset.varId) {
+                    this.#switch.classList.replace('switch-button_left', 'switch-button_right');
+                }
+                else {
+                    this.#switch.classList.replace('switch-button_right', 'switch-button_left');
+                }
+            }
+            [...tableBody.querySelectorAll('.var-table__item')].forEach(el =>
+                el.querySelector('input').addEventListener('change', switchChange.bind(this, el))
+            );
         }
         else if (type === 'grouping-var') {
             tableBody = this.#element.querySelector('.grouping-var__table-body');
@@ -238,6 +260,21 @@ export default class Module extends AbstractModule {
             arrOfIds.push(dep?.dataset.varId);
             arrOfIds.push(indep?.dataset.varId);
             tableBody.innerHTML = createElementsStr();
+            const switchChange = (el) => {
+                if (this.#tableData.indepTable.firstElementChild?.dataset.varId === el.dataset.varId) {
+                    this.#switch2.classList.replace('switch-button_right', 'switch-button_left');
+                }
+                else if (this.#tableData.depTable.firstElementChild?.dataset.varId === el.dataset.varId) {
+                    this.#switch1.classList.replace('switch-button_right', 'switch-button_left');
+                }
+                else {
+                    this.#switch1.classList.replace('switch-button_left', 'switch-button_right');
+                    this.#switch2.classList.replace('switch-button_left', 'switch-button_right');
+                }
+            }
+            [...tableBody.querySelectorAll('.var-table__item')].forEach(el =>
+                el.querySelector('input').addEventListener('change', switchChange.bind(this, el))
+            );
         }
 
         function createElementsStr() {
@@ -305,7 +342,7 @@ export default class Module extends AbstractModule {
             <input class="collapsible__input" type="checkbox" checked>
             <div class="parameters__head">
                 <div class="parameters__title-container">
-                    <div class="collapsible__symbol"></div>
+                    <div class="collapsible__symbol collapsible__symbol_checked"></div>
                     <h2 class="parameters__title">${name}</h2>
                     <input class="parameters__title-input" type='text'>
                 </div>
@@ -323,7 +360,7 @@ export default class Module extends AbstractModule {
                 </div>
             </div>
         </label>
-        <div class="collapsible__content">
+        <div class="collapsible__content collapsible__content_checked">
             <div class="parameters__content">
                 <form id="module-option-form_${this.#id}" class="module-option-form" data-id=${this.#id}></form>
                 <div class="option-block">

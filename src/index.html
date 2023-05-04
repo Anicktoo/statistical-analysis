@@ -13,7 +13,9 @@
         <div class="page-header__inner">
             <label title="Открыть главное меню" class="page-header__burger-menu burger-menu">
                 <div class="burger-menu__content">
+                    <div class="burger-menu__line-up"></div>
                     <input type="checkbox" id="burger-menu__input">
+                    <div class="burger-menu__line-down"></div>
                 </div>
             </label>
             <div class="modules">
@@ -52,12 +54,12 @@
                             <input class="collapsible__input" type="checkbox" checked>
                             <div class="parameters__head">
                                 <div class="parameters__title-container">
-                                    <div class="collapsible__symbol"></div>
+                                    <div class="collapsible__symbol collapsible__symbol_checked"></div>
                                     <h2 class="parameters__title">Параметры проекта</h2>
                                 </div>
                             </div>
                         </label>
-                        <div class="collapsible__content">
+                        <div class="collapsible__content collapsible__content_checked">
                             <div class="parameters__content">
                                 <form id="module-option-form_glob" class="module-option-form"></form>
                                 <div class="option-block">
@@ -79,8 +81,8 @@
                                         <div class="main-select">
                                             <select id="main-hypothesis" name="mainHypothesis"
                                                 class="main-input form-change-trigger" form="module-option-form_glob">
-                                                <option class='main-hypothesis__option_null' value="" disabled selected
-                                                    hidden>Выбрать гипотезу
+                                                <option class='main-hypothesis__option_null' value="" selected hidden>
+                                                    Выбрать гипотезу
                                                 </option>
                                                 <!-- <option value="-">-</option> -->
                                             </select>
@@ -287,7 +289,8 @@
         </form>
     </div>
     <form>
-        <input type='text' id="error-show" class="error-show" />
+        <input type='radio' id="error-show" class="error-show" />
+
     </form>
 </body>
 

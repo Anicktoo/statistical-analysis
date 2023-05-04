@@ -3,23 +3,23 @@
         display: block;
     }
 
-    &__head:has(.collapsible__input:checked)~&__content {
-        height: fit-content;
-    }
-
-    &__head:has(.collapsible__input:checked) &__symbol {
-        rotate: 180deg;
-    }
-
     &__symbol {
         transition: rotate $fast-animation-timing;
         rotate: 90deg;
         @include triangle();
     }
 
+    &__symbol_checked {
+        rotate: 180deg;
+    }
+
     &__content {
         height: 1px;
         overflow: hidden;
+    }
+
+    &__content_checked {
+        height: fit-content;
     }
 
     &__input {

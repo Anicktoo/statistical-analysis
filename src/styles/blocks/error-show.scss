@@ -1,7 +1,10 @@
 .error-show {
     cursor: default;
+    -webkit-appearance: none;
+    appearance: none;
     pointer-events: none;
-    visibility: hidden;
+    border: none;
+    background-color: transparent;
     width: 0px;
     height: 0px;
     position: absolute;

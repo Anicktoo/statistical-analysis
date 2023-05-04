@@ -22,11 +22,6 @@
 
     &__item {
         border-bottom: 1px solid $third-grey;
-
-        &:has(.parameters__hide-button > input:checked) .parameters__content,
-        &:has(.parameters__hide-button > input:checked) .parameters__title-container {
-            @include disabled;
-        }
     }
 
     &__head {
@@ -39,7 +34,11 @@
     &__title-container {
         display: flex;
         align-items: center;
-        gap: 10px
+        gap: 10px;
+
+        &_hidden {
+            @include disabled;
+        }
     }
 
     &__title {
@@ -83,7 +82,7 @@
             display: none;
         }
 
-        &:has(input:checked) {
+        &_hidden {
             background-image: url("../img/extra/unhide.png");
         }
     }
@@ -110,6 +109,10 @@
 
     &__content {
         padding: 8px 16px 16px 16px;
+
+        &_hidden {
+            @include disabled;
+        }
     }
 
 
