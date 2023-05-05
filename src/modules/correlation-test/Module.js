@@ -159,6 +159,10 @@ export default class Module extends AbstractModule {
         return this.#element;
     }
 
+    getResultElement() {
+        return this.#resultBlock;
+    }
+
     getFormSheets() {
         return this.#formSheets;
     }
@@ -384,6 +388,52 @@ export default class Module extends AbstractModule {
                             </label>
                         </div>
                     </div>
+                    <div class="option-block__two-column">
+                        <div class="option-block">
+                            <div class="option-block__sub">
+                                Тест
+                                <div class="option-block__list option-block__test-type">
+                                    <label class="radio-line">
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
+                                            name="test-type" value="pearson"
+                                            form="module-option-form_${this.#id}" checked>
+                                        <span>Пирсона</span>
+                                    </label>
+                                    <label class="radio-line disabled">
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
+                                            name="test-type" value="spearman"
+                                            form="module-option-form_${this.#id}">
+                                        <span>Спирмена</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="option-block">
+                            <div class="option-block__sub">
+                                Проверка альтернативной гипотезы
+                                <div class="option-block__list">
+                                    <label class="radio-line">
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
+                                            name="hyp-check" value="both"
+                                            form="module-option-form_${this.#id}" checked>
+                                        <span>${Module.altHypText['both']}</span>
+                                    </label>
+                                    <label class="radio-line">
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
+                                            name="hyp-check" value="right"
+                                            form="module-option-form_${this.#id}">
+                                        <span>${Module.altHypText['right']}</span>
+                                    </label>
+                                    <label class="radio-line">
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
+                                            name="hyp-check" value="left"
+                                            form="module-option-form_${this.#id}">
+                                        <span>${Module.altHypText['left']}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="option-block__sub option-block__manual-input option-block__pearson option-block_hidden">
                         Введите параметры:
                         <div class="option-block__list">
@@ -428,8 +478,6 @@ export default class Module extends AbstractModule {
                             </div>
                         </div>
                     </div>
-
-
                     <div class="option-block__tables grouping-var option-block_hidden">
                         <div class="var-table">
                             <div class="var-table__header">
@@ -466,52 +514,6 @@ export default class Module extends AbstractModule {
                                     <div class="var-table__header">Группировка по переменной</div>
                                     <div class="var-table__body grouping-var__independent-table-body">
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="option-block__two-column">
-                        <div class="option-block">
-                            <div class="option-block__sub">
-                                Тест
-                                <div class="option-block__list option-block__test-type">
-                                    <label class="radio-line">
-                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
-                                            name="test-type" value="pearson"
-                                            form="module-option-form_${this.#id}" checked>
-                                        <span>Пирсона</span>
-                                    </label>
-                                    <label class="radio-line">
-                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
-                                            name="test-type" value="spearman"
-                                            form="module-option-form_${this.#id}">
-                                        <span>Спирмена</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="option-block">
-                            <div class="option-block__sub">
-                                Проверка альтернативной гипотезы
-                                <div class="option-block__list">
-                                    <label class="radio-line">
-                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
-                                            name="hyp-check" value="both"
-                                            form="module-option-form_${this.#id}" checked>
-                                        <span>${Module.altHypText['both']}</span>
-                                    </label>
-                                    <label class="radio-line">
-                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
-                                            name="hyp-check" value="right"
-                                            form="module-option-form_${this.#id}">
-                                        <span>${Module.altHypText['right']}</span>
-                                    </label>
-                                    <label class="radio-line">
-                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
-                                            name="hyp-check" value="left"
-                                            form="module-option-form_${this.#id}">
-                                        <span>${Module.altHypText['left']}</span>
-                                    </label>
                                 </div>
                             </div>
                         </div>

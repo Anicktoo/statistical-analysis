@@ -49,6 +49,10 @@ $varTableItemPadding: 2px;
     }
 }
 
+.disabled {
+    @include disabled();
+}
+
 // @mixin enabled {
 //     cursor: unset;
 //     pointer-events: auto;

@@ -62,6 +62,17 @@ export default class ModuleIntegrator {
         }
     }
 
+    static getHypElementById(id) {
+        if (id || id === 0) {
+            return ModuleIntegrator.hypotheses[id].hyp.getElement();
+        }
+    }
+
+    static getResultElementById(id) {
+        if (id || id === 0) {
+            return ModuleIntegrator.hypotheses[id].hyp.getResultElement();
+        }
+    }
 
     static async createModuleButtons() {
 
@@ -96,7 +107,7 @@ export default class ModuleIntegrator {
         ModuleIntegrator.setSettings('glob', UIControls.parametersGlobItem.querySelector('form'));
     }
 
-    //add new hypothesis by type id and if needed to make clone with reference Hyp
+    //add new hypothesis by type id and if needed to make clone with reference Hyp. returns new hypothesis ID
     static addHypothesis(hypTypeId, refHyp = null) {
         const globalSettings = ModuleIntegrator.globalSettings;
         const newHyp = new ModuleIntegrator.modules[hypTypeId](globalSettings.hypCounter, refHyp);
@@ -118,6 +129,8 @@ export default class ModuleIntegrator {
         globalSettings.unhiddenCounter++;
 
         ModuleIntegrator.setSettings('glob');
+
+        return globalSettings.hypCounter - 1;
     }
 
     //add options to sheet select of all hypotheses with sheet obj and bool (should all hyp refresh vars?) 
@@ -448,15 +461,20 @@ export default class ModuleIntegrator {
                     }
 
                     .results__container {
-                        display: flex;
-                        flex-direction: column;
+                        overflow: auto;
                         height: 100%;
-                        gap: 56px;
                         padding: 10px 24px 24px 24px;
-                        max-width: 1048px;
+                        max-width: 100%;
 
                         font-weight: 400;
                         font-size: 14px;
+                    }
+
+                    .results__container::after {
+                        display: block;
+                        content: '';
+                        width: 0px;
+                        height: 50%;
                     }
 
                     .results__header {
@@ -470,7 +488,8 @@ export default class ModuleIntegrator {
                         gap: 24px;
                         min-width: 1000px;
                         max-width: 1000px;
-                        flex-shrink: 1;
+                        margin-bottom: 56px;
+
                     }
                 
                     .results__block-inner {

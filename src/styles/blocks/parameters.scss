@@ -6,6 +6,7 @@
     background-color: $main-grey;
 
     &__container {
+        position: relative;
         overflow-x: hidden;
         overflow-y: auto;
         width: 100%;
@@ -14,9 +15,8 @@
         &::after {
             display: block;
             content: '';
-            background-color: red;
             width: 0px;
-            height: 40%;
+            height: 40vh;
         }
     }
 
@@ -108,7 +108,7 @@
     }
 
     &__content {
-        padding: 8px 16px 16px 16px;
+        padding: 8px 16px 32px 16px;
 
         &_hidden {
             @include disabled;

@@ -4,6 +4,7 @@ import ModuleIntegrator from '@/ModuleIntegrator';
 class UIControls {
 
     static body;
+    static pageBody;
     static moduleListElement;
     static modulesItems = [];
     static burgerMenu;
@@ -80,6 +81,7 @@ class UIControls {
 
     static initConstElements() {
         UIControls.body = document.getElementsByTagName('body')[0];
+        UIControls.pageBody = document.querySelector('.page-body');
         UIControls.moduleListElement = document.querySelector('.modules__list');
 
         UIControls.dataContainer = document.querySelector('.data__container');
@@ -138,7 +140,6 @@ class UIControls {
 
     static initConstListeners() {
         UIControls.addBurgerListener();
-        // UIControls.addMenuBtnsListeners();
         UIControls.addResizeBarsListeners();
         UIControls.addWindowResizeListeners();
         UIControls.addModalSettingsListener();
@@ -169,14 +170,7 @@ class UIControls {
     static addBurgerListener() {
         UIControls.burgerMenu.addEventListener('click', UIControls.toggleMenu);
         UIControls.fadeScreen.addEventListener('click', UIControls.toggleMenu);
-        // UIControls.fadeScreen.addEventListener('click', UIControls.fadeScreenTriggerFadeOut);
     }
-
-    // static addMenuBtnsListeners() {
-    //     UIControls.menuBtns.forEach(btn => {
-    //         btn.addEventListener('click', UIControls.toggleMenu);
-    //     });
-    // }
 
     static addCsvUploadListeners() {
         UIControls.csvUploadBtn.addEventListener('click', function () {
@@ -376,9 +370,18 @@ class UIControls {
         modulesItems.forEach(el => {
             const id = el.dataset.moduleId;
             el.addEventListener('click', () => {
-                ModuleIntegrator.addHypothesis(id);
+                const newHypId = ModuleIntegrator.addHypothesis(id);
+                const newHyp = ModuleIntegrator.getHypElementById(newHypId);
+                const newRes = ModuleIntegrator.getResultElementById(newHypId);
+                UIControls.scrollCenter(UIControls.parametersContainer, newHyp);
+                UIControls.scrollCenter(UIControls.resultsContainer, newRes);
             });
         });
+    }
+
+    static scrollCenter(parentEl, toEl) {
+        let y = toEl.offsetTop - UIControls.pageBody.getBoundingClientRect().height / 2 + toEl.getBoundingClientRect().height / 2;
+        parentEl.scrollTo(({ behavior: "smooth", top: y, left: 0 }));
     }
 
     static addModuleFormListeners(element, moduleCallbackFunction, isGlob) {

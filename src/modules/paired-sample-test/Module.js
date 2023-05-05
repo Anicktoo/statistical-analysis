@@ -164,6 +164,10 @@ export default class Module extends AbstractModule {
         return this.#element;
     }
 
+    getResultElement() {
+        return this.#resultBlock;
+    }
+
     getFormSheets() {
         return this.#formSheets;
     }
@@ -389,6 +393,53 @@ export default class Module extends AbstractModule {
                             </label>
                         </div>
                     </div>
+                    <div class="option-block__two-column">
+                        <div class="option-block">
+                            <div class="option-block__sub">
+                                Тест
+                                <div class="option-block__list option-block__test-type">
+                                    <label class="radio-line">
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="test-type"
+                                            value="student" form="module-option-form_${this.#id}" checked>
+                                        <span>Стьюдента</span>
+                                    </label>
+                                    <label class="radio-line disabled">
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="test-type"
+                                            value="wilcoxon" form="module-option-form_${this.#id}">
+                                        <span>Уилкоксона</span>
+                                    </label>
+                                    <label class="radio-line">
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="test-type"
+                                            value="sign" form="module-option-form_${this.#id}">
+                                        <span>Тест знаков</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="option-block">
+                            <div class="option-block__sub">
+                                Проверка альтернативной гипотезы
+                                <div class="option-block__list">
+                                    <label class="radio-line">
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="hyp-check"
+                                            value="both" form="module-option-form_${this.#id}" checked>
+                                        <span>Двусторонняя (M1 ≠ M2)</span>
+                                    </label>
+                                    <label class="radio-line">
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="hyp-check"
+                                            value="right" form="module-option-form_${this.#id}">
+                                        <span>Правосторонняя (M2 &#62; M1)</span>
+                                    </label>
+                                    <label class="radio-line">
+                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="hyp-check"
+                                            value="left" form="module-option-form_${this.#id}">
+                                        <span>Левосторонняя (M2 &#60; M1)</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="option-block__sub option-block__manual-input option-block__student option-block_hidden">
                         Введите параметры:
                         <div class="option-block__list">
@@ -480,54 +531,6 @@ export default class Module extends AbstractModule {
                                     <div class="var-table__header">Группировка по переменной</div>
                                     <div class="var-table__body grouping-var__independent-table-body">
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    
-                    <div class="option-block__two-column">
-                        <div class="option-block">
-                            <div class="option-block__sub">
-                                Тест
-                                <div class="option-block__list option-block__test-type">
-                                    <label class="radio-line">
-                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="test-type"
-                                            value="student" form="module-option-form_${this.#id}" checked>
-                                        <span>Стьюдента</span>
-                                    </label>
-                                    <label class="radio-line">
-                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="test-type"
-                                            value="wilcoxon" form="module-option-form_${this.#id}">
-                                        <span>Уилкоксона</span>
-                                    </label>
-                                    <label class="radio-line">
-                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="test-type"
-                                            value="sign" form="module-option-form_${this.#id}">
-                                        <span>Тест знаков</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="option-block">
-                            <div class="option-block__sub">
-                                Проверка альтернативной гипотезы
-                                <div class="option-block__list">
-                                    <label class="radio-line">
-                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="hyp-check"
-                                            value="both" form="module-option-form_${this.#id}" checked>
-                                        <span>Двусторонняя (M1 ≠ M2)</span>
-                                    </label>
-                                    <label class="radio-line">
-                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="hyp-check"
-                                            value="right" form="module-option-form_${this.#id}">
-                                        <span>Правосторонняя (M2 &#62; M1)</span>
-                                    </label>
-                                    <label class="radio-line">
-                                        <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="hyp-check"
-                                            value="left" form="module-option-form_${this.#id}">
-                                        <span>Левосторонняя (M2 &#60; M1)</span>
-                                    </label>
                                 </div>
                             </div>
                         </div>
