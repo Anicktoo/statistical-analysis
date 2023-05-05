@@ -917,8 +917,6 @@ export default class Module extends AbstractModule {
             secondDataColumn = getColumnOfAdaptedVals(data2, var2, callback);
         }
 
-        console.log(firstDataColumn, secondDataColumn);
-
         firstDataColumn.forEach((el, index) => {
             const dif = el - secondDataColumn[index];
             if (dif === 0) {

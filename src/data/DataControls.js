@@ -23,7 +23,6 @@ export default class DataControls {
             curSheet.setSettings(formData);
         }
         else if (applyTo === 'all') {
-            console.log('all', formData);
             Settings.setGlobalSettings(formData);
             DataControls.#sheets.forEach(sheet => sheet.setSettings(formData));
         }
