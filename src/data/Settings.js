@@ -1,5 +1,3 @@
-import * as initSettings from './initial-settings.json';
-
 export default class Settings {
     static #form = document.getElementById('settings-form');
     static #skipInput = Settings.#form.querySelector('#skip-options');
@@ -7,7 +5,33 @@ export default class Settings {
     static #colDelimiterInput = Settings.#form.querySelector('#col-delimiter-options');
     static #decimalDelimiterInput = Settings.#form.querySelector('#decimal-delimiter-options');
 
-    static #globalSettings = initSettings.default;
+    static #globalSettings = {
+        skip: {
+            value: "0"
+        },
+        encoding: {
+            select: {
+                "windows-1251": "Windows-1251",
+                "utf-8": "UTF-8"
+            },
+            selected: "windows-1251"
+        },
+        colDelimiter: {
+            select: {
+                ",": "Запятая (,)",
+                ".": "Точка (.)",
+                ";": "Точка c запятой (;)"
+            },
+            selected: ","
+        },
+        decimalDelimiter: {
+            select: {
+                ",": "Запятая (,)",
+                ".": "Точка (.)"
+            },
+            selected: "."
+        }
+    };
     #skip;
     #encoding;
     #colDelimiter;
@@ -18,10 +42,10 @@ export default class Settings {
     }
 
     init(settings) {
-        this.#skip = Object.deepCopy(settings['skip']);
-        this.#encoding = Object.deepCopy(settings['encoding']);
-        this.#colDelimiter = Object.deepCopy(settings['col-delimiter']);
-        this.#decimalDelimiter = Object.deepCopy(settings['decimal-delimiter']);
+        this.#skip = Object.deepCopy(settings.skip);
+        this.#encoding = Object.deepCopy(settings.encoding);
+        this.#colDelimiter = Object.deepCopy(settings.colDelimiter);
+        this.#decimalDelimiter = Object.deepCopy(settings.decimalDelimiter);
     }
 
     createHTML() {
@@ -57,9 +81,9 @@ export default class Settings {
     }
 
     static setGlobalSettings(formData) {
-        Settings.#globalSettings['skip'].value = formData.get('skip');
-        Settings.#globalSettings['encoding'].selected = formData.get('encoding');
-        Settings.#globalSettings['col-delimiter'].selected = formData.get('col-delimiter');
-        Settings.#globalSettings['decimal-delimiter'].selected = formData.get('decimal-delimiter');
+        Settings.#globalSettings.skip.value = formData.get('skip');
+        Settings.#globalSettings.encoding.selected = formData.get('encoding');
+        Settings.#globalSettings.colDelimiter.selected = formData.get('col-delimiter');
+        Settings.#globalSettings.decimalDelimiter.selected = formData.get('decimal-delimiter');
     }
 }

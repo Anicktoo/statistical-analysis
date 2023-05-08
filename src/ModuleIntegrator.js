@@ -2,11 +2,11 @@ import AbstractModule from '@modules/AbstractModule';
 import dataControls from './data/dataControls';
 
 const moduleIntegrator = {
-    MODULE_FOLDERS: ['paired-sample-test', 'independent-sample-test', 'correlation-test'],
-    modules: [],
-    timerId: undefined,
-    hypotheses: [],
-    globalSettings: {
+    _MODULE_FOLDERS: ['paired-sample-test', 'independent-sample-test', 'correlation-test'],
+    _modules: [],
+    _timerId: undefined,
+    _hypotheses: [],
+    _globalSettings: {
         form: document.querySelector('#module-option-form_glob'),
         name: undefined,
         FWER: undefined,
@@ -32,7 +32,7 @@ const moduleIntegrator = {
             }
         },
         getMainHypName() {
-            const main = moduleIntegrator.hypotheses[this.mainHypId];
+            const main = moduleIntegrator._hypotheses[this.mainHypId];
             return main && main.hyp ? main.hyp.getName() : '-';
         },
         createNewHypOption(id, name) {
@@ -63,20 +63,20 @@ const moduleIntegrator = {
 
     getHypElementById(id) {
         if (id || id === 0) {
-            return moduleIntegrator.hypotheses[id].hyp.getElement();
+            return moduleIntegrator._hypotheses[id].hyp.getElement();
         }
     },
 
     getResultElementById(id) {
         if (id || id === 0) {
-            return moduleIntegrator.hypotheses[id].hyp.getResultElement();
+            return moduleIntegrator._hypotheses[id].hyp.getResultElement();
         }
     },
 
     async createModuleButtons() {
 
-        const modules = moduleIntegrator.modules;
-        for (const folder of moduleIntegrator.MODULE_FOLDERS) {
+        const modules = moduleIntegrator._modules;
+        for (const folder of moduleIntegrator._MODULE_FOLDERS) {
             const { default: Module } = await import(`@modules/${folder}/Module.js`);
             if (AbstractModule.isPrototypeOf(Module))
                 modules.push(Module);
@@ -108,9 +108,9 @@ const moduleIntegrator = {
 
     //add new hypothesis by type id and if needed to make clone with reference Hyp. returns new hypothesis ID
     addHypothesis(hypTypeId, refHyp = null) {
-        const globalSettings = moduleIntegrator.globalSettings;
-        const newHyp = new moduleIntegrator.modules[hypTypeId](globalSettings.hypCounter, refHyp);
-        moduleIntegrator.hypotheses.push({ hyp: newHyp, update: null });
+        const globalSettings = moduleIntegrator._globalSettings;
+        const newHyp = new moduleIntegrator._modules[hypTypeId](globalSettings.hypCounter, refHyp);
+        moduleIntegrator._hypotheses.push({ hyp: newHyp, update: null });
         if (!refHyp) {
             newHyp.createHTML();
         }
@@ -134,8 +134,8 @@ const moduleIntegrator = {
 
     //add options to sheet select of all hypotheses with sheet obj and bool (should all hyp refresh vars?) 
     optionListAdd(newSheet, optionsEmpty = false) {
-        for (let i = 0; i < moduleIntegrator.globalSettings.hypCounter; i++) {
-            AbstractModule.addSheetOptions([newSheet], moduleIntegrator.hypotheses[i].hyp.getSheetSelects());
+        for (let i = 0; i < moduleIntegrator._globalSettings.hypCounter; i++) {
+            AbstractModule.addSheetOptions([newSheet], moduleIntegrator._hypotheses[i].hyp.getSheetSelects());
             if (optionsEmpty) {
                 moduleIntegrator.refreshVarsOfHyp(i);
             }
@@ -148,16 +148,16 @@ const moduleIntegrator = {
             formElements = [el];
         }
         else {
-            formElements = moduleIntegrator.hypotheses[hypID].hyp.getFormSheets();
+            formElements = moduleIntegrator._hypotheses[hypID].hyp.getFormSheets();
         }
         formElements.forEach(element => {
             const curSheetId = Number(new FormData(element).get('sheet-select'));
-            moduleIntegrator.hypotheses[hypID].hyp.displayVarsOfSheet(curSheetId, element.dataset.type);
+            moduleIntegrator._hypotheses[hypID].hyp.displayVarsOfSheet(curSheetId, element.dataset.type);
         })
     },
 
     updateVarsOfSheet(sheetId, clearSelected) {
-        moduleIntegrator.hypotheses.forEach(el => {
+        moduleIntegrator._hypotheses.forEach(el => {
             if (clearSelected) {
                 el.hyp.clearSelectedVars();
             }
@@ -181,28 +181,28 @@ const moduleIntegrator = {
 
         uiControls.resultsLoadingShow();
         if (id === 'glob') {
-            moduleIntegrator.globalSettings.update = true;
+            moduleIntegrator._globalSettings.update = true;
         }
         else {
-            moduleIntegrator.hypotheses[id].update = true;
+            moduleIntegrator._hypotheses[id].update = true;
         }
 
         function delayed() {
             moduleIntegrator.applySettings();
             uiControls.resultsLoadingHide();
-            moduleIntegrator.timerId = 0;
+            moduleIntegrator._timerId = 0;
         }
 
-        if (moduleIntegrator.timerId) {
-            clearTimeout(moduleIntegrator.timerId);
+        if (moduleIntegrator._timerId) {
+            clearTimeout(moduleIntegrator._timerId);
         }
 
-        moduleIntegrator.timerId = setTimeout(delayed, 1000);
+        moduleIntegrator._timerId = setTimeout(delayed, 1000);
     },
 
     applySettings() {
-        const hypotheses = moduleIntegrator.hypotheses;
-        const globalSettings = moduleIntegrator.globalSettings;
+        const hypotheses = moduleIntegrator._hypotheses;
+        const globalSettings = moduleIntegrator._globalSettings;
         let updateAllResults = false;
         let mainHyp = hypotheses[globalSettings.mainHypId];
 
@@ -229,7 +229,7 @@ const moduleIntegrator = {
         }
 
         const alpha = globalSettings.getAlpha(false);
-        for (let i = 0; i < moduleIntegrator.globalSettings.hypCounter; i++) {
+        for (let i = 0; i < moduleIntegrator._globalSettings.hypCounter; i++) {
             const { hyp, update, hidden } = hypotheses[i];
 
             if ((updateAllResults || update) && hyp !== mainHyp.hyp && !hidden) {
@@ -242,7 +242,7 @@ const moduleIntegrator = {
     },
 
     setGlobalSettings() {
-        const globalSettings = moduleIntegrator.globalSettings;
+        const globalSettings = moduleIntegrator._globalSettings;
         const formData = new FormData(globalSettings.form);
         globalSettings.name = formData.get('name');
         globalSettings.FWER = Number(formData.get('FWER'));
@@ -257,8 +257,8 @@ const moduleIntegrator = {
     },
 
     setMainSettings() {
-        const globalSettings = moduleIntegrator.globalSettings;
-        const mainHyp = moduleIntegrator.hypotheses[globalSettings.mainHypId];
+        const globalSettings = moduleIntegrator._globalSettings;
+        const mainHyp = moduleIntegrator._hypotheses[globalSettings.mainHypId];
         mainHyp.hyp.setSettings();
         const n = mainHyp.hyp.getN(globalSettings.getAlpha(false), globalSettings.power);
         globalSettings.preciseSampleSize = n;
@@ -267,7 +267,7 @@ const moduleIntegrator = {
     },
 
     updateResultsGlob() {
-        const globalSettings = moduleIntegrator.globalSettings;
+        const globalSettings = moduleIntegrator._globalSettings;
 
         uiControls.resName.textContent = globalSettings.name;
         uiControls.resFwer.textContent = Number.resultForm(globalSettings.FWER);
@@ -282,9 +282,9 @@ const moduleIntegrator = {
     //extra functions 
 
     hideUnhideHyp(id) {
-        const hypotheses = moduleIntegrator.hypotheses;
+        const hypotheses = moduleIntegrator._hypotheses;
         const hyp = hypotheses[id];
-        const globalSettings = moduleIntegrator.globalSettings;
+        const globalSettings = moduleIntegrator._globalSettings;
         const optionEl = uiControls.mainHypSelect.querySelector('.main-hypothesis__option_' + id);
         if (hyp.hidden) {
             unhide();
@@ -329,28 +329,28 @@ const moduleIntegrator = {
     },
 
     nameChange(id, name) {
-        const hyp = moduleIntegrator.hypotheses[id];
+        const hyp = moduleIntegrator._hypotheses[id];
         if (hyp) {
             hyp.hyp.setName(name);
-            moduleIntegrator.globalSettings.updateHypOption(id, name);
+            moduleIntegrator._globalSettings.updateHypOption(id, name);
         }
     },
 
     duplicateHyp(id) {
-        const hyp = moduleIntegrator.hypotheses[id];
+        const hyp = moduleIntegrator._hypotheses[id];
         if (hyp) {
             moduleIntegrator.addHypothesis(hyp.hyp.constructor.getModuleTypeId(), hyp.hyp);
         }
     },
 
     deleteHyp(id) {
-        const hyp = moduleIntegrator.hypotheses[id];
+        const hyp = moduleIntegrator._hypotheses[id];
         if (!hyp) {
             return;
         }
-        const globalSettings = moduleIntegrator.globalSettings;
+        const globalSettings = moduleIntegrator._globalSettings;
         const optionEl = uiControls.mainHypSelect.querySelector('.main-hypothesis__option_' + id);
-        moduleIntegrator.globalSettings.deleteHypOption(id);
+        moduleIntegrator._globalSettings.deleteHypOption(id);
 
         globalSettings.hypCounter--;
         if (!hyp.hidden) {
@@ -358,14 +358,14 @@ const moduleIntegrator = {
         }
 
         hyp.hyp.deleteSelf();
-        moduleIntegrator.hypotheses[id] = null;
+        moduleIntegrator._hypotheses[id] = null;
 
         for (let i = id; i < globalSettings.hypCounter; i++) {
-            moduleIntegrator.hypotheses[i] = moduleIntegrator.hypotheses[i + 1];
-            moduleIntegrator.hypotheses[i].hyp.setId(i);
+            moduleIntegrator._hypotheses[i] = moduleIntegrator._hypotheses[i + 1];
+            moduleIntegrator._hypotheses[i].hyp.setId(i);
         }
 
-        moduleIntegrator.hypotheses = moduleIntegrator.hypotheses.slice(0, -1);
+        moduleIntegrator._hypotheses = moduleIntegrator._hypotheses.slice(0, -1);
 
         optionEl.selected = false;
         if (globalSettings.unhiddenCounter === 0) {
@@ -373,7 +373,7 @@ const moduleIntegrator = {
             uiControls.mainHypSelectNullOption.selected = true;
         }
         else {
-            globalSettings.mainHypId = moduleIntegrator.hypotheses.findIndex((el) => !el.hidden);
+            globalSettings.mainHypId = moduleIntegrator._hypotheses.findIndex((el) => !el.hidden);
             uiControls.mainHypSelect.querySelector('.main-hypothesis__option_' + globalSettings.mainHypId).selected = true;
         }
 
@@ -389,7 +389,7 @@ const moduleIntegrator = {
         const url = URL.createObjectURL(blob);
 
         const link = document.createElement('a');
-        link.download = `${moduleIntegrator.globalSettings.name}.html`;
+        link.download = `${moduleIntegrator._globalSettings.name}.html`;
         link.href = url;
         link.click();
 
