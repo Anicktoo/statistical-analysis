@@ -1,6 +1,6 @@
 import img from './img/moduleCorrelation.png';
-import ModuleIntegrator from '@/ModuleIntegrator';
-import DataControls from '@data/DataControls';
+import moduleIntegrator from '@/moduleIntegrator';
+import dataControls from '@data/dataControls';
 import AbstractModule from '@modules/AbstractModule';
 import Var from '@data/Var';
 
@@ -83,8 +83,8 @@ export default class Module extends AbstractModule {
     }
 
     deleteSelf() {
-        UIControls.parametersContainer.removeChild(this.#element);
-        UIControls.resultsContainer.removeChild(this.#resultBlock);
+        uiControls.parametersContainer.removeChild(this.#element);
+        uiControls.resultsContainer.removeChild(this.#resultBlock);
     }
 
     #makeCopy(reference) {
@@ -98,8 +98,8 @@ export default class Module extends AbstractModule {
         this.#vars = refData.vars;
         this.#hypName = refData.hypName;
 
-        const parametersContainer = UIControls.parametersContainer;
-        const resultsContainer = UIControls.resultsContainer;
+        const parametersContainer = uiControls.parametersContainer;
+        const resultsContainer = uiControls.resultsContainer;
         const newHyp = refData.element.cloneNode(true);
         const newRes = document.createElement('div');
         newRes.classList.add('results__block');
@@ -113,8 +113,8 @@ export default class Module extends AbstractModule {
             el.classList.replace('form-change-trigger_' + refData.id, 'form-change-trigger_' + this.#id);
             el.setAttribute('form', 'module-option-form_' + this.#id);
         });
-        UIControls.parametersContainer.insertBefore(this.#element, refData.element.nextElementSibling);
-        UIControls.resultsContainer.insertBefore(this.#resultBlock, refData.resultBlock.nextElementSibling);
+        uiControls.parametersContainer.insertBefore(this.#element, refData.element.nextElementSibling);
+        uiControls.resultsContainer.insertBefore(this.#resultBlock, refData.resultBlock.nextElementSibling);
     }
 
     getAllData() {
@@ -196,7 +196,7 @@ export default class Module extends AbstractModule {
 
         const callSettings = () => {
             if ((depTable.firstElementChild && indepTable.firstElementChild) || tableData.children.length === 2) {
-                ModuleIntegrator.setSettings(this.#id);
+                moduleIntegrator.setSettings(this.#id);
             }
         }
 
@@ -230,7 +230,7 @@ export default class Module extends AbstractModule {
     }
 
     displayVarsOfSheet(sheetId, type) {
-        const vars = DataControls.getVarsBySheetId(sheetId);
+        const vars = dataControls.getVarsBySheetId(sheetId);
         if (!vars)
             return;
 
@@ -316,7 +316,7 @@ export default class Module extends AbstractModule {
                 if (el) {
                     const ids = el.dataset.varId.split('_');
                     if (ids[1] == sheetId) {
-                        const v = DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
+                        const v = dataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
                         const elImg = el.querySelector('img');
                         el.querySelector('span').innerHTML = v.getName();
                         elImg.setAttribute('src', v.getImg());
@@ -335,8 +335,8 @@ export default class Module extends AbstractModule {
 
     createHTML() {
         const name = 'Гипотеза ' + (this.#id + 1);
-        const parametersContainer = UIControls.parametersContainer;
-        const resultsContainer = UIControls.resultsContainer;
+        const parametersContainer = uiControls.parametersContainer;
+        const resultsContainer = uiControls.resultsContainer;
         const newHyp = document.createElement('div');
         const newRes = document.createElement('div');
         newHyp.classList.add('parameters__item', 'collapsible');
@@ -594,8 +594,8 @@ export default class Module extends AbstractModule {
             if (validTableData) {
                 selectedVars.forEach(el => {
                     const ids = el.dataset.varId.split('_');
-                    data.push(DataControls.getDataBySheetAndVarId(ids[1], ids[2]).slice(1));
-                    vars.push(DataControls.getVarBySheetIdAndVarId(ids[1], ids[2]));
+                    data.push(dataControls.getDataBySheetAndVarId(ids[1], ids[2]).slice(1));
+                    vars.push(dataControls.getVarBySheetIdAndVarId(ids[1], ids[2]));
                 });
                 this.#data.first = data[0];
                 this.#data.second = data[1];
@@ -643,11 +643,11 @@ export default class Module extends AbstractModule {
                 errorElement = this.#tableData.pair;
 
                 if (firstVarName !== secondVarName) {
-                    UIControls.showError(errorElement, 'Нельзя сравнить данные разного типа');
+                    uiControls.showError(errorElement, 'Нельзя сравнить данные разного типа');
                     return;
                 }
                 if (this.#data.first.length !== this.#data.second.length) {
-                    UIControls.showError(errorElement, 'Выбранные наборы данных должны иметь равный размер');
+                    uiControls.showError(errorElement, 'Выбранные наборы данных должны иметь равный размер');
                     return;
                 }
 
@@ -658,11 +658,11 @@ export default class Module extends AbstractModule {
                 errorElement = this.#tableData.indepTable;
 
                 if (secondVarName !== Var.Binary.name) {
-                    UIControls.showError(errorElement, 'Переменная для группировки должна быть дихотомического типа');
+                    uiControls.showError(errorElement, 'Переменная для группировки должна быть дихотомического типа');
                     return;
                 }
                 if (this.#data.first.length !== this.#data.second.length) {
-                    UIControls.showError(errorElement, 'Размеры данных зависимой переменной и переменной для группировки должны совпадать');
+                    uiControls.showError(errorElement, 'Размеры данных зависимой переменной и переменной для группировки должны совпадать');
                     return;
                 }
 
@@ -676,17 +676,17 @@ export default class Module extends AbstractModule {
                         data2.push(el);
                     }
                     else {
-                        UIControls.showError(errorElement, 'Ошибка вычисления');
+                        uiControls.showError(errorElement, 'Ошибка вычисления');
                         return;
                     }
                 });
                 if (data1.length !== data2.length) {
-                    UIControls.showError(errorElement, 'Выборки должны иметь равный размер');
+                    uiControls.showError(errorElement, 'Выборки должны иметь равный размер');
                     return;
                 }
             }
             if (data1.length === 0 || data2.length === 0) {
-                UIControls.showError(errorElement, 'Присутствует пустая выборка, невозможно провести вычисления');
+                uiControls.showError(errorElement, 'Присутствует пустая выборка, невозможно провести вычисления');
                 return;
             }
         }
@@ -724,7 +724,7 @@ export default class Module extends AbstractModule {
             }
         }
         catch (err) {
-            UIControls.showError(errorElement, err.message);
+            uiControls.showError(errorElement, err.message);
             return;
         }
 

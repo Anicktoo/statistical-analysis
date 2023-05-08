@@ -94,10 +94,10 @@ export default class Var {
         }
     }
     createHTML() {
-        const modal = UIControls.modalVarType;
-        const name = UIControls.modalVarType.querySelector('#modal-var-types__name');
-        const continuesLabel = UIControls.modalVarType.querySelector('.modal-var-types__continues-container');
-        const varChooseInputs = [...UIControls.modalVarType.querySelectorAll('.modal-var-types__item-input')];
+        const modal = uiControls.modalVarType;
+        const name = uiControls.modalVarType.querySelector('#modal-var-types__name');
+        const continuesLabel = uiControls.modalVarType.querySelector('.modal-var-types__continues-container');
+        const varChooseInputs = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__item-input')];
         const rangBody = modal.querySelector('.modal-var-types__rang-table-body');
         const binBodies = [...modal.querySelectorAll('.modal-var-types__binary-table-body')];
 
@@ -170,10 +170,10 @@ export default class Var {
 
         function switchChange(el) {
             if (binBodies[1].isSameNode(el.parentElement)) {
-                UIControls.varTypesSwitchBtn.classList.replace('switch-button_right', 'switch-button_left');
+                uiControls.varTypesSwitchBtn.classList.replace('switch-button_right', 'switch-button_left');
             }
             else {
-                UIControls.varTypesSwitchBtn.classList.replace('switch-button_left', 'switch-button_right');
+                uiControls.varTypesSwitchBtn.classList.replace('switch-button_left', 'switch-button_right');
             }
         }
     }

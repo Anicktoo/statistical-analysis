@@ -1,7 +1,8 @@
 import '@styles/styles.scss';
 import '@/utils/utils';
-import '@/UIControls';
-import ModuleIntegrator from '@/ModuleIntegrator';
+import '@/uiControls';
+import moduleIntegrator from '@/moduleIntegrator';
 
-UIControls.initConstUIControls();
-ModuleIntegrator.createModuleButtons();
+uiControls.initConstuiControls();
+moduleIntegrator.createModuleButtons();
+console.log('test');

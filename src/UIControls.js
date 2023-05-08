@@ -1,197 +1,197 @@
-import DataControls from '@data/DataControls';
-import ModuleIntegrator from '@/ModuleIntegrator';
+import dataControls from '@data/dataControls';
+import moduleIntegrator from '@/moduleIntegrator';
 
-class UIControls {
+window.uiControls = {
 
-    static body;
-    static pageBody;
-    static moduleListElement;
-    static modulesItems = [];
-    static burgerMenu;
-    static burgerMenuInput;
-    static burgerUpLine;
-    static burgerDownLine;
-    static fadeScreen;
-    static sidebar;
-    static menuBtns = [];
-    static csvUploadBtn;
-    static exportBtn;
-    static settingsForm;
-    static dataContainer;
-    static dataTable;
-    static dataFooter;
-    static footerList;
-    static dataFooterElements = {
+    body: undefined,
+    pageBody: undefined,
+    moduleListElement: undefined,
+    modulesItems: [],
+    burgerMenu: undefined,
+    burgerMenuInput: undefined,
+    burgerUpLine: undefined,
+    burgerDownLine: undefined,
+    fadeScreen: undefined,
+    sidebar: undefined,
+    menuBtns: [],
+    csvUploadBtn: undefined,
+    exportBtn: undefined,
+    settingsForm: undefined,
+    dataContainer: undefined,
+    dataTable: undefined,
+    dataFooter: undefined,
+    footerList: undefined,
+    dataFooterElements: {
         old: [],
         new: []
-    };
-    static calculationWindow;
-    static parameters;
-    static parametersContainer;
-    static parametersGlobItem;
-    static FWERInput;
-    static powerInput;
-    static mainHypSelect;
-    static mainHypSelectNullOption;
+    },
+    calculationWindow: undefined,
+    parameters: undefined,
+    parametersContainer: undefined,
+    parametersGlobItem: undefined,
+    FWERInput: undefined,
+    powerInput: undefined,
+    mainHypSelect: undefined,
+    mainHypSelectNullOption: undefined,
 
-    static resizeBarsEl = [];
-    static results;
-    static resultsContainer;
-    static resultsLoader;
+    resizeBarsEl: [],
+    results: undefined,
+    resultsContainer: undefined,
+    resultsLoader: undefined,
 
-    static resBlock;
-    static resFwer;
-    static resNumber;
-    static resImportance;
-    static resMainHyp;
-    static resPower;
-    static resSampleSizePrecise;
-    static resSampleSize;
+    resBlock: undefined,
+    resFwer: undefined,
+    resNumber: undefined,
+    resImportance: undefined,
+    resMainHyp: undefined,
+    resPower: undefined,
+    resSampleSizePrecise: undefined,
+    resSampleSize: undefined,
 
 
-    static modalVarType;
-    static varIcons = {
+    modalVarType: undefined,
+    varIcons: {
         old: [],
         new: []
-    };
-    static varTypesBtns = [];
-    static varTypesForm;
-    static rangTable;
-    static binSettings;
-    static binTables;
-    static varTypesLevelControls = {
+    },
+    varTypesBtns: [],
+    varTypesForm: undefined,
+    rangTable: undefined,
+    binSettings: undefined,
+    binTables: undefined,
+    varTypesLevelControls: {
         up: undefined,
         down: undefined
-    };
-    static varTypesSwitchBtn;
-    static modalVarTypeBtns;
-    static curIcon;
-    static modalSettings;
-    static dataSettingsBtns = {
+    },
+    varTypesSwitchBtn: undefined,
+    modalVarTypeBtns: undefined,
+    curIcon: undefined,
+    modalSettings: undefined,
+    dataSettingsBtns: {
         old: [],
         new: []
-    };
-    static modalSettingsBtns;
-    static errorElement;
+    },
+    modalSettingsBtns: undefined,
+    errorElement: undefined,
 
-    static initConstUIControls() {
-        UIControls.initConstElements();
-        UIControls.initConstListeners();
-    }
+    initConstuiControls() {
+        uiControls.initConstElements();
+        uiControls.initConstListeners();
+    },
 
-    static initConstElements() {
-        UIControls.body = document.getElementsByTagName('body')[0];
-        UIControls.pageBody = document.querySelector('.page-body');
-        UIControls.moduleListElement = document.querySelector('.modules__list');
+    initConstElements() {
+        uiControls.body = document.getElementsByTagName('body')[0];
+        uiControls.pageBody = document.querySelector('.page-body');
+        uiControls.moduleListElement = document.querySelector('.modules__list');
 
-        UIControls.dataContainer = document.querySelector('.data__container');
-        UIControls.dataFooter = UIControls.dataContainer.querySelector('.data__footer');
-        UIControls.footerList = UIControls.dataContainer.querySelector('.footer__list');
-        UIControls.burgerMenu = document.querySelector('.burger-menu');
-        UIControls.burgerMenuInput = UIControls.burgerMenu.querySelector('#burger-menu__input');
-        UIControls.burgerUpLine = UIControls.burgerMenu.querySelector('.burger-menu__line-up');
-        UIControls.burgerDownLine = UIControls.burgerMenu.querySelector('.burger-menu__line-down');
-        UIControls.sidebar = document.querySelector('.sidebar');
-        UIControls.fadeScreen = document.querySelector('.fade');
-        UIControls.menuBtns = [...document.querySelectorAll('.sidebar__item')];
+        uiControls.dataContainer = document.querySelector('.data__container');
+        uiControls.dataFooter = uiControls.dataContainer.querySelector('.data__footer');
+        uiControls.footerList = uiControls.dataContainer.querySelector('.footer__list');
+        uiControls.burgerMenu = document.querySelector('.burger-menu');
+        uiControls.burgerMenuInput = uiControls.burgerMenu.querySelector('#burger-menu__input');
+        uiControls.burgerUpLine = uiControls.burgerMenu.querySelector('.burger-menu__line-up');
+        uiControls.burgerDownLine = uiControls.burgerMenu.querySelector('.burger-menu__line-down');
+        uiControls.sidebar = document.querySelector('.sidebar');
+        uiControls.fadeScreen = document.querySelector('.fade');
+        uiControls.menuBtns = [...document.querySelectorAll('.sidebar__item')];
 
-        UIControls.csvUploadBtn = document.getElementById('csvUpload');
-        UIControls.exportBtn = document.getElementById('export-results');
-        UIControls.settingsForm = document.getElementById('settings-form');
+        uiControls.csvUploadBtn = document.getElementById('csvUpload');
+        uiControls.exportBtn = document.getElementById('export-results');
+        uiControls.settingsForm = document.getElementById('settings-form');
 
-        UIControls.calculationWindow = document.querySelector('.calculation-window');
-        UIControls.resizeBarsEl = [...UIControls.calculationWindow.querySelectorAll('.resize-bar')];
-        UIControls.results = UIControls.calculationWindow.querySelector('.results');
-        UIControls.resultsLoader = UIControls.results.querySelector('.loader');
-        UIControls.resultsContainer = UIControls.results.querySelector('.results__container');
+        uiControls.calculationWindow = document.querySelector('.calculation-window');
+        uiControls.resizeBarsEl = [...uiControls.calculationWindow.querySelectorAll('.resize-bar')];
+        uiControls.results = uiControls.calculationWindow.querySelector('.results');
+        uiControls.resultsLoader = uiControls.results.querySelector('.loader');
+        uiControls.resultsContainer = uiControls.results.querySelector('.results__container');
 
-        UIControls.resBlock = UIControls.resultsContainer.querySelector('#global-results');
-        UIControls.resName = UIControls.resBlock.querySelector('#results-name');
-        UIControls.resFwer = UIControls.resBlock.querySelector('#results-FWER');
-        UIControls.resNumber = UIControls.resBlock.querySelector('#results-number');
-        UIControls.resImportance = UIControls.resBlock.querySelector('#results-importance');
-        UIControls.resMainHyp = UIControls.resBlock.querySelector('#results-main-hyp');
-        UIControls.resPower = UIControls.resBlock.querySelector('#results-power');
-        UIControls.resSampleSize = UIControls.resBlock.querySelector('#results-sample-size');
-        UIControls.resSampleSizePrecise = UIControls.resBlock.querySelector('#results-sample-size-precise');
+        uiControls.resBlock = uiControls.resultsContainer.querySelector('#global-results');
+        uiControls.resName = uiControls.resBlock.querySelector('#results-name');
+        uiControls.resFwer = uiControls.resBlock.querySelector('#results-FWER');
+        uiControls.resNumber = uiControls.resBlock.querySelector('#results-number');
+        uiControls.resImportance = uiControls.resBlock.querySelector('#results-importance');
+        uiControls.resMainHyp = uiControls.resBlock.querySelector('#results-main-hyp');
+        uiControls.resPower = uiControls.resBlock.querySelector('#results-power');
+        uiControls.resSampleSize = uiControls.resBlock.querySelector('#results-sample-size');
+        uiControls.resSampleSizePrecise = uiControls.resBlock.querySelector('#results-sample-size-precise');
 
-        UIControls.parameters = UIControls.calculationWindow.querySelector('.parameters');
-        UIControls.parametersContainer = UIControls.parameters.querySelector('.parameters__container');
-        UIControls.parametersGlobItem = UIControls.parameters.querySelector('#parameters__item_glob');
-        UIControls.FWERInput = UIControls.parametersGlobItem.querySelector('#FWER-input');
-        UIControls.powerInput = UIControls.parametersGlobItem.querySelector('#power-input');
-        UIControls.mainHypSelect = UIControls.parametersContainer.querySelector('#main-hypothesis');
-        UIControls.mainHypSelectNullOption = UIControls.mainHypSelect.querySelector('.main-hypothesis__option_null');
+        uiControls.parameters = uiControls.calculationWindow.querySelector('.parameters');
+        uiControls.parametersContainer = uiControls.parameters.querySelector('.parameters__container');
+        uiControls.parametersGlobItem = uiControls.parameters.querySelector('#parameters__item_glob');
+        uiControls.FWERInput = uiControls.parametersGlobItem.querySelector('#FWER-input');
+        uiControls.powerInput = uiControls.parametersGlobItem.querySelector('#power-input');
+        uiControls.mainHypSelect = uiControls.parametersContainer.querySelector('#main-hypothesis');
+        uiControls.mainHypSelectNullOption = uiControls.mainHypSelect.querySelector('.main-hypothesis__option_null');
 
-        UIControls.modalVarType = document.querySelector('.modal-var-types');
-        UIControls.varTypesForm = UIControls.modalVarType.querySelector('#var-type-form');
-        UIControls.rangTable = UIControls.modalVarType.querySelector('.modal-var-types__rang-table-body');
-        UIControls.binSettings = UIControls.modalVarType.querySelector('.modal-var-types__binary-settings');
-        UIControls.binTables = [...UIControls.modalVarType.querySelectorAll('.modal-var-types__binary-table-body')];
-        UIControls.varTypesLevelControls.up = UIControls.modalVarType.querySelector('.switch-button_up');
-        UIControls.varTypesLevelControls.down = UIControls.modalVarType.querySelector('.switch-button_down');
-        UIControls.modalVarTypeBtns = [...UIControls.modalVarType.querySelectorAll('.modal-var-types__btn')];
-        UIControls.varTypesSwitchBtn = UIControls.binSettings.querySelector('.switch-button');
-        UIControls.modalSettings = document.querySelector('.modal-settings');
-        UIControls.modalSettingsBtns = [...UIControls.modalSettings.querySelectorAll('.modal-settings__btn')];
+        uiControls.modalVarType = document.querySelector('.modal-var-types');
+        uiControls.varTypesForm = uiControls.modalVarType.querySelector('#var-type-form');
+        uiControls.rangTable = uiControls.modalVarType.querySelector('.modal-var-types__rang-table-body');
+        uiControls.binSettings = uiControls.modalVarType.querySelector('.modal-var-types__binary-settings');
+        uiControls.binTables = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__binary-table-body')];
+        uiControls.varTypesLevelControls.up = uiControls.modalVarType.querySelector('.switch-button_up');
+        uiControls.varTypesLevelControls.down = uiControls.modalVarType.querySelector('.switch-button_down');
+        uiControls.modalVarTypeBtns = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__btn')];
+        uiControls.varTypesSwitchBtn = uiControls.binSettings.querySelector('.switch-button');
+        uiControls.modalSettings = document.querySelector('.modal-settings');
+        uiControls.modalSettingsBtns = [...uiControls.modalSettings.querySelectorAll('.modal-settings__btn')];
 
-        UIControls.errorElement = document.querySelector('#error-show');
-    }
+        uiControls.errorElement = document.querySelector('#error-show');
+    },
 
-    static initConstListeners() {
-        UIControls.addBurgerListener();
-        UIControls.addResizeBarsListeners();
-        UIControls.addWindowResizeListeners();
-        UIControls.addModalSettingsListener();
-        UIControls.addModalVarChooseListener();
-        UIControls.addCsvUploadListeners();
-        UIControls.addExportBtnListeners();
-    }
+    initConstListeners() {
+        uiControls.addBurgerListener();
+        uiControls.addResizeBarsListeners();
+        uiControls.addWindowResizeListeners();
+        uiControls.addModalSettingsListener();
+        uiControls.addModalVarChooseListener();
+        uiControls.addCsvUploadListeners();
+        uiControls.addExportBtnListeners();
+    },
 
-    static initNewSheetControls() {
-        UIControls.initNewSheetElements();
-        UIControls.initNewSheetListeners();
-    }
+    initNewSheetControls() {
+        uiControls.initNewSheetElements();
+        uiControls.initNewSheetListeners();
+    },
 
-    static initNewSheetElements() {
-        UIControls.dataFooterElements.new = [...UIControls.dataFooter.querySelectorAll('.footer__item_new')];
-        UIControls.varIcons.new = [...UIControls.dataContainer.querySelectorAll('.data__var-icon_new')];
-        UIControls.dataSettingsBtns.new = [...UIControls.dataContainer.querySelectorAll('.dataSettingsBtn_new')];
-    }
+    initNewSheetElements() {
+        uiControls.dataFooterElements.new = [...uiControls.dataFooter.querySelectorAll('.footer__item_new')];
+        uiControls.varIcons.new = [...uiControls.dataContainer.querySelectorAll('.data__var-icon_new')];
+        uiControls.dataSettingsBtns.new = [...uiControls.dataContainer.querySelectorAll('.dataSettingsBtn_new')];
+    },
 
-    static initNewSheetListeners() {
-        UIControls.addVarIconsListeners();
-        UIControls.addDataSettingsListener();
-        UIControls.addFooterItemListeners();
-    }
+    initNewSheetListeners() {
+        uiControls.addVarIconsListeners();
+        uiControls.addDataSettingsListener();
+        uiControls.addFooterItemListeners();
+    },
 
     // LISTENERS //
 
-    static addBurgerListener() {
-        UIControls.burgerMenu.addEventListener('click', UIControls.toggleMenu);
-        UIControls.fadeScreen.addEventListener('click', UIControls.toggleMenu);
-    }
+    addBurgerListener() {
+        uiControls.burgerMenu.addEventListener('click', uiControls.toggleMenu);
+        uiControls.fadeScreen.addEventListener('click', uiControls.toggleMenu);
+    },
 
-    static addCsvUploadListeners() {
-        UIControls.csvUploadBtn.addEventListener('click', function () {
+    addCsvUploadListeners() {
+        uiControls.csvUploadBtn.addEventListener('click', function () {
             this.value = null;
         });
 
-        UIControls.csvUploadBtn.addEventListener('change', (event) => {
-            DataControls.readSingleFile(event);
-            UIControls.toggleMenu();
+        uiControls.csvUploadBtn.addEventListener('change', (event) => {
+            dataControls.readSingleFile(event);
+            uiControls.toggleMenu();
         });
-    }
+    },
 
-    static addExportBtnListeners() {
-        UIControls.exportBtn.addEventListener('click', () => {
-            ModuleIntegrator.exportResults();
-            UIControls.toggleMenu();
+    addExportBtnListeners() {
+        uiControls.exportBtn.addEventListener('click', () => {
+            moduleIntegrator.exportResults();
+            uiControls.toggleMenu();
         });
-    }
+    },
 
-    static addResizeBarsListeners() {
-        UIControls.resizeBarsEl.forEach(el => {
+    addResizeBarsListeners() {
+        uiControls.resizeBarsEl.forEach(el => {
             el.addEventListener('mousedown', mousedown);
         });
 
@@ -201,89 +201,89 @@ class UIControls {
             window.addEventListener('mouseup', mouseup);
 
             const startX = e.clientX;
-            const startWidth = UIControls.calculationWindow.offsetWidth;
+            const startWidth = uiControls.calculationWindow.offsetWidth;
 
 
             function mousemove(e) {
                 e.preventDefault();
-                UIControls.calculationWindow.style.width = (startWidth - (event.clientX - startX)) + 'px';
+                uiControls.calculationWindow.style.width = (startWidth - (event.clientX - startX)) + 'px';
             }
 
             function mouseup() {
-                UIControls.resizeBarCheckBounds();
-                UIControls.footerChange();
+                uiControls.resizeBarCheckBounds();
+                uiControls.footerChange();
 
                 window.removeEventListener('mousemove', mousemove);
                 window.removeEventListener('mouseup', mouseup);
             }
         }
-    }
+    },
 
-    static addWindowResizeListeners() {
-        window.addEventListener('DOMContentLoaded', UIControls.footerChange);
-        window.addEventListener('resize', UIControls.footerChange);
-        window.addEventListener('resize', UIControls.resizeBarCheckBounds);
-    }
+    addWindowResizeListeners() {
+        window.addEventListener('DOMContentLoaded', uiControls.footerChange);
+        window.addEventListener('resize', uiControls.footerChange);
+        window.addEventListener('resize', uiControls.resizeBarCheckBounds);
+    },
 
-    static addFooterItemListeners() {
-        UIControls.dataFooterElements.new.forEach(el => {
-            el.addEventListener('click', () => DataControls.selectSheet(el.id));
+    addFooterItemListeners() {
+        uiControls.dataFooterElements.new.forEach(el => {
+            el.addEventListener('click', () => dataControls.selectSheet(el.id));
             el.classList.remove('footer__item_new');
-            UIControls.dataFooterElements.old.push(el);
+            uiControls.dataFooterElements.old.push(el);
         });
-        UIControls.dataFooterElements.new = [];
-    }
+        uiControls.dataFooterElements.new = [];
+    },
 
-    static addVarIconsListeners() {
-        UIControls.varIcons.new.forEach(el => {
+    addVarIconsListeners() {
+        uiControls.varIcons.new.forEach(el => {
             el.addEventListener('click', (event) => {
-                const create = DataControls.createVarSettings.bind(null, event.currentTarget.getAttribute('id'));
-                UIControls.openModal(event, UIControls.modalVarType, create);
+                const create = dataControls.createVarSettings.bind(null, event.currentTarget.getAttribute('id'));
+                uiControls.openModal(event, uiControls.modalVarType, create);
             });
             el.classList.remove('data__var-icon_new');
         });
-        UIControls.varIcons.new = [];
-    }
+        uiControls.varIcons.new = [];
+    },
 
-    static addDataSettingsListener() {
-        UIControls.dataSettingsBtns.new.forEach(el => {
+    addDataSettingsListener() {
+        uiControls.dataSettingsBtns.new.forEach(el => {
             el.addEventListener('click', (event) => {
-                UIControls.openModal(event, UIControls.modalSettings);
+                uiControls.openModal(event, uiControls.modalSettings);
             });
             el.classList.remove('dataSettingsBtn_new');
-            UIControls.dataSettingsBtns.old.push(el);
+            uiControls.dataSettingsBtns.old.push(el);
         })
-        UIControls.dataSettingsBtns.new = [];
-    }
+        uiControls.dataSettingsBtns.new = [];
+    },
 
-    static addModalSettingsListener() {
-        UIControls.modalSettings.addEventListener('click', (event) => {
+    addModalSettingsListener() {
+        uiControls.modalSettings.addEventListener('click', (event) => {
             event.stopPropagation();
         });
 
-        UIControls.settingsForm.addEventListener('submit', (event) => {
-            DataControls.submitSettings(event, new FormData(UIControls.settingsForm));
+        uiControls.settingsForm.addEventListener('submit', (event) => {
+            dataControls.submitSettings(event, new FormData(uiControls.settingsForm));
         });
 
-        UIControls.modalSettingsBtns.forEach(btn => {
-            btn.addEventListener('click', () => UIControls.modalSettings.style.display = 'none');
+        uiControls.modalSettingsBtns.forEach(btn => {
+            btn.addEventListener('click', () => uiControls.modalSettings.style.display = 'none');
         });
 
-        UIControls.modalSettings.querySelector('.modal-window__header').addEventListener('mousedown', (event) => {
-            UIControls.dragMouseDown(event, UIControls.modalSettings);
+        uiControls.modalSettings.querySelector('.modal-window__header').addEventListener('mousedown', (event) => {
+            uiControls.dragMouseDown(event, uiControls.modalSettings);
         });
-    }
+    },
 
-    static addModalVarChooseListener() {
-        UIControls.modalVarType.addEventListener('click', (event) => {
+    addModalVarChooseListener() {
+        uiControls.modalVarType.addEventListener('click', (event) => {
             event.stopPropagation();
         });
 
-        const varTypeInputs = [...UIControls.modalVarType.querySelectorAll('.modal-var-types__item-input')];
-        const rangInput = UIControls.modalVarType.querySelector('.modal-var-types__rang');
-        const rangSettings = UIControls.modalVarType.querySelector('.modal-var-types__rang-settings');
-        const binInput = UIControls.modalVarType.querySelector('.modal-var-types__binary');
-        const binSettings = UIControls.modalVarType.querySelector('.modal-var-types__binary-settings');
+        const varTypeInputs = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__item-input')];
+        const rangInput = uiControls.modalVarType.querySelector('.modal-var-types__rang');
+        const rangSettings = uiControls.modalVarType.querySelector('.modal-var-types__rang-settings');
+        const binInput = uiControls.modalVarType.querySelector('.modal-var-types__binary');
+        const binSettings = uiControls.modalVarType.querySelector('.modal-var-types__binary-settings');
 
         varTypeInputs.forEach(el => el.addEventListener('click', () => {
             if (el.isSameNode(binInput)) {
@@ -300,31 +300,31 @@ class UIControls {
             }
         }));
 
-        UIControls.varTypesLevelControls.up.addEventListener('click', () => { moveLabel(false) });
-        UIControls.varTypesLevelControls.down.addEventListener('click', () => { moveLabel(true) });
-        UIControls.varTypesSwitchBtn.addEventListener('click', switchLabel);
+        uiControls.varTypesLevelControls.up.addEventListener('click', () => { moveLabel(false) });
+        uiControls.varTypesLevelControls.down.addEventListener('click', () => { moveLabel(true) });
+        uiControls.varTypesSwitchBtn.addEventListener('click', switchLabel);
 
-        UIControls.varTypesForm.addEventListener('submit', (event) => {
+        uiControls.varTypesForm.addEventListener('submit', (event) => {
             event.preventDefault();
-            const newOrder = [...UIControls.rangTable.querySelectorAll('.var-table__item')].map(el => Number(el.dataset.order));
+            const newOrder = [...uiControls.rangTable.querySelectorAll('.var-table__item')].map(el => Number(el.dataset.order));
             const twoTables = {
-                group0: [...UIControls.binTables[0].querySelectorAll('.var-table__item')].map(el => el.dataset.anchor),
-                group1: [...UIControls.binTables[1].querySelectorAll('.var-table__item')].map(el => el.dataset.anchor)
+                group0: [...uiControls.binTables[0].querySelectorAll('.var-table__item')].map(el => el.dataset.anchor),
+                group1: [...uiControls.binTables[1].querySelectorAll('.var-table__item')].map(el => el.dataset.anchor)
             };
-            DataControls.setVarSettings(new FormData(UIControls.varTypesForm), newOrder, twoTables);
+            dataControls.setVarSettings(new FormData(uiControls.varTypesForm), newOrder, twoTables);
         });
 
-        UIControls.modalVarTypeBtns.forEach(btn => {
-            btn.addEventListener('click', () => UIControls.modalVarType.style.display = 'none');
+        uiControls.modalVarTypeBtns.forEach(btn => {
+            btn.addEventListener('click', () => uiControls.modalVarType.style.display = 'none');
         });
 
-        UIControls.modalVarType.querySelector('.modal-window__header').addEventListener('mousedown', (event) => {
-            UIControls.dragMouseDown(event, UIControls.modalVarType);
+        uiControls.modalVarType.querySelector('.modal-window__header').addEventListener('mousedown', (event) => {
+            uiControls.dragMouseDown(event, uiControls.modalVarType);
         });
 
 
         function switchLabel() {
-            const curLabel = UIControls.binSettings.querySelector('input[type="radio"]:checked').parentElement;
+            const curLabel = uiControls.binSettings.querySelector('input[type="radio"]:checked').parentElement;
             const curTableBody = curLabel.parentElement;
 
             curTableBody.removeChild(curLabel);
@@ -333,17 +333,17 @@ class UIControls {
                 toTable.insertBefore(curLabel, toTable.querySelector('.var-table__anchor_' + curLabel.dataset.anchor));
             }
 
-            if (curTableBody.isSameNode(UIControls.binTables[0])) {
-                insertChild(UIControls.binTables[1]);
-                UIControls.varTypesSwitchBtn.classList.replace('switch-button_right', 'switch-button_left');
+            if (curTableBody.isSameNode(uiControls.binTables[0])) {
+                insertChild(uiControls.binTables[1]);
+                uiControls.varTypesSwitchBtn.classList.replace('switch-button_right', 'switch-button_left');
             }
             else {
-                insertChild(UIControls.binTables[0]);
-                UIControls.varTypesSwitchBtn.classList.replace('switch-button_left', 'switch-button_right');
+                insertChild(uiControls.binTables[0]);
+                uiControls.varTypesSwitchBtn.classList.replace('switch-button_left', 'switch-button_right');
             }
         }
         function moveLabel(isDown) {
-            const rangTable = UIControls.rangTable;
+            const rangTable = uiControls.rangTable;
             const curLabel = rangTable.querySelector('input[type="radio"]:checked').parentElement;
             if (!curLabel)
                 return;
@@ -360,31 +360,31 @@ class UIControls {
                 rangTable.insertBefore(curLabel, sibling);
             }
         }
-    }
+    },
 
     // MODULE LISTENERS //
 
-    static addModuleBtnsListeners() {
+    addModuleBtnsListeners() {
         const modulesItems = [...document.querySelectorAll('.modules__item')];
-        UIControls.modulesItems = modulesItems;
+        uiControls.modulesItems = modulesItems;
         modulesItems.forEach(el => {
             const id = el.dataset.moduleId;
             el.addEventListener('click', () => {
-                const newHypId = ModuleIntegrator.addHypothesis(id);
-                const newHyp = ModuleIntegrator.getHypElementById(newHypId);
-                const newRes = ModuleIntegrator.getResultElementById(newHypId);
-                UIControls.scrollCenter(UIControls.parametersContainer, newHyp);
-                UIControls.scrollCenter(UIControls.resultsContainer, newRes);
+                const newHypId = moduleIntegrator.addHypothesis(id);
+                const newHyp = moduleIntegrator.getHypElementById(newHypId);
+                const newRes = moduleIntegrator.getResultElementById(newHypId);
+                uiControls.scrollCenter(uiControls.parametersContainer, newHyp);
+                uiControls.scrollCenter(uiControls.resultsContainer, newRes);
             });
         });
-    }
+    },
 
-    static scrollCenter(parentEl, toEl) {
-        let y = toEl.offsetTop - UIControls.pageBody.getBoundingClientRect().height / 2 + toEl.getBoundingClientRect().height / 2;
+    scrollCenter(parentEl, toEl) {
+        let y = toEl.offsetTop - uiControls.pageBody.getBoundingClientRect().height / 2 + toEl.getBoundingClientRect().height / 2;
         parentEl.scrollTo(({ behavior: "smooth", top: y, left: 0 }));
-    }
+    },
 
-    static addModuleFormListeners(element, moduleCallbackFunction, isGlob) {
+    addModuleFormListeners(element, moduleCallbackFunction, isGlob) {
         const elementFormMain = element.querySelector('.module-option-form');
         const triggers = [...element.querySelectorAll('.form-change-trigger')];
         const collapsibleInput = element.querySelector('.collapsible__input');
@@ -398,19 +398,19 @@ class UIControls {
 
         if (isGlob) {
             triggers.forEach(el => el.addEventListener('change', () => {
-                ModuleIntegrator.setSettings('glob', elementFormMain, elementFormMain.querySelector('.target-table-data'));
+                moduleIntegrator.setSettings('glob', elementFormMain, elementFormMain.querySelector('.target-table-data'));
             }));
             return;
         }
 
         triggers.forEach(el => el.addEventListener('change', () => {
-            ModuleIntegrator.setSettings(getId(element), elementFormMain, elementFormMain.querySelector('.target-table-data'));
+            moduleIntegrator.setSettings(getId(element), elementFormMain, elementFormMain.querySelector('.target-table-data'));
         }));
 
         const elementFormSheets = [...element.querySelectorAll('.sheet-form')];
         elementFormSheets.forEach(el => {
             el.addEventListener('change', () => {
-                ModuleIntegrator.refreshVarsOfHyp(getId(element), el);
+                moduleIntegrator.refreshVarsOfHyp(getId(element), el);
             });
         });
 
@@ -480,7 +480,7 @@ class UIControls {
             content.classList.toggle('parameters__content_hidden');
             titleContainer.classList.toggle('parameters__title-container_hidden');
             hideBtn.classList.toggle('parameters__hide-button_hidden');
-            ModuleIntegrator.hideUnhideHyp(getId(element));
+            moduleIntegrator.hideUnhideHyp(getId(element));
         });
 
 
@@ -509,81 +509,81 @@ class UIControls {
 
         function submitNewName() {
             if (elementHeaderInput.value.trim() === '') {
-                UIControls.showError(elementHeaderInput, 'Заполните это поле');
+                uiControls.showError(elementHeaderInput, 'Заполните это поле');
                 return;
             }
             elementHeaderInput.removeEventListener('focusout', focusListener);
             elementHeaderInput.removeEventListener('keypress', enterListener);
             elementHeader.style.display = 'inline';
             elementHeaderInput.style.display = 'none';
-            ModuleIntegrator.nameChange(getId(element), elementHeaderInput.value);
+            moduleIntegrator.nameChange(getId(element), elementHeaderInput.value);
         }
 
         //dublicate
 
         const dupbtn = element.querySelector('.parameters__duplicate-button');
         dupbtn.addEventListener('click', () => {
-            ModuleIntegrator.duplicateHyp(getId(element));
+            moduleIntegrator.duplicateHyp(getId(element));
         });
 
         //delete 
 
         const deleteBtn = element.querySelector('.parameters__delete-button');
         deleteBtn.addEventListener('click', () => {
-            ModuleIntegrator.deleteHyp(getId(element));
+            moduleIntegrator.deleteHyp(getId(element));
         });
 
         function getId(el) {
             return Number(el.querySelector('.module-option-form').dataset.id);
         }
-    }
+    },
 
     // COMMON FUNCTIONS //
 
-    static resizeBarCheckBounds() {
-        const calculationWindowWidth = UIControls.calculationWindow.offsetWidth;
-        const resizeBarWidth = UIControls.resizeBarsEl[0].offsetWidth;
-        const resultsWidth = resizeBarWidth + UIControls.results.offsetWidth;
-        const parametersWidth = resizeBarWidth + UIControls.parameters.offsetWidth;
-        const bodyWidth = UIControls.body.clientWidth;
+    resizeBarCheckBounds() {
+        const calculationWindowWidth = uiControls.calculationWindow.offsetWidth;
+        const resizeBarWidth = uiControls.resizeBarsEl[0].offsetWidth;
+        const resultsWidth = resizeBarWidth + uiControls.results.offsetWidth;
+        const parametersWidth = resizeBarWidth + uiControls.parameters.offsetWidth;
+        const bodyWidth = uiControls.body.clientWidth;
 
         if (resultsWidth >= bodyWidth) {
-            UIControls.calculationWindow.style.width = parametersWidth + bodyWidth + 'px';
+            uiControls.calculationWindow.style.width = parametersWidth + bodyWidth + 'px';
         }
         else if (calculationWindowWidth < resizeBarWidth) {
-            UIControls.calculationWindow.style.width = resizeBarWidth + 'px';
+            uiControls.calculationWindow.style.width = resizeBarWidth + 'px';
         }
-    }
+    },
 
-    static toggleMenu() {
-        if (UIControls.burgerMenuInput.checked)
+    toggleMenu() {
+        if (uiControls.burgerMenuInput.checked)
             fadeOut();
         else
             fadeIn();
 
         function fadeIn() {
-            UIControls.sidebar.classList.add('sidebar_checked');
-            UIControls.burgerUpLine.classList.add('burger-menu__line-up_checked');
-            UIControls.burgerDownLine.classList.add('burger-menu__line-down_checked');
-            UIControls.fadeScreen.style['z-index'] = '1';
-            UIControls.burgerMenuInput.checked = true;
-            UIControls.fadeScreen.style.opacity = '1';
+            uiControls.sidebar.classList.add('sidebar_checked');
+            uiControls.burgerUpLine.classList.add('burger-menu__line-up_checked');
+            uiControls.burgerDownLine.classList.add('burger-menu__line-down_checked');
+            uiControls.fadeScreen.style['z-index'] = '1';
+            uiControls.burgerMenuInput.checked = true;
+            uiControls.fadeScreen.style.opacity = '1';
         }
 
         function fadeOut() {
-            UIControls.sidebar.classList.remove('sidebar_checked');
-            UIControls.burgerUpLine.classList.remove('burger-menu__line-up_checked');
-            UIControls.burgerDownLine.classList.remove('burger-menu__line-down_checked');
-            UIControls.fadeScreen.style['z-index'] = '-1';
-            UIControls.burgerMenuInput.checked = false;
-            UIControls.fadeScreen.style.opacity = '0';
+            uiControls.sidebar.classList.remove('sidebar_checked');
+            uiControls.burgerUpLine.classList.remove('burger-menu__line-up_checked');
+            uiControls.burgerDownLine.classList.remove('burger-menu__line-down_checked');
+            uiControls.fadeScreen.style['z-index'] = '-1';
+            uiControls.burgerMenuInput.checked = false;
+            uiControls.fadeScreen.style.opacity = '0';
         }
-    }
+    },
 
-    static footerChange() {
-        const dataTable = UIControls.dataContainer.querySelector('.data__table_shown');
-        const dataContainer = UIControls.dataContainer;
-        const dataFooter = UIControls.dataFooter;
+    footerChange() {
+        const dataTable = uiControls.dataContainer.querySelector('.data__table_shown');
+        const dataContainer = uiControls.dataContainer;
+        const dataFooter = uiControls.dataFooter;
 
         if (!dataTable) {
             dataFooter.style.width = 0;
@@ -596,9 +596,9 @@ class UIControls {
         else {
             dataFooter.style.position = 'sticky';
         }
-    }
+    },
 
-    static openModal(event, modalWindow, createModalFunc) {
+    openModal(event, modalWindow, createModalFunc) {
         const curIcon = event.currentTarget;
         event.preventDefault();
         event.stopPropagation();
@@ -615,9 +615,9 @@ class UIControls {
         function closeModal() {
             modalWindow.style.display = 'none';
         }
-    }
+    },
 
-    static dragMouseDown(e, elmnt) {
+    dragMouseDown(e, elmnt) {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
         e = e || window.event;
         e.preventDefault();
@@ -641,19 +641,19 @@ class UIControls {
             document.onmouseup = null;
             document.onmousemove = null;
         }
-    }
+    },
 
-    static resultsLoadingShow() {
-        UIControls.resultsContainer.style.opacity = '0.1';
-        UIControls.resultsLoader.style.display = 'block';
-    }
+    resultsLoadingShow() {
+        uiControls.resultsContainer.style.opacity = '0.1';
+        uiControls.resultsLoader.style.display = 'block';
+    },
 
-    static resultsLoadingHide() {
-        UIControls.resultsContainer.style.opacity = '1';
-        UIControls.resultsLoader.style.display = 'none';
-    }
+    resultsLoadingHide() {
+        uiControls.resultsContainer.style.opacity = '1';
+        uiControls.resultsLoader.style.display = 'none';
+    },
 
-    static showError(el, errorText) {
+    showError(el, errorText) {
         const rect = el.getBoundingClientRect();
         const x = countCoord((rect.x + rect.width / 2), window.innerWidth);
         const y = countCoord((rect.y + rect.height), window.innerHeight);
@@ -672,12 +672,10 @@ class UIControls {
             }
         }
 
-        UIControls.errorElement.style.left = x + 'px';
-        UIControls.errorElement.style.top = y + 'px';
-        UIControls.errorElement.setCustomValidity(errorText);
-        UIControls.errorElement.reportValidity();
+        uiControls.errorElement.style.left = x + 'px';
+        uiControls.errorElement.style.top = y + 'px';
+        uiControls.errorElement.setCustomValidity(errorText);
+        uiControls.errorElement.reportValidity();
     }
 }
-
-window.UIControls = UIControls;
 

@@ -1,7 +1,7 @@
 import * as Papa from 'papaparse';
 import Settings from './Settings';
-// import UIControls from '@/UIControls';
-import ModuleIntegrator from '@/ModuleIntegrator';
+// import uiControls from '@/uiControls';
+import moduleIntegrator from '@/moduleIntegrator';
 import Var from './Var';
 
 export default class Sheet {
@@ -54,7 +54,7 @@ export default class Sheet {
 
     setVarSettings(formData, order, twoTables) {
         this.#openedVar.setSettings(formData, order, twoTables);
-        ModuleIntegrator.updateVarsOfSheet(this.#id, false);
+        moduleIntegrator.updateVarsOfSheet(this.#id, false);
     }
 
     readyToShow() {
@@ -65,7 +65,7 @@ export default class Sheet {
         this.#settings.obj.createHTML();
         this.#tableElement.classList.add('data__table_shown');
         this.#footerElement.classList.add('footer__item_selected');
-        UIControls.footerChange();
+        uiControls.footerChange();
     }
 
     hide() {
@@ -79,7 +79,7 @@ export default class Sheet {
     }
 
     #createTableElement() {
-        this.#tableElement = UIControls.dataContainer.insertBefore(document.createElement('table'), UIControls.dataContainer.firstChild);
+        this.#tableElement = uiControls.dataContainer.insertBefore(document.createElement('table'), uiControls.dataContainer.firstChild);
         this.#tableElement.classList.add('data__table');
         this.#tableElement.setAttribute('id', this.#id);
         this.#tableElement.innerHTML = `
@@ -99,7 +99,7 @@ export default class Sheet {
     }
 
     #createFooterElement() {
-        this.#footerElement = UIControls.footerList.appendChild(document.createElement('li'));
+        this.#footerElement = uiControls.footerList.appendChild(document.createElement('li'));
         this.#footerElement.classList.add('footer__item', 'footer__item_selected', 'footer__item_new');
         this.#footerElement.setAttribute('id', this.#id);
         this.#footerElement.innerHTML = `
@@ -172,7 +172,7 @@ export default class Sheet {
             }
         }
 
-        UIControls.initNewSheetControls();
+        uiControls.initNewSheetControls();
         this.show();
     }
 
@@ -207,13 +207,13 @@ export default class Sheet {
                 this.#initVars();
                 this.#createHTML();
                 if (isNewFile) {
-                    ModuleIntegrator.optionListAdd({
+                    moduleIntegrator.optionListAdd({
                         name: this.#name,
                         id: this.#id
                     });
                 }
                 if (this.#id === 0 || !isNewFile) {
-                    ModuleIntegrator.updateVarsOfSheet(this.#id, true);
+                    moduleIntegrator.updateVarsOfSheet(this.#id, true);
                 }
             }
         });
