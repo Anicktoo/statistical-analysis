@@ -67,8 +67,8 @@ Math.mean = function (array) {
     return array.reduce((el, c) => el + c) / array.length;
 }
 
-Math.stddiv = {};
-Math.stddiv.s = function (array) {
+Math.stddev = {};
+Math.stddev.s = function (array) {
     const n = array.length
     const mean = array.reduce((a, b) => a + b) / n
     return Math.sqrt(array.map(x => ((x - mean) ** 2)).reduce((a, b) => a + b) / (n - 1))
@@ -163,4 +163,12 @@ Math.rank.avg = function (array, getRankFunc) {
     function getKeyByValue(object, value) {
         return Object.keys(object).find(key => object[key] === value);
     }
+}
+
+Math.getZAlpha = function (altHypTest, alpha) {
+    return altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha)
+}
+
+Math.getZ = function (zAlpha, power) {
+    return zAlpha + Math.norminv(100 - power);
 }

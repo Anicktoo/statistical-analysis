@@ -51,11 +51,24 @@ export default class AbstractModule {
         throw new Error('This method must be implemented');
     }
 
+    getResultElement() {
+        throw new Error('This method must be implemented');
+    }
+
     getFormSheets() {
         throw new Error('This method must be implemented');
     }
 
     getSheetSelects() {
+        throw new Error('This method must be implemented');
+    }
+
+    setSheetOptions(listOfSheets) {
+        throw new Error('This method must be implemented');
+
+    }
+
+    addSheetOptions(listOfSheets) {
         throw new Error('This method must be implemented');
     }
 
@@ -99,28 +112,5 @@ export default class AbstractModule {
         throw new Error('This method must be implemented');
     }
 
-    //ABSTRACT ONLY
-
-    static addSheetOptions(listOfSheets, selects) {
-        let str = '';
-        for (let el of listOfSheets) {
-            if (!selects[0].querySelector(`.select-option-${el.id}`)) {
-                const option = `<option class='select-option-${el.id}' value="${el.id}">${el.name}</option>`
-                str += option;
-            }
-        }
-
-        for (let select of selects) {
-            select.innerHTML += str;
-        }
-    }
-
-    getZAlpha(altHypTest, alpha) {
-        return altHypTest === 'both' ? Math.norminv(alpha / 2) : Math.norminv(alpha)
-    }
-
-    getZ(zAlpha, power) {
-        return zAlpha + Math.norminv(100 - power);
-    }
 }
 

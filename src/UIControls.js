@@ -206,7 +206,7 @@ window.uiControls = {
 
             function mousemove(e) {
                 e.preventDefault();
-                uiControls.calculationWindow.style.width = (startWidth - (event.clientX - startX)) + 'px';
+                uiControls.calculationWindow.style.width = (startWidth - (e.clientX - startX)) + 'px';
             }
 
             function mouseup() {

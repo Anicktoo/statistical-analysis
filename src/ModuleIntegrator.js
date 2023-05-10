@@ -61,18 +61,6 @@ const moduleIntegrator = {
         }
     },
 
-    getHypElementById(id) {
-        if (id || id === 0) {
-            return moduleIntegrator._hypotheses[id].hyp.getElement();
-        }
-    },
-
-    getResultElementById(id) {
-        if (id || id === 0) {
-            return moduleIntegrator._hypotheses[id].hyp.getResultElement();
-        }
-    },
-
     async createModuleButtons() {
 
         const modules = moduleIntegrator._modules;
@@ -106,6 +94,18 @@ const moduleIntegrator = {
         moduleIntegrator.setSettings('glob', uiControls.parametersGlobItem.querySelector('form'));
     },
 
+    getHypElementById(id) {
+        if (id || id === 0) {
+            return moduleIntegrator._hypotheses[id].hyp.getElement();
+        }
+    },
+
+    getResultElementById(id) {
+        if (id || id === 0) {
+            return moduleIntegrator._hypotheses[id].hyp.getResultElement();
+        }
+    },
+
     //add new hypothesis by type id and if needed to make clone with reference Hyp. returns new hypothesis ID
     addHypothesis(hypTypeId, refHyp = null) {
         const globalSettings = moduleIntegrator._globalSettings;
@@ -116,7 +116,7 @@ const moduleIntegrator = {
         }
         const newEl = newHyp.getElement();
         globalSettings.createNewHypOption(globalSettings.hypCounter, newHyp.getName());
-        AbstractModule.addSheetOptions(dataControls.getListOfSheets(), newHyp.getSheetSelects());
+        newHyp.setSheetOptions(dataControls.getListOfSheets());
         moduleIntegrator.refreshVarsOfHyp(globalSettings.hypCounter)
         uiControls.addModuleFormListeners(newEl, newHyp.addListeners.bind(newHyp, newEl));
 
@@ -135,7 +135,7 @@ const moduleIntegrator = {
     //add options to sheet select of all hypotheses with sheet obj and bool (should all hyp refresh vars?) 
     optionListAdd(newSheet, optionsEmpty = false) {
         for (let i = 0; i < moduleIntegrator._globalSettings.hypCounter; i++) {
-            AbstractModule.addSheetOptions([newSheet], moduleIntegrator._hypotheses[i].hyp.getSheetSelects());
+            moduleIntegrator._hypotheses[i].hyp.addSheetOptions([newSheet]);
             if (optionsEmpty) {
                 moduleIntegrator.refreshVarsOfHyp(i);
             }

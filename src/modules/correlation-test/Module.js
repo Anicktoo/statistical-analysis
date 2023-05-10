@@ -171,6 +171,36 @@ export default class Module extends AbstractModule {
         return this.#sheetSelects;
     }
 
+    setSheetOptions(listOfSheets) {
+        let str = '';
+        for (let el of listOfSheets) {
+            const option = `<option class='select-option-${el.id}' value="${el.id}">${el.name}</option>`
+            str += option;
+        }
+
+        for (let select of this.#sheetSelects) {
+            select.innerHTML = str;
+        }
+    }
+
+    addSheetOptions(listOfSheets) {
+        const arrOfOptions = [];
+        for (let el of listOfSheets) {
+            if (!this.#sheetSelects[0].querySelector(`.select-option-${el.id}`)) {
+                const option = document.createElement('option');
+                option.classList.add(`select-option-${el.id}`);
+                option.value = el.id;
+                option.textContent = el.name;
+                arrOfOptions.push(option);
+            }
+        }
+
+        const arrOfOptions2 = arrOfOptions.map(el => el.cloneNode(true));
+
+        this.#sheetSelects[0].append(...arrOfOptions);
+        this.#sheetSelects[1].append(...arrOfOptions2);
+    }
+
     addListeners(element) {
         const tableTwo = element.querySelector('.two-column-var');
         const switch0 = tableTwo.querySelector('.switch-button');
@@ -737,8 +767,8 @@ export default class Module extends AbstractModule {
 
     #pearsonTest(alpha, power, data1, data2) {
         let r;
-        const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
-        const z = this.getZ(zAlpha, power);
+        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
+        const z = Math.getZ(zAlpha, power);
 
         if (this.#inputType === 'manual') {
             r = this.#resultsTableData.pearson.r;
@@ -778,7 +808,7 @@ export default class Module extends AbstractModule {
 
     #pearsonTestInv(alpha, n, data1, data2) {
         let r, z;
-        const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
+        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
 
         if (this.#inputType === 'manual') {
             r = this.#resultsTableData.pearson.r;
@@ -825,8 +855,8 @@ export default class Module extends AbstractModule {
     //!!!
     #spearmanTest(alpha, power, data1, data2) {
         let p;
-        const zAlpha = this.getZAlpha(this.#altHypTest, alpha);
-        const z = this.getZ(zAlpha, power);
+        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
+        const z = Math.getZ(zAlpha, power);
 
         if (this.#inputType === 'manual') {
             p = this.#resultsTableData.spearman.p;
