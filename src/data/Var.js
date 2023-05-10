@@ -36,6 +36,9 @@ export default class Var {
     #onlyNumbers;
 
     constructor(type, id, set, name, onlyNumbers) {
+        if (type !== Var.Binary && type !== Var.Nominal &&
+            type !== Var.Continues && type !== Var.Rang)
+            throw new Error('Данный тип данных не поддерживается приложением');
         this.#typeName = type.name;
         this.#img = type.img;
         this.#ruTypeName = type.ruName;

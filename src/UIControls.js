@@ -17,6 +17,10 @@ window.uiControls = {
     csvUploadBtn: undefined,
     exportBtn: undefined,
     settingsForm: undefined,
+    settingsSkipInput: undefined,
+    settingsEncodingInput: undefined,
+    settingsColDelimiterInput: undefined,
+    settingsDecimalDelimiterInput: undefined,
     dataContainer: undefined,
     dataTable: undefined,
     dataFooter: undefined,
@@ -98,6 +102,10 @@ window.uiControls = {
         uiControls.csvUploadBtn = document.getElementById('csvUpload');
         uiControls.exportBtn = document.getElementById('export-results');
         uiControls.settingsForm = document.getElementById('settings-form');
+        uiControls.settingsSkipInput = uiControls.settingsForm.querySelector('#skip-options');
+        uiControls.settingsEncodingInput = uiControls.settingsForm.querySelector('#encoding-options');
+        uiControls.settingsColDelimiterInput = uiControls.settingsForm.querySelector('#col-delimiter-options');
+        uiControls.settingsDecimalDelimiterInput = uiControls.settingsForm.querySelector('#decimal-delimiter-options');
 
         uiControls.calculationWindow = document.querySelector('.calculation-window');
         uiControls.resizeBarsEl = [...uiControls.calculationWindow.querySelectorAll('.resize-bar')];

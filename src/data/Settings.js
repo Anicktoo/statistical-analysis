@@ -1,10 +1,4 @@
 export default class Settings {
-    static #form = document.getElementById('settings-form');
-    static #skipInput = Settings.#form.querySelector('#skip-options');
-    static #encodingInput = Settings.#form.querySelector('#encoding-options');
-    static #colDelimiterInput = Settings.#form.querySelector('#col-delimiter-options');
-    static #decimalDelimiterInput = Settings.#form.querySelector('#decimal-delimiter-options');
-
     static #globalSettings = {
         skip: {
             value: "0"
@@ -49,12 +43,12 @@ export default class Settings {
     }
 
     createHTML() {
-        Settings.#skipInput.setAttribute('value', `${this.#skip.value}`);
-        Settings.#skipInput.value = this.#skip.value;
+        uiControls.settingsSkipInput.setAttribute('value', `${this.#skip.value}`);
+        uiControls.settingsSkipInput.value = this.#skip.value;
 
-        createOptions(this.#encoding, Settings.#encodingInput);
-        createOptions(this.#colDelimiter, Settings.#colDelimiterInput);
-        createOptions(this.#decimalDelimiter, Settings.#decimalDelimiterInput);
+        createOptions(this.#encoding, uiControls.settingsEncodingInput);
+        createOptions(this.#colDelimiter, uiControls.settingsColDelimiterInput);
+        createOptions(this.#decimalDelimiter, uiControls.settingsDecimalDelimiterInput);
 
         function createOptions(settingName, settingElement) {
             settingElement.innerHTML = '';
