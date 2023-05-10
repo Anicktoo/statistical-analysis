@@ -1,5 +1,5 @@
 import AbstractModule from '@modules/AbstractModule';
-import dataControls from './data/dataControls';
+import dataControls from '@data/dataControls';
 
 const moduleIntegrator = {
     _MODULE_FOLDERS: ['paired-sample-test', 'independent-sample-test', 'correlation-test'],
