@@ -1,5 +1,7 @@
 .main-button {
     cursor: pointer;
+    appearance: none;
+    background-color: inherit;
     border-radius: 10px;
 
     &:hover {

@@ -9,7 +9,7 @@ export function binTest() {
     function startBinTest() {
         function getTest(max) {
             for (let i = 0; i <= max; i++) {
-                console.log(isValInZeroGroup(i));
+                // console.log(isValInZeroGroup(i));
             }
         }
         //1
@@ -374,6 +374,10 @@ export function binTest() {
     }
 
     function binCheck(n) {
+        console.log(`TEST ${n}`);
+
+        console.log('group 0: ', twoTables.group0);
+        console.log('group 1: ', twoTables.group1);
 
         let curItem = 0;
         let curBit = twoTables.group1[curItem];
@@ -395,7 +399,8 @@ export function binTest() {
             gr[gr.length - i - 1] = number;
         }
 
-        console.log(gr.map(el => dec2bin(el)));
+        console.log('number: ', gr);
+        console.log('bin array: ', gr.map(el => dec2bin(el)));
 
         let str = [];
         let str2 = [];
@@ -420,8 +425,9 @@ export function binTest() {
             }
         }
 
-        console.log(`TEST ${n}: `, JSON.stringify(str) === JSON.stringify(twoTables.group0) &&
+        console.log(`RESULT: `, JSON.stringify(str) === JSON.stringify(twoTables.group0) &&
             JSON.stringify(str2) === JSON.stringify(twoTables.group1));
+        console.log('----------------------------------------------------------------------------------');
     }
 
     function isValInZeroGroup(ind) {
