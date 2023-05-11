@@ -86,11 +86,6 @@ String.resultForm = function (s) {
     return s !== undefined && s !== null ? s : '-';
 }
 
-// Math.roundFixed = function (num, dec) {
-//     const mult = 10 ** dec;
-//     return Math.round((num + Number.EPSILON) * mult) / mult;
-// }
-
 Math.roundGOST = function (num) {
     let tempN = Math.abs(num);
     let tempAnswer;

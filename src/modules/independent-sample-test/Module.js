@@ -433,13 +433,13 @@ export default class Module extends AbstractModule {
                                             form="module-option-form_${this.#id}" checked>
                                         <span>Точный тест Фишера</span>
                                     </label>
-                                    <label class="radio-line">
+                                    <label class="radio-line disabled">
                                         <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="test-type" value="mann"
                                             form="module-option-form_${this.#id}">
                                         <span>Манна-Уитни</span>
                                     </label>
-                                    <label class="radio-line">
+                                    <label class="radio-line disabled">
                                         <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="test-type" value="student"
                                             form="module-option-form_${this.#id}">

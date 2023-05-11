@@ -275,8 +275,8 @@ const moduleIntegrator = {
         uiControls.resImportance.textContent = globalSettings.getAlpha();
         uiControls.resMainHyp.textContent = globalSettings.getMainHypName();
         uiControls.resPower.textContent = Number.resultForm(globalSettings.power);
-        uiControls.resSampleSizePrecise.textContent = Number.resultForm(globalSettings.preciseSampleSize, false);
-        uiControls.resSampleSize.textContent = Number.resultForm(globalSettings.sampleSize);
+        uiControls.resSampleSizePrecise.textContent = Number.resultForm(globalSettings.preciseSampleSize);
+        uiControls.resSampleSize.textContent = Number.resultForm(globalSettings.sampleSize, true);
     },
 
     //extra functions 

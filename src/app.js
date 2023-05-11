@@ -5,3 +5,5 @@ import moduleIntegrator from '@/moduleIntegrator';
 
 uiControls.initConstuiControls();
 moduleIntegrator.createModuleButtons();
+
+console.log('Test');
