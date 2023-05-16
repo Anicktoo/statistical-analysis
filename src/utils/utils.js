@@ -120,7 +120,6 @@ Math.roundGOST = function (num) {
     }
 }
 
-//Возможно нужно ранжировать значения обоих выборок как одной
 Math.rank = {};
 Math.rank.avg = function (array, getRankFunc) {
     const obj = {
@@ -135,28 +134,34 @@ Math.rank.avg = function (array, getRankFunc) {
         }
         else {
             obj[el] = {
-                avg: el.getRankFunc(),
+                rank: getRankFunc(el),
+                avg: 0,
                 count: 1
             }
         }
     }
-    let curRank = 0;
-    let nextRank = 1;
+    let curRank = 1;
+    let nextRank = 2;
+    let cumulativeCount = 0;
     let curKey = getKeyByValue(obj, curRank);
     let nextKey = getKeyByValue(obj, nextRank);
-    while (curKey !== undefined) {
-        obj[key].avg = obj[key].avg + obj[key].count * 0.5 - 0.5;
-        obj[nextKey].avg += obj[key].count - 1;
-        curRank = nextRank;
-        nextRank = nextRank + 1;
-        curKey = nextKey;
-        nextKey = getKeyByValue(obj, nextRank);
+    while (true) {
+        obj[curKey].avg = (cumulativeCount * 2 + obj[curKey].count + 1) / 2;
+        if (nextKey) {
+            cumulativeCount = cumulativeCount + obj[curKey].count;
+            nextRank = nextRank + 1;
+            curKey = nextKey;
+            nextKey = getKeyByValue(obj, nextRank);
+        }
+        else {
+            break;
+        }
     }
 
     return obj;
 
     function getKeyByValue(object, value) {
-        return Object.keys(object).find(key => object[key] === value);
+        return Object.keys(object).find(key => object[key].rank === value);
     }
 }
 

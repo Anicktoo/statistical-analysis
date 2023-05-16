@@ -429,7 +429,7 @@ export default class Module extends AbstractModule {
                                             form="module-option-form_${this.#id}" checked>
                                         <span>Пирсона</span>
                                     </label>
-                                    <label class="radio-line disabled">
+                                    <label class="radio-line">
                                         <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="test-type" value="spearman"
                                             form="module-option-form_${this.#id}">
@@ -836,7 +836,7 @@ export default class Module extends AbstractModule {
 
         this.#resultsTableData.pearson.r = r;
 
-        z = Math.sqrt(Math.fisher(r) ** 2 * (n - 3));
+        z = Math.fisher(r) * Math.sqrt((n - 3));
         if (z > 0) {
             z *= -1;
         }
@@ -852,7 +852,6 @@ export default class Module extends AbstractModule {
         return power;
     }
 
-    //!!!
     #spearmanTest(alpha, power, data1, data2) {
         let p;
         const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
@@ -862,18 +861,18 @@ export default class Module extends AbstractModule {
             p = this.#resultsTableData.spearman.p;
         }
         else {
-            // const rankObj1 = Math.rank.avg(data1);
-            // const rankObj2 = Math.rank.avg(data2);
-            const xmean = Math.mean(data1);
-            const ymean = Math.mean(data2);
+            const rankObj1 = Math.rank.avg(data1, this.#vars.first.getOrderOfVal.bind(this.#vars.first));
+            const rankObj2 = Math.rank.avg(data2, this.#vars.second.getOrderOfVal.bind(this.#vars.second));
+            const xmean = (data1.length + 1) / 2;
+            const ymean = (data2.length + 1) / 2;
             const xdifarr = [];
             const ydifarr = [];
             for (let i = 0; i < data1.length; i++) {
                 if (data1[i] === '' || data2[i] === '') {
                     throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
                 }
-                xdifarr.push(data1[i] - xmean);
-                ydifarr.push(data2[i] - ymean);
+                xdifarr.push(rankObj1.get(data1[i]) - xmean);
+                ydifarr.push(rankObj2.get(data2[i]) - ymean);
             }
             const initialValue = 0;
             const up = xdifarr.reduce((sum, el, ind) => sum + el * ydifarr[ind], initialValue);
@@ -881,13 +880,13 @@ export default class Module extends AbstractModule {
             const ysqrsum = ydifarr.reduce((sum, el) => sum + el ** 2, initialValue);
             const down = Math.sqrt(xsqrsum * ysqrsum);
 
-            r = up / down;
+            p = up / down;
         }
 
         this.#resultsTableData.z = z;
         this.#resultsTableData.spearman.p = p;
 
-        // const n = (z / Math.fisher(r)) ** 2 + 3;
+        const n = 1.06 * ((z / Math.fisher(p)) ** 2) + 3;
 
         if (n === undefined || typeof n !== 'number') {
             throw new Error('Ошибка расчета данных');
@@ -897,7 +896,50 @@ export default class Module extends AbstractModule {
     }
 
     #spearmanTestInv(alpha, n, data1, data2) {
+        let p, z;
+        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
 
+        if (this.#inputType === 'manual') {
+            p = this.#resultsTableData.spearman.p;
+        }
+        else {
+            const rankObj1 = Math.rank.avg(data1, this.#vars.first.getOrderOfVal.bind(this.#vars.first));
+            const rankObj2 = Math.rank.avg(data2, this.#vars.second.getOrderOfVal.bind(this.#vars.second));
+            const xmean = (data1.length + 1) / 2;
+            const ymean = (data2.length + 1) / 2;
+            const xdifarr = [];
+            const ydifarr = [];
+            for (let i = 0; i < data1.length; i++) {
+                if (data1[i] === '' || data2[i] === '') {
+                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
+                }
+                xdifarr.push(rankObj1.get(data1[i]) - xmean);
+                ydifarr.push(rankObj2.get(data2[i]) - ymean);
+            }
+            const initialValue = 0;
+            const up = xdifarr.reduce((sum, el, ind) => sum + el * ydifarr[ind], initialValue);
+            const xsqrsum = xdifarr.reduce((sum, el) => sum + el ** 2, initialValue);
+            const ysqrsum = ydifarr.reduce((sum, el) => sum + el ** 2, initialValue);
+            const down = Math.sqrt(xsqrsum * ysqrsum);
+
+            p = up / down;
+        }
+
+        this.#resultsTableData.spearman.p = p;
+
+        z = Math.fisher(p) * Math.sqrt((n - 3) / 1.06);
+        if (z > 0) {
+            z *= -1;
+        }
+        this.#resultsTableData.z = z;
+        const zB = z - zAlpha;
+        const power = 100 - Math.normdist(zB);
+
+        if (power === undefined || typeof power !== 'number') {
+            throw new Error('Ошибка расчета данных');
+        }
+
+        return power;
     }
 
     updateResultsHtml(isMain) {

@@ -203,13 +203,14 @@ export default class Var {
         }
     }
 
+    //resturns rang of value strating with 1
     getOrderOfVal(val) {
         const indexInSet = this.#set.indexOf(val);
         if (indexInSet === -1)
             return -1;
         const order = this.#order.indexOf(indexInSet);
 
-        return order !== undefined ? order : -1;
+        return order !== undefined ? order + 1 : -1;
     }
 
     getID() {
