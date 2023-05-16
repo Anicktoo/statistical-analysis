@@ -205,6 +205,7 @@ window.uiControls = {
 
         function mousedown(e) {
             e.preventDefault();
+            uiControls.footerSetMaxWidth();
             window.addEventListener('mousemove', mousemove);
             window.addEventListener('mouseup', mouseup);
 
@@ -592,18 +593,43 @@ window.uiControls = {
         const dataTable = uiControls.dataContainer.querySelector('.data__table_shown');
         const dataContainer = uiControls.dataContainer;
         const dataFooter = uiControls.dataFooter;
+        // const scrollbarWidth = getScrollbarWidth();
 
         if (!dataTable) {
             dataFooter.style.width = 0;
             return;
         }
-        dataFooter.style.width = dataContainer.offsetWidth > dataTable.offsetWidth ? '100%' : dataTable.offsetWidth + 'px';
-        if (dataContainer.offsetHeight > dataTable.offsetHeight) {
-            dataFooter.style.position = 'absolute';
-        }
-        else {
-            dataFooter.style.position = 'sticky';
-        }
+        // dataFooter.style.width = dataContainer.offsetWidth > dataTable.offsetWidth ? '100%' : dataTable.offsetWidth + 'px';
+        dataFooter.style.width = dataContainer.clientWidth + 'px';
+        // if (dataContainer.offsetHeight - scrollbarWidth > dataTable.offsetHeight) {
+        //     dataFooter.style.width = dataContainer.clientWidth + 'px';
+        // }
+        // else {
+        //     dataFooter.style.width = dataContainer.clientWidth - scrollbarWidth + 'px';
+        // }
+
+        // function getScrollbarWidth() {
+
+        //     const outer = document.createElement('div');
+        //     outer.style.visibility = 'hidden';
+        //     outer.style.overflow = 'scroll';
+        //     outer.style.msOverflowStyle = 'scrollbar';
+        //     document.body.appendChild(outer);
+
+        //     const inner = document.createElement('div');
+        //     outer.appendChild(inner);
+
+        //     const scrollbarWidth = (outer.offsetWidth - inner.offsetWidth);
+
+        //     outer.parentNode.removeChild(outer);
+
+        //     return scrollbarWidth;
+        // }
+    },
+
+    footerSetMaxWidth() {
+        const dataFooter = uiControls.dataFooter;
+        dataFooter.style.width = '100%';
     },
 
     openModal(event, modalWindow, createModalFunc) {

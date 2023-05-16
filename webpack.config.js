@@ -73,6 +73,7 @@ module.exports = {
         {
             app:
             {
+                // name: 'chrome'
                 name: 'firefox'
             }
         }
