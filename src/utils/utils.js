@@ -179,3 +179,7 @@ Math.getZAlpha = function (altHypTest, alpha) {
 Math.getZ = function (zAlpha, power) {
     return zAlpha + Math.norminv(100 - power);
 }
+
+Array.prototype.has = function (target) {
+    return this.find(el => el === target) !== undefined;
+}

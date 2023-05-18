@@ -114,12 +114,13 @@ export default class Sheet {
     #createHTML() {
         const createThead = () => {
             const createTh = (name, index) => {
-                return this.#dataVars[index].getTypeName() === Var.Empty.name ? `<th></th>` :
-                    `<th>
+                return `
+                <th>
                     <div class="data__column-header">
+                        ${this.#dataVars[index].getTypeName() === Var.Empty.name ? `` : `
                         <div title="Сменить тип данных колонки" id=${this.#dataVars[index].getID()} class="data__var-icon data__var-icon_new">
                             <img src="${this.#dataVars[index].getImg()}" alt="${this.#dataVars[index].getName()}">
-                        </div>
+                        </div>`}
                         <span class="data__var-name">${name}</span>
                     </div>
                 </th>`;
@@ -276,6 +277,23 @@ export default class Sheet {
     }
 
     getDataByVarId(varId) {
-        return this.#data.map((arr) => arr[varId]);
+        const data = this.#data.map((arr) => arr[varId]).slice(1);
+        return trimDataEnd(data);
+
+        function trimDataEnd(data) {
+            let trimCount = 0;
+            for (let i = data.length - 1; i >= 0; i--) {
+                if (data[i] === '') {
+                    trimCount--;
+                }
+                else {
+                    break;
+                }
+            }
+            if (trimCount) {
+                return data.slice(0, trimCount)
+            }
+            return data;
+        }
     }
 }

@@ -441,7 +441,7 @@ export default class Module extends AbstractModule {
                                             form="module-option-form_${this.#id}">
                                         <span>Манна-Уитни</span>
                                     </label>
-                                    <label class="radio-line">
+                                    <label class="radio-line disabled">
                                         <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="test-type" value="student"
                                             form="module-option-form_${this.#id}">
@@ -664,7 +664,7 @@ export default class Module extends AbstractModule {
             if (validTableData) {
                 selectedVars.forEach(el => {
                     const ids = el.dataset.varId.split('_');
-                    data.push(dataControls.getDataBySheetAndVarId(ids[1], ids[2]).slice(1));
+                    data.push(dataControls.getDataBySheetAndVarId(ids[1], ids[2]));
                     vars.push(dataControls.getVarBySheetIdAndVarId(ids[1], ids[2]));
                 });
                 this.#data.first = data[0];
@@ -707,11 +707,19 @@ export default class Module extends AbstractModule {
                 return;
             }
 
+            const checkEmpties = () => {
+                if (this.#data.first.has('') || this.#data.second.has('')) {
+                    uiControls.showError(errorElement, 'Невозможно обработать набор данных, имеются пропущенные значения');
+                }
+            }
+
             firstVarName = this.#vars.first.getTypeName();
             secondVarName = this.#vars.second.getTypeName();
 
             if (this.#inputType === 'data-input-two') {
                 errorElement = this.#tableData.pair;
+
+                checkEmpties();
 
                 if (firstVarName !== secondVarName) {
                     uiControls.showError(errorElement, 'Нельзя сравнить данные разного типа');
@@ -723,6 +731,8 @@ export default class Module extends AbstractModule {
             }
             else {
                 errorElement = this.#tableData.indepTable;
+
+                checkEmpties();
 
                 if (secondVarName !== Var.Binary.name) {
                     uiControls.showError(errorElement, 'Переменная для группировки должна быть дихотомического типа');
@@ -812,9 +822,6 @@ export default class Module extends AbstractModule {
         else {
             x = Math.mean(data1);
             y = Math.mean(data2);
-            if (typeof x !== 'number' || typeof y !== 'number') {
-                throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
-            }
             varX = Math.var.s(data1);
             varY = Math.var.s(data2);
 
@@ -849,9 +856,6 @@ export default class Module extends AbstractModule {
         else {
             x = Math.mean(data1);
             y = Math.mean(data2);
-            if (typeof x !== 'number' || typeof y !== 'number') {
-                throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
-            }
             varX = Math.var.s(data1);
             varY = Math.var.s(data2);
 
@@ -973,8 +977,6 @@ export default class Module extends AbstractModule {
 
         function getColumnOfAdaptedVals(data, curVar) {
             return data.map(el => {
-                if (el === '')
-                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
                 const group = curVar.isValInZeroGroup(el);
                 if (group === -1)
                     throw new Error('Ошибка вычислений');

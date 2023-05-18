@@ -43,6 +43,8 @@ export default class Var {
     constructor(type, id, set, name, onlyNumbers) {
         if (type === Var.Empty) {
             this.#typeName = type.name;
+            this.#ruTypeName = type.ruName;
+            this.#name = name;
             return;
         }
         if (type !== Var.Binary && type !== Var.Nominal &&

@@ -430,18 +430,18 @@ export default class Module extends AbstractModule {
                                 <div class="option-block__list option-block__test-type">
                                     <label class="radio-line">
                                         <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="test-type"
-                                            value="student" form="module-option-form_${this.#id}" checked>
-                                        <span>Стьюдента</span>
+                                            value="sign" form="module-option-form_${this.#id}" checked>
+                                        <span>Тест знаков</span>
                                     </label>
                                     <label class="radio-line disabled">
                                         <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="test-type"
                                             value="wilcoxon" form="module-option-form_${this.#id}">
                                         <span>Уилкоксона</span>
                                     </label>
-                                    <label class="radio-line">
+                                    <label class="radio-line disabled">
                                         <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="test-type"
-                                            value="sign" form="module-option-form_${this.#id}">
-                                        <span>Тест знаков</span>
+                                            value="student" form="module-option-form_${this.#id}">
+                                        <span>Стьюдента</span>
                                     </label>
                                 </div>
                             </div>
@@ -689,11 +689,19 @@ export default class Module extends AbstractModule {
                 return;
             }
 
+            const checkEmpties = () => {
+                if (this.#data.first.has('') || this.#data.second.has('')) {
+                    uiControls.showError(errorElement, 'Невозможно обработать набор данных, имеются пропущенные значения');
+                }
+            }
+
             firstVarName = this.#vars.first.getTypeName();
             secondVarName = this.#vars.second.getTypeName();
 
             if (this.#inputType === 'data-input-two') {
                 errorElement = this.#tableData.pair;
+
+                checkEmpties();
 
                 if (firstVarName !== secondVarName) {
                     uiControls.showError(errorElement, 'Нельзя сравнить данные разного типа');
@@ -709,6 +717,8 @@ export default class Module extends AbstractModule {
             }
             else {
                 errorElement = this.#tableData.indepTable;
+
+                checkEmpties();
 
                 if (secondVarName !== Var.Binary.name) {
                     uiControls.showError(errorElement, 'Переменная для группировки должна быть дихотомического типа');
@@ -797,11 +807,7 @@ export default class Module extends AbstractModule {
             sd = this.#resultsTableData.student.sd;
         }
         else {
-            const differences = data1.map((el, i) => {
-                if (el === '' || data2[i] === '')
-                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
-                return el - data2[i];
-            });
+            const differences = data1.map((el, i) => el - data2[i]);
             d = Math.abs(Math.mean(differences));
             sd = Math.stddev.s(differences);
 
@@ -829,11 +835,7 @@ export default class Module extends AbstractModule {
             sd = this.#resultsTableData.student.sd;
         }
         else {
-            const differences = data1.map((el, i) => {
-                if (el === '' || data2[i] === '')
-                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения')
-                return el - data2[i];
-            });
+            const differences = data1.map((el, i) => el - data2[i]);
             d = Math.abs(Math.mean(differences));
             sd = Math.stddev.s(differences);
 
@@ -968,8 +970,6 @@ export default class Module extends AbstractModule {
 
         function getColumnOfAdaptedVals(data, curVar, callback) {
             return data.map(el => {
-                if (el === '')
-                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
                 const group = callback.call(curVar, el);
                 if (group === -1)
                     throw new Error('Ошибка вычислений');

@@ -90,7 +90,10 @@ const dataControls = {
     },
 
     getDataBySheetAndVarId(sheetId, varId) {
-        return this._sheets[sheetId].getDataByVarId(varId);
+        if (dataControls._sheets[sheetId]) {
+            return dataControls._sheets[sheetId].getDataByVarId(varId);
+        }
+        return null;
     }
 };
 

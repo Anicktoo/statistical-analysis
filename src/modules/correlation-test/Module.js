@@ -666,11 +666,19 @@ export default class Module extends AbstractModule {
                 return;
             }
 
+            const checkEmpties = () => {
+                if (this.#data.first.has('') || this.#data.second.has('')) {
+                    uiControls.showError(errorElement, 'Невозможно обработать набор данных, имеются пропущенные значения');
+                }
+            }
+
             firstVarName = this.#vars.first.getTypeName();
             secondVarName = this.#vars.second.getTypeName();
 
             if (this.#inputType === 'data-input-two') {
                 errorElement = this.#tableData.pair;
+
+                checkEmpties();
 
                 if (firstVarName !== secondVarName) {
                     uiControls.showError(errorElement, 'Нельзя сравнить данные разного типа');
@@ -686,6 +694,8 @@ export default class Module extends AbstractModule {
             }
             else {
                 errorElement = this.#tableData.indepTable;
+
+                checkEmpties();
 
                 if (secondVarName !== Var.Binary.name) {
                     uiControls.showError(errorElement, 'Переменная для группировки должна быть дихотомического типа');
@@ -779,9 +789,6 @@ export default class Module extends AbstractModule {
             const xdifarr = [];
             const ydifarr = [];
             for (let i = 0; i < data1.length; i++) {
-                if (data1[i] === '' || data2[i] === '') {
-                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
-                }
                 xdifarr.push(data1[i] - xmean);
                 ydifarr.push(data2[i] - ymean);
             }
@@ -819,9 +826,6 @@ export default class Module extends AbstractModule {
             const xdifarr = [];
             const ydifarr = [];
             for (let i = 0; i < data1.length; i++) {
-                if (data1[i] === '' || data2[i] === '') {
-                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
-                }
                 xdifarr.push(data1[i] - xmean);
                 ydifarr.push(data2[i] - ymean);
             }
@@ -868,9 +872,6 @@ export default class Module extends AbstractModule {
             const xdifarr = [];
             const ydifarr = [];
             for (let i = 0; i < data1.length; i++) {
-                if (data1[i] === '' || data2[i] === '') {
-                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
-                }
                 xdifarr.push(rankObj1.get(data1[i]) - xmean);
                 ydifarr.push(rankObj2.get(data2[i]) - ymean);
             }
@@ -910,9 +911,6 @@ export default class Module extends AbstractModule {
             const xdifarr = [];
             const ydifarr = [];
             for (let i = 0; i < data1.length; i++) {
-                if (data1[i] === '' || data2[i] === '') {
-                    throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
-                }
                 xdifarr.push(rankObj1.get(data1[i]) - xmean);
                 ydifarr.push(rankObj2.get(data2[i]) - ymean);
             }
