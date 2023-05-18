@@ -474,11 +474,11 @@ export default class Module extends AbstractModule {
                         Введите параметры:
                         <div class="option-block__list">
                             <label class="input-line">
-                                Средняя разность (d):
+                                <span>Средняя разность (d&#772;):</span>
                                 <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="d" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
                             </label>
                             <label class="input-line">
-                                Стандартное отклонение (sd):
+                                <span>Стандартное отклонение разностей (s<sub>d</sub>):</span>
                                 <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="sd" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
                             </label>
                         </div>
@@ -804,11 +804,12 @@ export default class Module extends AbstractModule {
             });
             d = Math.abs(Math.mean(differences));
             sd = Math.stddev.s(differences);
+
+            this.#resultsTableData.student.d = d;
+            this.#resultsTableData.student.sd = sd;
         }
 
         this.#resultsTableData.z = z;
-        this.#resultsTableData.student.d = d;
-        this.#resultsTableData.student.sd = sd;
 
         const n = (z * sd / d) ** 2 + ((zAlpha ** 2) / 2);
 
@@ -835,10 +836,11 @@ export default class Module extends AbstractModule {
             });
             d = Math.abs(Math.mean(differences));
             sd = Math.stddev.s(differences);
+
+            this.#resultsTableData.student.d = d;
+            this.#resultsTableData.student.sd = sd;
         }
 
-        this.#resultsTableData.student.d = d;
-        this.#resultsTableData.student.sd = sd;
 
         z = (Math.sqrt(n - ((zAlpha ** 2) / 2)) * d) / sd;
         if (z > 0) {
@@ -870,13 +872,14 @@ export default class Module extends AbstractModule {
             const dataLength = signs[1] + signs[2];
             p0 = signs[0] / data1.length;
             p1 = signs[1] / dataLength;
+
+            this.#resultsTableData.sign.p0 = p0;
+            this.#resultsTableData.sign.p1 = p1;
         }
 
         p2 = 1 - p1;
 
         this.#resultsTableData.z = z;
-        this.#resultsTableData.sign.p0 = p0;
-        this.#resultsTableData.sign.p1 = p1;
         this.#resultsTableData.sign.p2 = p2;
 
         const n = (z ** 2) / (4 * (1 - p0) * ((p1 - 0.5) ** 2));
@@ -903,11 +906,12 @@ export default class Module extends AbstractModule {
             const dataLength = signs[1] + signs[2];
             p0 = signs[0] / data1.length;
             p1 = signs[1] / dataLength;
+
+            this.#resultsTableData.sign.p0 = p0;
+            this.#resultsTableData.sign.p1 = p1;
         }
         p2 = 1 - p1;
 
-        this.#resultsTableData.sign.p0 = p0;
-        this.#resultsTableData.sign.p1 = p1;
         this.#resultsTableData.sign.p2 = p2;
 
         let z = Math.sqrt(n * 4 * ((p1 - 0.5) ** 2) * (1 - p0));
@@ -1011,10 +1015,10 @@ export default class Module extends AbstractModule {
                         <tr>
                             ${inputTypeHeader}
                             <th>
-                                d mean
+                                d&#772;
                             </th>
                             <th>
-                                sd
+                                s<sub>d</sub>
                             </th>
                             <th>
                                 z

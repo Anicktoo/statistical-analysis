@@ -29,8 +29,10 @@ export default class Module extends AbstractModule {
     #resultsTableData = {
         z: undefined,
         student: {
-            d: undefined,
-            sd: undefined,
+            x: undefined,
+            y: undefined,
+            varX: undefined,
+            varY: undefined,
         },
         fisher: {
             p0: undefined,
@@ -439,7 +441,7 @@ export default class Module extends AbstractModule {
                                             form="module-option-form_${this.#id}">
                                         <span>Манна-Уитни</span>
                                     </label>
-                                    <label class="radio-line disabled">
+                                    <label class="radio-line">
                                         <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="test-type" value="student"
                                             form="module-option-form_${this.#id}">
@@ -478,12 +480,20 @@ export default class Module extends AbstractModule {
                         Введите параметры:
                         <div class="option-block__list">
                             <label class="input-line">
-                                Средняя разность (d):
-                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="d" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
+                                <span>Среднее арифметическое 1-й выборки ( x&#772; ):</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="x" value="1" step="0.1" form="module-option-form_${this.#id}">
                             </label>
                             <label class="input-line">
-                                Стандартное отклонение (sd):
-                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="sd" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
+                                <span>Среднее арифметическое 2-й выборки ( y&#772; ):</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="y" value="1" step="0.1" form="module-option-form_${this.#id}">
+                            </label>
+                            <label class="input-line">
+                                <span>Дисперсия 1-й выборки ( <i>Var(x)</i> )</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="varX" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
+                            </label>
+                            <label class="input-line">
+                                <span>Дисперсия 2-й выборки ( <i>Var(y)</i> )</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="varY" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
                             </label>
                         </div>
                     </div>
@@ -491,11 +501,11 @@ export default class Module extends AbstractModule {
                         Введите параметры:
                         <div class="option-block__list">
                             <label class="input-line">
-                                <span>Вероятность успеха в 1-й выборке (&#961;<sub>1</sub>):</span>
+                                <span>Вероятность успеха в 1-й выборке ( &#961;<sub>1</sub> ):</span>
                                 <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="p1" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
                             </label>
                             <label class="input-line">
-                                <span>Вероятность успеха во 2-й выборке (&#961;<sub>2</sub>):</span>
+                                <span>Вероятность успеха во 2-й выборке ( &#961;<sub>2</sub> ):</span>
                                 <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="p2" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
                             </label>
                         </div>
@@ -599,12 +609,16 @@ export default class Module extends AbstractModule {
         switch (this.#testType) {
             case 'student': {
                 if (this.#inputType === 'manual') {
-                    this.#resultsTableData.student.d = Number(formData.get('d'));
-                    this.#resultsTableData.student.sd = Number(formData.get('sd'));
+                    this.#resultsTableData.student.x = Number(formData.get('x'));
+                    this.#resultsTableData.student.y = Number(formData.get('y'));
+                    this.#resultsTableData.student.varX = Number(formData.get('varX'));
+                    this.#resultsTableData.student.varY = Number(formData.get('varY'));
                 }
                 else {
-                    this.#resultsTableData.student.d = null;
-                    this.#resultsTableData.student.sd = null;
+                    this.#resultsTableData.student.x = null;
+                    this.#resultsTableData.student.y = null;
+                    this.#resultsTableData.student.varX = null;
+                    this.#resultsTableData.student.varY = null;
                 }
                 break;
             }
@@ -786,11 +800,82 @@ export default class Module extends AbstractModule {
     }
 
     #studentTest(alpha, power, data1, data2) {
+        let x, y, varX, varY;
+        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
+        const z = Math.getZ(zAlpha, power);
+        if (this.#inputType === 'manual') {
+            x = this.#resultsTableData.student.x;
+            y = this.#resultsTableData.student.y;
+            varX = this.#resultsTableData.student.varX;
+            varY = this.#resultsTableData.student.varY;
+        }
+        else {
+            x = Math.mean(data1);
+            y = Math.mean(data2);
+            if (typeof x !== 'number' || typeof y !== 'number') {
+                throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
+            }
+            varX = Math.var.s(data1);
+            varY = Math.var.s(data2);
 
+            this.#resultsTableData.student.x = x;
+            this.#resultsTableData.student.y = y;
+            this.#resultsTableData.student.varX = varX;
+            this.#resultsTableData.student.varY = varY;
+        }
+
+        this.#resultsTableData.z = z;
+
+        const n = (z * Math.sqrt(varX + varY) / (y - x)) ** 2 + zAlpha ** 2 / 2;
+        const N = Math.ceil(n) * 2;
+
+        if (N === undefined || typeof N !== 'number') {
+            throw new Error('Ошибка расчета данных');
+        }
+
+        return N;
     }
 
-    #studentTestInv(alpha, n) {
+    #studentTestInv(alpha, n, data1, data2) {
+        let x, y, varX, varY;
+        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
 
+        if (this.#inputType === 'manual') {
+            x = this.#resultsTableData.student.x;
+            y = this.#resultsTableData.student.y;
+            varX = this.#resultsTableData.student.varX;
+            varY = this.#resultsTableData.student.varY;
+        }
+        else {
+            x = Math.mean(data1);
+            y = Math.mean(data2);
+            if (typeof x !== 'number' || typeof y !== 'number') {
+                throw new Error('Невозможно обработать набор данных, имеются пропущенные значения');
+            }
+            varX = Math.var.s(data1);
+            varY = Math.var.s(data2);
+
+            this.#resultsTableData.student.x = x;
+            this.#resultsTableData.student.y = y;
+            this.#resultsTableData.student.varX = varX;
+            this.#resultsTableData.student.varY = varY;
+        }
+
+
+        let z = (Math.sqrt((n - (zAlpha ** 2)) / 2) * (y - x)) / (Math.sqrt(varX + varY));
+
+        if (z > 0) {
+            z *= -1;
+        }
+        this.#resultsTableData.z = z;
+        const zB = z - zAlpha;
+        const power = 100 - Math.normdist(zB);
+
+        if (power === undefined || typeof power !== 'number') {
+            throw new Error('Ошибка расчета данных');
+        }
+
+        return power;
     }
 
     #fisherTest(alpha, power, data1, data2) {
@@ -807,14 +892,15 @@ export default class Module extends AbstractModule {
             const signs = this.#fisherTestGetListOfNumberOfSigns(data1, data2, var1, var2);
             p1 = signs[0] / data1.length;
             p2 = signs[1] / data2.length;
+
+            this.#resultsTableData.fisher.p1 = p1;
+            this.#resultsTableData.fisher.p2 = p2;
         }
 
         p0 = (p1 + p2) / 2;
 
         this.#resultsTableData.z = z;
         this.#resultsTableData.fisher.p0 = p0;
-        this.#resultsTableData.fisher.p1 = p1;
-        this.#resultsTableData.fisher.p2 = p2;
 
         const n = z ** 2 * p0 * (1 - p0) / (2 * (p1 - p0) ** 2);
 
@@ -841,14 +927,15 @@ export default class Module extends AbstractModule {
             const signs = this.#fisherTestGetListOfNumberOfSigns(data1, data2, var1, var2);
             p1 = signs[0] / data1.length;
             p2 = signs[1] / data2.length;
+
+            this.#resultsTableData.fisher.p1 = p1;
+            this.#resultsTableData.fisher.p2 = p2;
         }
         p0 = (p1 + p2) / 2;
 
         this.#resultsTableData.fisher.p0 = p0;
-        this.#resultsTableData.fisher.p1 = p1;
-        this.#resultsTableData.fisher.p2 = p2;
 
-        let z = Math.sqrt((2 * n * (p1 - p0) ** 2) / (2 * p0 * (1 - p0)));
+        let z = Math.sqrt((n * (p1 - p0) ** 2) / (p0 * (1 - p0)));
         if (z > 0) {
             z *= -1;
         }
@@ -933,10 +1020,16 @@ export default class Module extends AbstractModule {
                         <tr>
                             ${inputTypeHeader}
                             <th>
-                                d mean
+                                x&#772;
                             </th>
                             <th>
-                                sd
+                                y&#772;
+                            </th>
+                            <th>
+                                <i>Var(x)</i>
+                            </th>
+                            <th>
+                                <i>Var(y)</i>
                             </th>
                             <th>
                                 z
@@ -952,10 +1045,16 @@ export default class Module extends AbstractModule {
                                 ${String.resultForm(this.#vars.second?.getName())}
                             </td>
                             <td>
-                                ${Number.resultForm(this.#resultsTableData.student.d)}
+                                ${Number.resultForm(this.#resultsTableData.student.x)}
                             </td>
                             <td>
-                                ${Number.resultForm(this.#resultsTableData.student.sd)}
+                                ${Number.resultForm(this.#resultsTableData.student.y)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.student.varX)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.student.varY)}
                             </td>
                             <td>
                                 ${Number.resultForm(this.#resultsTableData.z)}

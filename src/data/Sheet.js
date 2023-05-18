@@ -9,6 +9,7 @@ export default class Sheet {
     #id;
     #data;
     #dataVars = [];
+    #notNullDataVars = [];
     #settings = {
         obj: {},
         props: {}
@@ -113,7 +114,8 @@ export default class Sheet {
     #createHTML() {
         const createThead = () => {
             const createTh = (name, index) => {
-                return `<th>
+                return this.#dataVars[index].getTypeName() === Var.Empty.name ? `<th></th>` :
+                    `<th>
                     <div class="data__column-header">
                         <div title="Сменить тип данных колонки" id=${this.#dataVars[index].getID()} class="data__var-icon data__var-icon_new">
                             <img src="${this.#dataVars[index].getImg()}" alt="${this.#dataVars[index].getName()}">
@@ -227,16 +229,23 @@ export default class Sheet {
         const idName = () => 'var' + '_' + this.#id + '_' + (i++);
         const dataVars = this.#data[0].map((_, colIndex) => getColumnVar(this.#data.map(row => row[colIndex])));
         this.#dataVars = dataVars;
+        this.#notNullDataVars = [];
+        dataVars.forEach(el => {
+            if (el.getTypeName() !== Var.Empty.name) {
+                this.#notNullDataVars.push(el);
+            }
+        })
 
         function getColumnVar(column) {
             const columnData = column.slice(1);
             const uniqueValues = new Set(columnData);
+            uniqueValues.delete('');
             const notANumber = columnData.find(val => typeof val !== 'number');
 
             const newVar = (type) => new Var(type, idName(), uniqueValues, column[0], (notANumber == undefined));
 
-            if (columnData.length === 0) {
-                return newVar(Var.Nominal);
+            if (uniqueValues.size === 0) {
+                return newVar(Var.Empty);
             }
 
             if (uniqueValues.size === 2) {
@@ -259,7 +268,7 @@ export default class Sheet {
     }
 
     getVars() {
-        return this.#dataVars;
+        return this.#notNullDataVars;
     }
 
     getVarById(varId) {

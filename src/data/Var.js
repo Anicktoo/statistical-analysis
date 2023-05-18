@@ -24,6 +24,11 @@ export default class Var {
         ruName: 'ранговый',
         img: rangImg,
     };
+    static Empty = {
+        name: 'empty',
+        ruName: 'пустой',
+        img: null
+    };
 
     #typeName;
     #ruTypeName;
@@ -36,6 +41,10 @@ export default class Var {
     #onlyNumbers;
 
     constructor(type, id, set, name, onlyNumbers) {
+        if (type === Var.Empty) {
+            this.#typeName = type.name;
+            return;
+        }
         if (type !== Var.Binary && type !== Var.Nominal &&
             type !== Var.Continues && type !== Var.Rang)
             throw new Error('Данный тип данных не поддерживается приложением');

@@ -69,9 +69,16 @@ Math.mean = function (array) {
 
 Math.stddev = {};
 Math.stddev.s = function (array) {
-    const n = array.length
-    const mean = array.reduce((a, b) => a + b) / n
-    return Math.sqrt(array.map(x => ((x - mean) ** 2)).reduce((a, b) => a + b) / (n - 1))
+    const n = array.length;
+    const mean = array.reduce((a, b) => a + b) / n;
+    return Math.sqrt(array.map(x => ((x - mean) ** 2)).reduce((a, b) => a + b) / (n - 1));
+}
+
+Math.var = {};
+Math.var.s = function (array) {
+    const n = array.length;
+    const mean = array.reduce((a, b) => a + b) / n;
+    return array.map(x => ((x - mean) ** 2)).reduce((a, b) => a + b) / (n - 1);
 }
 
 Math.fisher = function (number) {

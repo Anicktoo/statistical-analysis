@@ -792,10 +792,10 @@ export default class Module extends AbstractModule {
             const down = Math.sqrt(xsqrsum * ysqrsum);
 
             r = up / down;
+            this.#resultsTableData.pearson.r = r;
         }
 
         this.#resultsTableData.z = z;
-        this.#resultsTableData.pearson.r = r;
 
         const n = (z / Math.fisher(r)) ** 2 + 3;
 
@@ -832,9 +832,9 @@ export default class Module extends AbstractModule {
             const down = Math.sqrt(xsqrsum * ysqrsum);
 
             r = up / down;
+            this.#resultsTableData.pearson.r = r;
         }
 
-        this.#resultsTableData.pearson.r = r;
 
         z = Math.fisher(r) * Math.sqrt((n - 3));
         if (z > 0) {
@@ -881,10 +881,10 @@ export default class Module extends AbstractModule {
             const down = Math.sqrt(xsqrsum * ysqrsum);
 
             p = up / down;
+            this.#resultsTableData.spearman.p = p;
         }
 
         this.#resultsTableData.z = z;
-        this.#resultsTableData.spearman.p = p;
 
         const n = 1.06 * ((z / Math.fisher(p)) ** 2) + 3;
 
@@ -923,9 +923,9 @@ export default class Module extends AbstractModule {
             const down = Math.sqrt(xsqrsum * ysqrsum);
 
             p = up / down;
+            this.#resultsTableData.spearman.p = p;
         }
 
-        this.#resultsTableData.spearman.p = p;
 
         z = Math.fisher(p) * Math.sqrt((n - 3) / 1.06);
         if (z > 0) {

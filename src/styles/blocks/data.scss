@@ -15,7 +15,7 @@
     }
 
     &__table {
-        flex: 1 0 auto;
+        flex-shrink: 0;
         display: none;
         background-color: $white;
         border-spacing: 0px;
@@ -24,12 +24,17 @@
 
         th,
         td {
-            border: 1px solid $third-grey;
+            overflow: hidden;
+            white-space: nowrap;
+
+            width: max-content;
             min-width: 100px;
             max-width: 1000px;
-            overflow: hidden;
-            width: max-content;
-            padding: 4px 8px;
+
+            height: 30px;
+            padding: 0 8px;
+
+            border: 1px solid $third-grey;
             font-size: inherit;
             font-weight: inherit;
             font-style: inherit;
@@ -48,10 +53,6 @@
 
         th {
             border-top: none;
-        }
-
-        td {
-            white-space: nowrap;
         }
 
         #dataSettingsBtn {
