@@ -624,7 +624,7 @@ export default class Module extends AbstractModule {
             if (validTableData) {
                 selectedVars.forEach(el => {
                     const ids = el.dataset.varId.split('_');
-                    data.push(dataControls.getDataBySheetAndVarId(ids[1], ids[2]).slice(1));
+                    data.push(dataControls.getDataBySheetAndVarId(ids[1], ids[2]));
                     vars.push(dataControls.getVarBySheetIdAndVarId(ids[1], ids[2]));
                 });
                 this.#data.first = data[0];
@@ -865,15 +865,15 @@ export default class Module extends AbstractModule {
             p = this.#resultsTableData.spearman.p;
         }
         else {
-            const rankObj1 = Math.rank.avg(data1, this.#vars.first.getOrderOfVal.bind(this.#vars.first));
-            const rankObj2 = Math.rank.avg(data2, this.#vars.second.getOrderOfVal.bind(this.#vars.second));
+            const rankArr1 = Math.rank.avg(data1, this.#vars.first.getOrderOfVal.bind(this.#vars.first));
+            const rankArr2 = Math.rank.avg(data2, this.#vars.second.getOrderOfVal.bind(this.#vars.second));
             const xmean = (data1.length + 1) / 2;
             const ymean = (data2.length + 1) / 2;
             const xdifarr = [];
             const ydifarr = [];
             for (let i = 0; i < data1.length; i++) {
-                xdifarr.push(rankObj1.get(data1[i]) - xmean);
-                ydifarr.push(rankObj2.get(data2[i]) - ymean);
+                xdifarr.push(rankArr1.get(data1[i]) - xmean);
+                ydifarr.push(rankArr2.get(data2[i]) - ymean);
             }
             const initialValue = 0;
             const up = xdifarr.reduce((sum, el, ind) => sum + el * ydifarr[ind], initialValue);

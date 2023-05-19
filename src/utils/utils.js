@@ -128,48 +128,80 @@ Math.roundGOST = function (num) {
 }
 
 Math.rank = {};
-Math.rank.avg = function (array, getRankFunc) {
-    const obj = {
-        get(i) {
-            if (this[i])
-                return this[i].avg;
-        }
-    };
+// Math.rank.avg = function (array, getRankFunc) {
+//     const obj = {
+//         get(i) {
+//             if (this[i])
+//                 return this[i].avg;
+//         }
+//     };
+//     for (let el of array) {
+//         if (obj[el]) {
+//             obj[el].count++;
+//         }
+//         else {
+//             obj[el] = {
+//                 rank: getRankFunc(el),
+//                 avg: 0,
+//                 count: 1
+//             }
+//         }
+//     }
+//     let curRank = 1;
+//     let nextRank = 2;
+//     let cumulativeCount = 0;
+//     let curKey = getKeyByValue(obj, curRank);
+//     let nextKey = getKeyByValue(obj, nextRank);
+//     while (true) {
+//         obj[curKey].avg = (cumulativeCount * 2 + obj[curKey].count + 1) / 2;
+//         if (nextKey) {
+//             cumulativeCount = cumulativeCount + obj[curKey].count;
+//             nextRank = nextRank + 1;
+//             curKey = nextKey;
+//             nextKey = getKeyByValue(obj, nextRank);
+//         }
+//         else {
+//             break;
+//         }
+//     }
+
+//     return obj;
+
+//     function getKeyByValue(object, value) {
+//         return Object.keys(object).find(key => object[key].rank === value);
+//     }
+// }
+
+Math.rank.avg = function (array, getRungFunc) {
+    const obj = {};
     for (let el of array) {
         if (obj[el]) {
             obj[el].count++;
         }
         else {
             obj[el] = {
-                rank: getRankFunc(el),
+                rank: getRungFunc(el),
                 avg: 0,
-                count: 1
+                count: 1,
+                val: el
             }
         }
     }
-    let curRank = 1;
-    let nextRank = 2;
+    const sortedArr = Object.values(obj).sort((a, b) => a.rank - b.rank);
+
+    sortedArr.get = function (value) {
+        return this.find(el => el.val === value).avg;
+    };
+
+    let curRankInd = 0
     let cumulativeCount = 0;
-    let curKey = getKeyByValue(obj, curRank);
-    let nextKey = getKeyByValue(obj, nextRank);
-    while (true) {
-        obj[curKey].avg = (cumulativeCount * 2 + obj[curKey].count + 1) / 2;
-        if (nextKey) {
-            cumulativeCount = cumulativeCount + obj[curKey].count;
-            nextRank = nextRank + 1;
-            curKey = nextKey;
-            nextKey = getKeyByValue(obj, nextRank);
-        }
-        else {
-            break;
-        }
+    while (curRankInd < sortedArr.length) {
+        sortedArr[curRankInd].avg = (cumulativeCount * 2 + sortedArr[curRankInd].count + 1) / 2;
+        cumulativeCount = cumulativeCount + sortedArr[curRankInd].count;
+        curRankInd++;
     }
 
-    return obj;
-
-    function getKeyByValue(object, value) {
-        return Object.keys(object).find(key => object[key].rank === value);
-    }
+    return sortedArr;
 }
 
 Math.getZAlpha = function (altHypTest, alpha) {

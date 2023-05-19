@@ -241,7 +241,7 @@ export default class Sheet {
             const columnData = column.slice(1);
             const uniqueValues = new Set(columnData);
             uniqueValues.delete('');
-            const notANumber = columnData.find(val => typeof val !== 'number');
+            const notANumber = columnData.find(val => typeof val !== 'number' && val !== '');
 
             const newVar = (type) => new Var(type, idName(), uniqueValues, column[0], (notANumber == undefined));
 
@@ -278,7 +278,8 @@ export default class Sheet {
 
     getDataByVarId(varId) {
         const data = this.#data.map((arr) => arr[varId]).slice(1);
-        return trimDataEnd(data);
+        const newData = trimDataEnd(data)
+        return newData;
 
         function trimDataEnd(data) {
             let trimCount = 0;

@@ -646,7 +646,7 @@ export default class Module extends AbstractModule {
             if (validTableData) {
                 selectedVars.forEach(el => {
                     const ids = el.dataset.varId.split('_');
-                    data.push(dataControls.getDataBySheetAndVarId(ids[1], ids[2]).slice(1));
+                    data.push(dataControls.getDataBySheetAndVarId(ids[1], ids[2]));
                     vars.push(dataControls.getVarBySheetIdAndVarId(ids[1], ids[2]));
                 });
                 this.#data.first = data[0];
