@@ -30,6 +30,10 @@ export default class Var {
         img: null
     };
 
+    static unitedRangs = [];
+    static unitedOrder = [];
+    static unitedSet = [];
+
     #typeName;
     #ruTypeName;
     #name;
@@ -39,8 +43,10 @@ export default class Var {
     #order = [];
     #binaryGroups;
     #onlyNumbers;
+    #united;
 
     constructor(type, id, set, name, onlyNumbers) {
+        this.#united = false;
         if (type === Var.Empty) {
             this.#typeName = type.name;
             this.#ruTypeName = type.ruName;
@@ -70,6 +76,42 @@ export default class Var {
             this.#binaryGroups[0] = (0x1 << 30);
     }
 
+    switchUnitedVar(on) {
+        if (on) {
+            this.showUnitedOrder();
+        }
+        else {
+            this.showNormalOrder();
+        }
+    }
+
+    showUnitedOrder() {
+        console.log('united show');
+    }
+    showNormalOrder() {
+        console.log('normal show');
+
+    }
+
+    addUnitedVar() {
+        if (Var.unitedRangs.length === 2 || Var.unitedRangs[0] === this) {
+            return;
+        }
+        console.log('add united');
+        Var.unitedRangs.push(this);
+        this.#united = true;
+    }
+    removeUnitedVar() {
+        if (Var.unitedRangs[0] === this) {
+            Var.unitedRangs.shift();
+        }
+        else if (Var.unitedRangs[1] === this) {
+            Var.unitedRangs.pop();
+        }
+        console.log('remove united');
+        this.#united = false;
+    }
+
     setSettings(formData, order, twoTables) {
         const varHeader = document.getElementById(this.#id);
 
@@ -79,8 +121,22 @@ export default class Var {
         this.#typeName = formData.get('var-type');
         this.#img = Object.entries(Var).find(item => item[1]['name'] === this.#typeName)[1]['img'];
         varHeader.querySelector('img').setAttribute('src', this.#img);
+        const isUnited = formData.get('unite');
 
-        this.#order = order;
+        if (this.#typeName === 'rang') {
+            if (isUnited) {
+                Var.unitedOrder = order;
+                this.addUnitedVar();
+
+            }
+            else {
+                this.removeUnitedVar();
+                this.#order = order;
+            }
+            return;
+        }
+
+        this.removeUnitedVar();
 
         if (!twoTables.group1[0]) {
             this.#binaryGroups.fill(0);
@@ -114,6 +170,7 @@ export default class Var {
         const varChooseInputs = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__item-input')];
         const rangBody = modal.querySelector('.modal-var-types__rang-table-body');
         const binBodies = [...modal.querySelectorAll('.modal-var-types__binary-table-body')];
+        uiControls.uniteCheckbox.dataset.id = this.#id;
 
         name.value = this.#name;
         name.setAttribute('value', this.#name);
@@ -129,11 +186,32 @@ export default class Var {
         }
 
         let str = '';
+        let curOrder, curSet;
+
+        if (this.#united) {
+            curOrder = Var.unitedOrder;
+            curSet = Var.unitedSet;
+            uiControls.uniteCheckbox.parentElement.classList.remove('disabled');
+            uiControls.uniteCheckbox.checked = true;
+
+        }
+        else {
+            curOrder = this.#order;
+            curSet = this.#set;
+            if (Var.unitedRangs.length === 2) {
+                uiControls.uniteCheckbox.parentElement.classList.add('disabled');
+            }
+            else {
+                uiControls.uniteCheckbox.parentElement.classList.remove('disabled');
+            }
+            uiControls.uniteCheckbox.checked = false;
+        }
+
         for (let i = 0; i < this.#set.length; i++) {
             str += `
-            <label class="var-table__item" data-order="${this.#order[i]}">
+            <label class="var-table__item" data-order="${curOrder[i]}">
                 <input type="radio" name="data_value">
-                <span>${this.#set[this.#order[i]]}</span>
+                <span>${curSet[curOrder[i]]}</span>
             </label>`;
         }
         rangBody.innerHTML = str;

@@ -1,5 +1,6 @@
 import Sheet from '@data/Sheet';
 import Settings from '@data/Settings';
+import Var from '@data/Var';
 
 
 const dataControls = {
@@ -94,6 +95,11 @@ const dataControls = {
             return dataControls._sheets[sheetId].getDataByVarId(varId);
         }
         return null;
+    },
+
+    switchUnitedVar(id, checked) {
+        const ids = id.split('_');
+        this.getVarBySheetIdAndVarId(ids[1], ids[2]).switchUnitedVar(checked);
     }
 };
 

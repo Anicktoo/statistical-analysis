@@ -67,6 +67,7 @@ window.uiControls = {
         up: undefined,
         down: undefined
     },
+    uniteCheckbox: undefined,
     varTypesSwitchBtn: undefined,
     modalVarTypeBtns: undefined,
     curIcon: undefined,
@@ -138,6 +139,7 @@ window.uiControls = {
         uiControls.binTables = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__binary-table-body')];
         uiControls.varTypesLevelControls.up = uiControls.modalVarType.querySelector('.switch-button_up');
         uiControls.varTypesLevelControls.down = uiControls.modalVarType.querySelector('.switch-button_down');
+        uiControls.uniteCheckbox = uiControls.modalVarType.querySelector('#unite-checkbox');
         uiControls.modalVarTypeBtns = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__btn')];
         uiControls.varTypesSwitchBtn = uiControls.binSettings.querySelector('.switch-button');
         uiControls.modalSettings = document.querySelector('.modal-settings');
@@ -312,6 +314,7 @@ window.uiControls = {
         uiControls.varTypesLevelControls.up.addEventListener('click', () => { moveLabel(false) });
         uiControls.varTypesLevelControls.down.addEventListener('click', () => { moveLabel(true) });
         uiControls.varTypesSwitchBtn.addEventListener('click', switchLabel);
+        uiControls.uniteCheckbox.addEventListener('change', unite);
 
         uiControls.varTypesForm.addEventListener('submit', (event) => {
             event.preventDefault();
@@ -368,6 +371,9 @@ window.uiControls = {
                 rangTable.removeChild(curLabel);
                 rangTable.insertBefore(curLabel, sibling);
             }
+        }
+        function unite(event) {
+            dataControls.switchUnitedVar(event.target.dataset.id, event.target.checked);
         }
     },
 
