@@ -222,3 +222,28 @@ Array.prototype.customSort = function (isContinues) {
             return a - b;
         } : undefined);
 }
+
+//returns U1
+Math.getU = function (array1, array2, getRungFunc) {
+    let U = 0;
+
+    if (getRungFunc) {
+        const unitedArr = [...array1, ...array2];
+        const rangArray = Math.rank.avg(unitedArr, getRungFunc);
+        const m = array1.length;
+        const n = array2.length;
+        let T = 0;
+        array1.forEach(el => T += rangArray.get(el));
+        U = m * n + (m * (m + 1) / 2) - T;
+    }
+    else {
+        array1.forEach(element => {
+            array2.forEach(el => {
+                if (element - el < 0) {
+                    U++;
+                }
+            });
+        });
+    }
+    return U;
+}

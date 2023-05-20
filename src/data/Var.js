@@ -70,7 +70,7 @@ export default class Var {
         }
         this.#binaryGroups = new Array(Math.ceil(set.size / 32)).fill(0);
         if (this.#typeName === 'binary')
-            this.#binaryGroups[0] = (0x1 << 30);
+            this.#binaryGroups[0] = (0x1 << 31);
     }
 
     static clearUnited() {
@@ -126,6 +126,7 @@ export default class Var {
 
     addUnitedVar(order) {
         console.log('set united');
+        document.getElementById(this.#id).querySelector('img').setAttribute('src', rangUnitedImg);
         Var.unitedOrder = order;
         this.#united = true;
 
@@ -136,7 +137,6 @@ export default class Var {
         Var.unitedRangs.push(this);
         const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this.#set]);
         Var.unitedSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
-        document.getElementById(this.#id).querySelector('img').setAttribute('src', rangUnitedImg);
     }
     removeUnitedVar() {
         if (Var.unitedRangs[0] === this) {
@@ -144,6 +144,9 @@ export default class Var {
         }
         else if (Var.unitedRangs[1] === this) {
             Var.unitedRangs.pop();
+        }
+        else {
+            return;
         }
         if (Var.unitedRangs[0]) {
             Var.unitedSet = Var.unitedRangs[0].getSet();
@@ -155,7 +158,6 @@ export default class Var {
         }
         console.log('remove united');
         this.#united = false;
-        // document.getElementById(this.#id).querySelector('img').setAttribute('src', rangUnitedImg);
     }
 
     setSettings(formData, order, twoTables) {
@@ -346,8 +348,21 @@ export default class Var {
         return order !== undefined ? order + 1 : -1;
     }
 
+    static getOrderOfValUnited(val) {
+        const indexInSet = Var.unitedSet.indexOf(val);
+        if (indexInSet === -1)
+            return -1;
+        const order = Var.unitedOrder.indexOf(indexInSet);
+
+        return order !== undefined ? order + 1 : -1;
+    }
+
     isOnlyNumbers() {
         return this.#onlyNumbers;
+    }
+
+    isUnited() {
+        return this.#united;
     }
 
     getID() {

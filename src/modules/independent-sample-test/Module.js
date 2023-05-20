@@ -38,6 +38,11 @@ export default class Module extends AbstractModule {
             p0: undefined,
             p1: undefined,
             p2: undefined,
+        },
+        mann: {
+            U: undefined,
+            m: undefined,
+            n: undefined
         }
     }
     #testType;
@@ -435,7 +440,7 @@ export default class Module extends AbstractModule {
                                             form="module-option-form_${this.#id}" checked>
                                         <span>Точный тест Фишера</span>
                                     </label>
-                                    <label class="radio-line disabled">
+                                    <label class="radio-line">
                                         <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="test-type" value="mann"
                                             form="module-option-form_${this.#id}">
@@ -507,6 +512,23 @@ export default class Module extends AbstractModule {
                             <label class="input-line">
                                 <span>Вероятность успеха во 2-й выборке ( &#961;<sub>2</sub> ):</span>
                                 <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="p2" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="option-block__sub option-block__manual-input option-block__mann option-block_hidden">
+                        Введите параметры:
+                        <div class="option-block__list">
+                            <label class="input-line">
+                                <span>U-критерий Манна-Уитни ( U ):</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="U" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
+                            </label>
+                            <label class="input-line">
+                                <span>Размер первой пилотной выборки ( n<sub>p</sub> ):</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="n" value="1" step="1" min="1" form="module-option-form_${this.#id}">
+                            </label>
+                            <label class="input-line">
+                                <span>Размер второй пилотной выборки ( m<sub>p</sub> ):</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="m" value="1" step="1" min="1" form="module-option-form_${this.#id}">
                             </label>
                         </div>
                     </div>
@@ -632,6 +654,19 @@ export default class Module extends AbstractModule {
                     this.#resultsTableData.fisher.p2 = null;
                 }
                 this.#resultsTableData.fisher.p0 = null;
+                break;
+            }
+            case 'mann': {
+                if (this.#inputType === 'manual') {
+                    this.#resultsTableData.mann.U = Number(formData.get('U'));
+                    this.#resultsTableData.mann.n = Number(formData.get('n'));
+                    this.#resultsTableData.mann.m = Number(formData.get('m'));
+                }
+                else {
+                    this.#resultsTableData.mann.U = null;
+                    this.#resultsTableData.mann.n = null;
+                    this.#resultsTableData.mann.m = null;
+                }
                 break;
             }
         }
@@ -792,6 +827,21 @@ export default class Module extends AbstractModule {
                     }
                     else {
                         returnValue = this.#fisherTest(alpha, arg, data1, data2);
+                    }
+                    break;
+                }
+                case 'mann': {
+                    if (this.#inputType !== 'manual' && firstVarName !== Var.Continues.name && firstVarName !== Var.Rang.name) {
+                        throw new Error(errorText([Var.Continues.ruName, Var.Rang.ruName]));
+                    }
+                    if (firstVarName === Var.Rang.name && this.#inputType === 'data-input-two' && (!this.#vars.first.isUnited() || !this.#vars.second.isUnited())) {
+                        throw new Error('Для данного теста и способа ввода данных необходимо сперва объеденить значения выборок в окне настроек столбца');
+                    }
+                    if (isInv) {
+                        returnValue = this.#mannTestInv(alpha, arg, data1, data2);
+                    }
+                    else {
+                        returnValue = this.#mannTest(alpha, arg, data1, data2);
                     }
                     break;
                 }
@@ -987,6 +1037,93 @@ export default class Module extends AbstractModule {
         }
     }
 
+    #mannTest(alpha, power, data1, data2) {
+        let U, m, n1;
+        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
+        const z = Math.getZ(zAlpha, power);
+        if (this.#inputType === 'manual') {
+            U = this.#resultsTableData.mann.U;
+            m = this.#resultsTableData.mann.m;
+            n1 = this.#resultsTableData.mann.n;
+        }
+        else {
+            const U1 = Math.getU(data1, data2, Var.getUnitedRang);
+            n1 = data1.length;
+            m = data2.length;
+            const U2 = n1 * m - U1;
+            if (this.#altHypTest == 'left') {
+                U = U2;
+            }
+            else if (this.#altHypTest == 'right') {
+                U = U1;
+            }
+            else {
+                U = Math.min(U1, U2);
+            }
+            this.#resultsTableData.mann.U = U;
+            this.#resultsTableData.mann.m = m;
+            this.#resultsTableData.mann.n = n1;
+        }
+
+        this.#resultsTableData.z = z;
+
+        const p = U / (m * n1);
+        const n = z ** 2 / (6 * (p - 0.5) ** 2);
+        const N = Math.ceil(n) * 2;
+
+        if (N === undefined || typeof N !== 'number') {
+            throw new Error('Ошибка расчета данных');
+        }
+
+        return N;
+    }
+
+    #mannTestInv(alpha, n, data1, data2) {
+        let U, m, n1;
+        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
+
+        if (this.#inputType === 'manual') {
+            U = this.#resultsTableData.mann.U;
+            m = this.#resultsTableData.mann.m;
+            n1 = this.#resultsTableData.mann.n;
+        }
+        else {
+            const U1 = Math.getU(data1, data2, Var.getUnitedRang);
+            n1 = data1.length;
+            m = data2.length;
+            const U2 = n1 * m - U1;
+            if (this.#altHypTest == 'left') {
+                U = U2;
+            }
+            else if (this.#altHypTest == 'right') {
+                U = U1;
+            }
+            else {
+                U = Math.min(U1, U2);
+            }
+            this.#resultsTableData.mann.U = U;
+            this.#resultsTableData.mann.m = m;
+            this.#resultsTableData.mann.n = n1;
+        }
+
+        const p = U / (m * n1);
+        const smallN = n / 2;
+        let z = smallN ** 2 * (p - 0.5) / Math.sqrt(smallN ** 3 / 6);
+
+        if (z > 0) {
+            z *= -1;
+        }
+        this.#resultsTableData.z = z;
+        const zB = z - zAlpha;
+        const power = 100 - Math.normdist(zB);
+
+        if (power === undefined || typeof power !== 'number') {
+            throw new Error('Ошибка расчета данных');
+        }
+
+        return power;
+    }
+
     updateResultsHtml(isMain) {
         const name = this.#hypName;
         const powerString = isMain ? `<p><b>Основная гипотеза</b></p>` : `<p>Статистическая мощность: ${Number.resultForm(this.#power)}%</p>`;
@@ -1098,6 +1235,47 @@ export default class Module extends AbstractModule {
                             </td>
                             <td>
                                 ${Number.resultForm(this.#resultsTableData.fisher.p2)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.z)}
+                            </td>
+                        </tr >
+                    </tbody >`;
+        }
+        else if (this.#testType === 'mann') {
+            table = `<thead>
+                        <tr>
+                            ${inputTypeHeader}
+                            <th>
+                                U
+                            </th>
+                            <th>
+                                n<sub>p</sub>
+                            </th>
+                            <th>
+                               m<sub>p</sub>
+                            </th>
+                            <th>
+                                z
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                ${String.resultForm(this.#vars.first?.getName())}
+                            </td>
+                            <td>
+                                ${String.resultForm(this.#vars.second?.getName())}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.mann.U)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.mann.n)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.mann.m)}
                             </td>
                             <td>
                                 ${Number.resultForm(this.#resultsTableData.z)}
