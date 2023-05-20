@@ -33,6 +33,7 @@ export default class Var {
     static unitedRangs = [];
     static unitedOrder = [];
     static unitedSet = [];
+    static tmpSet = [];
 
     #typeName;
     #ruTypeName;
@@ -62,11 +63,7 @@ export default class Var {
         this.#id = id;
         this.#name = name;
         this.#onlyNumbers = onlyNumbers;
-        let sortFunction = this.#typeName !== 'continues' ?
-            undefined : function (a, b) {
-                return a - b;
-            };
-        this.#set = [...set].sort(sortFunction);
+        this.#set = [...set].customSort(this.#typeName === 'continues');
         this.#order = new Array(set.size);
         for (let i = 0; i < set.size; i++) {
             this.#order[i] = i;
@@ -87,19 +84,52 @@ export default class Var {
 
     showUnitedOrder() {
         console.log('united show');
+        if (!Var.unitedRangs[0]) {
+            return;
+        }
+        const rangBody = uiControls.rangTable;
+        const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this.#set]);
+        const curSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
+        Var.tmpSet = curSet;
+        const curOrder = curSet.map((el, ind) => ind);
+        let str = '';
+        for (let i = 0; i < curSet.length; i++) {
+            str += `
+            <label class="var-table__item" data-order="${curOrder[i]}">
+                <input type="radio" name="data_value">
+                <span>${curSet[curOrder[i]]}</span>
+            </label>`;
+        }
+        rangBody.innerHTML = str;
     }
     showNormalOrder() {
         console.log('normal show');
-
+        const rangBody = uiControls.rangTable;
+        const curOrder = this.#order;
+        const curSet = this.#set;
+        let str = '';
+        for (let i = 0; i < curSet.length; i++) {
+            str += `
+            <label class="var-table__item" data-order="${curOrder[i]}">
+                <input type="radio" name="data_value">
+                <span>${curSet[curOrder[i]]}</span>
+            </label>`;
+        }
+        rangBody.innerHTML = str;
     }
 
-    addUnitedVar() {
-        if (Var.unitedRangs.length === 2 || Var.unitedRangs[0] === this) {
+    addUnitedVar(order) {
+        console.log('set united');
+        Var.unitedOrder = order;
+        this.#united = true;
+
+        if (Var.unitedRangs[0] === this || Var.unitedRangs[1] === this) {
             return;
         }
         console.log('add united');
         Var.unitedRangs.push(this);
-        this.#united = true;
+        const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this.#set]);
+        Var.unitedSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
     }
     removeUnitedVar() {
         if (Var.unitedRangs[0] === this) {
@@ -107,6 +137,14 @@ export default class Var {
         }
         else if (Var.unitedRangs[1] === this) {
             Var.unitedRangs.pop();
+        }
+        if (Var.unitedRangs[0]) {
+            Var.unitedSet = Var.unitedRangs[0].getSet();
+            Var.unitedOrder = Var.unitedRangs[0].getOrder();
+        }
+        else {
+            Var.unitedSet = [];
+            Var.unitedOrder = [];
         }
         console.log('remove united');
         this.#united = false;
@@ -125,9 +163,7 @@ export default class Var {
 
         if (this.#typeName === 'rang') {
             if (isUnited) {
-                Var.unitedOrder = order;
-                this.addUnitedVar();
-
+                this.addUnitedVar(order);
             }
             else {
                 this.removeUnitedVar();
@@ -168,8 +204,8 @@ export default class Var {
         const name = uiControls.modalVarType.querySelector('#modal-var-types__name');
         const continuesLabel = uiControls.modalVarType.querySelector('.modal-var-types__continues-container');
         const varChooseInputs = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__item-input')];
-        const rangBody = modal.querySelector('.modal-var-types__rang-table-body');
-        const binBodies = [...modal.querySelectorAll('.modal-var-types__binary-table-body')];
+        const rangBody = uiControls.rangTable;
+        const binBodies = uiControls.binTables;
         uiControls.uniteCheckbox.dataset.id = this.#id;
 
         name.value = this.#name;
@@ -207,7 +243,7 @@ export default class Var {
             uiControls.uniteCheckbox.checked = false;
         }
 
-        for (let i = 0; i < this.#set.length; i++) {
+        for (let i = 0; i < curSet.length; i++) {
             str += `
             <label class="var-table__item" data-order="${curOrder[i]}">
                 <input type="radio" name="data_value">
@@ -302,6 +338,10 @@ export default class Var {
         return order !== undefined ? order + 1 : -1;
     }
 
+    isOnlyNumbers() {
+        return this.#onlyNumbers;
+    }
+
     getID() {
         return this.#id;
     }
@@ -312,6 +352,14 @@ export default class Var {
 
     getImg() {
         return this.#img;
+    }
+
+    getSet() {
+        return this.#set;
+    }
+
+    getOrder() {
+        return this.#order;
     }
 
     getTypeName() {

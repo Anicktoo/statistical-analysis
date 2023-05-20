@@ -215,3 +215,10 @@ Math.getZ = function (zAlpha, power) {
 Array.prototype.has = function (target) {
     return this.find(el => el === target) !== undefined;
 }
+
+Array.prototype.customSort = function (isContinues) {
+    return this.sort(isContinues ?
+        function (a, b) {
+            return a - b;
+        } : undefined);
+}
