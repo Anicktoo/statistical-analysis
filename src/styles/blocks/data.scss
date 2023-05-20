@@ -71,9 +71,24 @@
     }
 
     &__var-icon {
+        position: relative;
         cursor: pointer;
         @include single-image($type-icon-size, $type-icon-size);
         min-width: 18px;
+
+        // &_united {
+        //     &::after {
+        //         content: 'U';
+        //         position: absolute;
+        //         border-radius: 9999px;
+        //         background-color: $white;
+        //         top: -20%;
+        //         left: -20%;
+        //         @include bold-text;
+        //         -webkit-text-stroke: 1px $main-blue;
+        //         color: $main-blue;
+        //     }
+        // }
     }
 
     &__var-name {

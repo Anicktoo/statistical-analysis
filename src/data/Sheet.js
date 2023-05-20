@@ -44,6 +44,7 @@ export default class Sheet {
 
     applySettingsAndShow() {
         this.#needToApplySettings = false;
+        Var.clearUnited();
         this.#parseDataInFile(false);
     }
 

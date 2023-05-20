@@ -2,6 +2,7 @@ import nominalImg from '@img/table/scaleNominal.png';
 import continuesImg from '@img/table/scaleContinues.png';
 import binaryImg from '@img/table/scaleBinary.png';
 import rangImg from '@img/table/scaleRang.png';
+import rangUnitedImg from '@img/table/scaleRangUnited.png';
 
 export default class Var {
     static Binary = {
@@ -33,7 +34,6 @@ export default class Var {
     static unitedRangs = [];
     static unitedOrder = [];
     static unitedSet = [];
-    static tmpSet = [];
 
     #typeName;
     #ruTypeName;
@@ -71,6 +71,12 @@ export default class Var {
         this.#binaryGroups = new Array(Math.ceil(set.size / 32)).fill(0);
         if (this.#typeName === 'binary')
             this.#binaryGroups[0] = (0x1 << 30);
+    }
+
+    static clearUnited() {
+        Var.unitedRangs = [];
+        Var.unitedOrder = [];
+        Var.unitedSet = [];
     }
 
     switchUnitedVar(on) {
@@ -130,6 +136,7 @@ export default class Var {
         Var.unitedRangs.push(this);
         const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this.#set]);
         Var.unitedSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
+        document.getElementById(this.#id).querySelector('img').setAttribute('src', rangUnitedImg);
     }
     removeUnitedVar() {
         if (Var.unitedRangs[0] === this) {
@@ -148,6 +155,7 @@ export default class Var {
         }
         console.log('remove united');
         this.#united = false;
+        // document.getElementById(this.#id).querySelector('img').setAttribute('src', rangUnitedImg);
     }
 
     setSettings(formData, order, twoTables) {
