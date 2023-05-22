@@ -49,13 +49,9 @@ export default class Module extends AbstractModule {
     #sheetSelects = [];
     #tableData = {
         pair: undefined,
-        indepTable: undefined,
-        depTable: undefined
     };
     #resultBlock;
     #switch;
-    #switch1;
-    #switch2;
 
     constructor(id, reference = null) {
         super();
@@ -98,8 +94,6 @@ export default class Module extends AbstractModule {
         this.#vars = refData.vars;
         this.#hypName = refData.hypName;
 
-        const parametersContainer = uiControls.parametersContainer;
-        const resultsContainer = uiControls.resultsContainer;
         const newHyp = refData.element.cloneNode(true);
         const newRes = document.createElement('div');
         newRes.classList.add('results__block');
@@ -207,15 +201,7 @@ export default class Module extends AbstractModule {
         const firstTable = tableTwo.querySelector('.two-column-var__table-body');
         const tableData = tableTwo.querySelector('.target-table-data');
 
-        const tableGroup = element.querySelector('.grouping-var');
-        const [switch1, switch2] = [...tableGroup.querySelectorAll('.switch-button')];
-        const leftTable = element.querySelector('.grouping-var__table-body');
-        const depTable = element.querySelector('.grouping-var__dependent-table-body');
-        const indepTable = element.querySelector('.grouping-var__independent-table-body');
-
         this.#switch = switch0;
-        this.#switch1 = switch1;
-        this.#switch2 = switch2;
 
         const insertChild = (item, toTable) => {
             const nextChild = toTable.querySelector('.var-table__anchor_' + item.dataset.varId);
@@ -225,7 +211,7 @@ export default class Module extends AbstractModule {
         }
 
         const callSettings = () => {
-            if ((depTable.firstElementChild && indepTable.firstElementChild) || tableData.children.length === 2) {
+            if (tableData.children.length === 2) {
                 moduleIntegrator.setSettings(this.#id);
             }
         }
@@ -254,9 +240,6 @@ export default class Module extends AbstractModule {
         }
 
         switch0.addEventListener('click', swapItem.bind(this, firstTable, tableData, 2, switch0));
-        switch1.addEventListener('click', swapItem.bind(this, leftTable, depTable, 1, switch1));
-        switch2.addEventListener('click', swapItem.bind(this, leftTable, indepTable, 1, switch2));
-
     }
 
     displayVarsOfSheet(sheetId, type) {
@@ -281,29 +264,6 @@ export default class Module extends AbstractModule {
                 }
                 else {
                     this.#switch.classList.replace('switch-button_right', 'switch-button_left');
-                }
-            }
-            [...tableBody.querySelectorAll('.var-table__item')].forEach(el =>
-                el.querySelector('input').addEventListener('change', switchChange.bind(this, el))
-            );
-        }
-        else if (type === 'grouping-var') {
-            tableBody = this.#element.querySelector('.grouping-var__table-body');
-            const dep = this.#tableData.depTable.firstElementChild;
-            const indep = this.#tableData.indepTable.firstElementChild;
-            arrOfIds.push(dep?.dataset.varId);
-            arrOfIds.push(indep?.dataset.varId);
-            tableBody.innerHTML = createElementsStr();
-            const switchChange = (el) => {
-                if (this.#tableData.indepTable.firstElementChild?.dataset.varId === el.dataset.varId) {
-                    this.#switch2.classList.replace('switch-button_right', 'switch-button_left');
-                }
-                else if (this.#tableData.depTable.firstElementChild?.dataset.varId === el.dataset.varId) {
-                    this.#switch1.classList.replace('switch-button_right', 'switch-button_left');
-                }
-                else {
-                    this.#switch1.classList.replace('switch-button_left', 'switch-button_right');
-                    this.#switch2.classList.replace('switch-button_left', 'switch-button_right');
                 }
             }
             [...tableBody.querySelectorAll('.var-table__item')].forEach(el =>
@@ -336,11 +296,6 @@ export default class Module extends AbstractModule {
         let curVars = [...tableData.querySelectorAll('label')];
         curVarsUpdate(curVars);
 
-        tableData = this.#tableData;
-        curVars = [tableData.depTable?.firstElementChild, tableData.indepTable?.firstElementChild];
-        curVarsUpdate(curVars);
-
-
         function curVarsUpdate(curVars) {
             curVars.forEach((el => {
                 if (el) {
@@ -359,8 +314,6 @@ export default class Module extends AbstractModule {
 
     clearSelectedVars() {
         this.#tableData.pair.innerHTML = '';
-        this.#tableData.depTable.innerHTML = '';
-        this.#tableData.indepTable.innerHTML = '';
     }
 
     createHTML() {
@@ -406,11 +359,6 @@ export default class Module extends AbstractModule {
                                 <input class="main-radio form-change-trigger form-change-trigger_${this.#id} data-input-two" type="radio" name="input-type" value="data-input-two" form="module-option-form_${this.#id}"
                                     checked>
                                 <span>Вычисление по данным (два столбца)</span>
-                            </label>
-                            <label class="radio-line">
-                                <input class="main-radio form-change-trigger form-change-trigger_${this.#id} data-input-group" type="radio" name="input-type" value="data-input-group" form="module-option-form_${this.#id}"
-                                    >
-                                <span>Вычисление по данным (группировка по переменной)</span>
                             </label>
                             <label class="radio-line">
                                 <input class="main-radio form-change-trigger form-change-trigger_${this.#id} manual-input-on" type="radio" name="input-type" value="manual" form="module-option-form_${this.#id}">
@@ -508,46 +456,6 @@ export default class Module extends AbstractModule {
                             </div>
                         </div>
                     </div>
-                    <div class="option-block__tables grouping-var option-block_hidden">
-                        <div class="var-table">
-                            <div class="var-table__header">
-                                <form class="sheet-form" data-type="grouping-var">
-                                    <div class="main-select">
-                                        <select class="main-input grouping-var__sheet-select sheet-select"
-                                            name="sheet-select"></select>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="var-table__body grouping-var__table-body">
-                            </div>
-                        </div>
-                        <div class="grouping-var__tables-and-switches">
-                            <div class="grouping-var__container">
-                                <div class="grouping-var__switch-container">
-                                    <div class="switch-button switch-button_right">
-                                        <div class="switch-button__symbol"></div>
-                                    </div>
-                                </div>
-                                <div class="var-table">
-                                    <div class="var-table__header">Зависимая переменная</div>
-                                    <div class="var-table__body grouping-var__dependent-table-body">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="grouping-var__container">
-                                <div class="grouping-var__switch-container">
-                                    <div class="switch-button switch-button_right">
-                                        <div class="switch-button__symbol"></div>
-                                    </div>
-                                </div>
-                                <div class="var-table">
-                                    <div class="var-table__header">Группировка по переменной</div>
-                                    <div class="var-table__body grouping-var__independent-table-body">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>`;
@@ -564,8 +472,6 @@ export default class Module extends AbstractModule {
         this.#formSheets = [...newHyp.querySelectorAll('.sheet-form')];
         this.#sheetSelects = [...newHyp.querySelectorAll('.sheet-select')];
         this.#tableData.pair = newHyp.querySelector('.target-table-data');
-        this.#tableData.indepTable = newHyp.querySelector('.grouping-var__independent-table-body');
-        this.#tableData.depTable = newHyp.querySelector('.grouping-var__dependent-table-body');
         this.#resultBlock = newRes;
     }
 
@@ -607,18 +513,12 @@ export default class Module extends AbstractModule {
         if (this.#inputType !== 'manual') {
 
             const tableData = this.#tableData;
-            const dep = tableData.depTable.firstElementChild;
-            const indep = tableData.indepTable.firstElementChild;
             let selectedVars;
             let validTableData;
 
             if (this.#inputType === 'data-input-two') {
                 selectedVars = [...tableData.pair.children];
                 validTableData = (selectedVars.length === 2);
-            }
-            else {
-                selectedVars = [dep, indep];
-                validTableData = (dep && indep);
             }
 
             if (validTableData) {
@@ -666,63 +566,26 @@ export default class Module extends AbstractModule {
                 return;
             }
 
-            const checkEmpties = () => {
-                if (this.#data.first.has('') || this.#data.second.has('')) {
-                    uiControls.showError(errorElement, 'Невозможно обработать набор данных, имеются пропущенные значения');
-                }
-            }
-
             firstVarName = this.#vars.first.getTypeName();
             secondVarName = this.#vars.second.getTypeName();
 
             if (this.#inputType === 'data-input-two') {
                 errorElement = this.#tableData.pair;
 
-                checkEmpties();
-
                 if (firstVarName !== secondVarName) {
                     uiControls.showError(errorElement, 'Нельзя сравнить данные разного типа');
                     return;
                 }
-                if (this.#data.first.length !== this.#data.second.length) {
-                    uiControls.showError(errorElement, 'Выбранные наборы данных должны иметь равный размер');
-                    return;
-                }
+                // removeEmpties;
+                const minLen = Math.min(this.#data.first.length, this.#data.second.length);
 
-                data1 = [...this.#data.first];
-                data2 = [...this.#data.second];
-            }
-            else {
-                errorElement = this.#tableData.indepTable;
-
-                checkEmpties();
-
-                if (secondVarName !== Var.Binary.name) {
-                    uiControls.showError(errorElement, 'Переменная для группировки должна быть дихотомического типа');
-                    return;
-                }
-                if (this.#data.first.length !== this.#data.second.length) {
-                    uiControls.showError(errorElement, 'Размеры данных зависимой переменной и переменной для группировки должны совпадать');
-                    return;
-                }
-
-                const indepVar = this.#vars.second;
-                this.#data.first.forEach((el, ind) => {
-                    const group = indepVar.isValInZeroGroup(this.#data.second[ind]);
-                    if (group === 0) {
-                        data1.push(el);
+                for (let i = 0; i < minLen; i++) {
+                    const first = this.#data.first[i];
+                    const second = this.#data.second[i];
+                    if (first !== '' && second !== '') {
+                        data1.push(first);
+                        data2.push(second);
                     }
-                    else if (group === 1) {
-                        data2.push(el);
-                    }
-                    else {
-                        uiControls.showError(errorElement, 'Ошибка вычисления');
-                        return;
-                    }
-                });
-                if (data1.length !== data2.length) {
-                    uiControls.showError(errorElement, 'Выборки должны иметь равный размер');
-                    return;
                 }
             }
             if (data1.length === 0 || data2.length === 0) {
@@ -959,15 +822,6 @@ export default class Module extends AbstractModule {
             </th>
             <th>
                 Выборка 2
-            </th>`;
-        }
-        else {
-            inputTypeHeader = `
-            <th>
-                Зависимая переменная
-            </th>
-            <th>
-                Переменная для группировки
             </th>`;
         }
         if (this.#testType === 'pearson') {

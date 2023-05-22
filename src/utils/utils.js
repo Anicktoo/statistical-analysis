@@ -86,7 +86,7 @@ Math.fisher = function (number) {
 }
 
 Number.resultForm = function (n, noRound) {
-    return typeof n === 'number' && !Number.isNaN(n) ? (noRound ? n : Math.roundGOST(n, 2)) : '-';
+    return typeof n === 'number' ? (noRound ? n : Math.roundGOST(n, 2)) : '-';
 }
 
 String.resultForm = function (s) {
@@ -128,50 +128,6 @@ Math.roundGOST = function (num) {
 }
 
 Math.rank = {};
-// Math.rank.avg = function (array, getRankFunc) {
-//     const obj = {
-//         get(i) {
-//             if (this[i])
-//                 return this[i].avg;
-//         }
-//     };
-//     for (let el of array) {
-//         if (obj[el]) {
-//             obj[el].count++;
-//         }
-//         else {
-//             obj[el] = {
-//                 rank: getRankFunc(el),
-//                 avg: 0,
-//                 count: 1
-//             }
-//         }
-//     }
-//     let curRank = 1;
-//     let nextRank = 2;
-//     let cumulativeCount = 0;
-//     let curKey = getKeyByValue(obj, curRank);
-//     let nextKey = getKeyByValue(obj, nextRank);
-//     while (true) {
-//         obj[curKey].avg = (cumulativeCount * 2 + obj[curKey].count + 1) / 2;
-//         if (nextKey) {
-//             cumulativeCount = cumulativeCount + obj[curKey].count;
-//             nextRank = nextRank + 1;
-//             curKey = nextKey;
-//             nextKey = getKeyByValue(obj, nextRank);
-//         }
-//         else {
-//             break;
-//         }
-//     }
-
-//     return obj;
-
-//     function getKeyByValue(object, value) {
-//         return Object.keys(object).find(key => object[key].rank === value);
-//     }
-// }
-
 Math.rank.avg = function (array, getRungFunc) {
     const obj = {};
     for (let el of array) {

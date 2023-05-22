@@ -109,8 +109,6 @@ export default class Module extends AbstractModule {
         this.#vars = refData.vars;
         this.#hypName = refData.hypName;
 
-        const parametersContainer = uiControls.parametersContainer;
-        const resultsContainer = uiControls.resultsContainer;
         const newHyp = refData.element.cloneNode(true);
         const newRes = document.createElement('div');
         newRes.classList.add('results__block');
@@ -742,45 +740,38 @@ export default class Module extends AbstractModule {
                 return;
             }
 
-            const checkEmpties = () => {
-                if (this.#data.first.has('') || this.#data.second.has('')) {
-                    uiControls.showError(errorElement, 'Невозможно обработать набор данных, имеются пропущенные значения');
-                }
-            }
-
             firstVarName = this.#vars.first.getTypeName();
             secondVarName = this.#vars.second.getTypeName();
 
             if (this.#inputType === 'data-input-two') {
                 errorElement = this.#tableData.pair;
 
-                checkEmpties();
-
                 if (firstVarName !== secondVarName) {
                     uiControls.showError(errorElement, 'Нельзя сравнить данные разного типа');
                     return;
                 }
 
-                data1 = [...this.#data.first];
-                data2 = [...this.#data.second];
+                const createArrayWithNoEmpties = (oldArr, newArr) => oldArr.forEach(el => el !== '' ? newArr.push(el) : null);
+                createArrayWithNoEmpties(this.#data.first, data1);
+                createArrayWithNoEmpties(this.#data.second, data2);
             }
             else {
                 errorElement = this.#tableData.indepTable;
-
-                checkEmpties();
 
                 if (secondVarName !== Var.Binary.name) {
                     uiControls.showError(errorElement, 'Переменная для группировки должна быть дихотомического типа');
                     return;
                 }
-                if (this.#data.first.length !== this.#data.second.length) {
-                    uiControls.showError(errorElement, 'Размеры данных зависимой переменной и переменной для группировки должны совпадать');
-                    return;
-                }
 
                 const indepVar = this.#vars.second;
-                this.#data.first.forEach((el, ind) => {
-                    const group = indepVar.isValInZeroGroup(this.#data.second[ind]);
+                const minLen = Math.min(this.#data.first.length, this.#data.second.length);
+
+                for (let i = 0; i < minLen; i++) {
+                    const el = this.#data.first[i];
+                    if (el === '') continue;
+                    const bin = this.#data.second[i];
+                    if (bin === '') continue;
+                    const group = indepVar.isValInZeroGroup(bin);
                     if (group === 0) {
                         data1.push(el);
                     }
@@ -791,7 +782,7 @@ export default class Module extends AbstractModule {
                         uiControls.showError(errorElement, 'Ошибка вычисления');
                         return;
                     }
-                });
+                }
             }
 
             if (data1.length === 0 || data2.length === 0) {
