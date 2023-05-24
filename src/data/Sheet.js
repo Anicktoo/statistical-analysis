@@ -16,35 +16,42 @@ export default class Sheet {
     _tableElement;
     _footerElement;
     _file;
-    _needToApplySettings = false;
     _openedVar;
 
 
-    constructor(name, file, id) {
+    constructor(name, id) {
         this._id = id;
         this._name = name;
         this._settings.obj = new Settings();
         this._settings.props = this._settings.obj.getSettings();;
         this._createTableElement();
         this._createFooterElement();
-        this.importFile(file);
     }
 
-    importFile(file) {
+    async importFile(file) {
         this._file = file;
-        this._parseDataInFile(true);
+        this._data = await this._parseDataInFile(true);
+        this._initVars();
+        this._createHTML();
+        uiControls.initNewSheetControls();
+        moduleIntegrator.optionListAdd({
+            name: this._name,
+            id: this._id
+        });
+        if (this._id === 0) {
+            moduleIntegrator.updateVarsOfSheet(this._id, true);
+        }
     }
 
-    setSettings(settingsFormData) {
-        this._needToApplySettings = true;
+    async setSettings(settingsFormData) {
+        Var.clearUnited();
         this._settings.obj.setSettings(settingsFormData);
         this._settings.props = this._settings.obj.getSettings();
-    }
-
-    applySettingsAndShow() {
-        this._needToApplySettings = false;
-        Var.clearUnited();
-        this._parseDataInFile(false);
+        this._data = await this._parseDataInFile(false);
+        this._initVars();
+        this._createHTML();
+        uiControls.initNewSheetControls();
+        moduleIntegrator.updateVarsOfSheet(this._id, true);
     }
 
     createVarSettings(varID) {
@@ -58,15 +65,10 @@ export default class Sheet {
         moduleIntegrator.updateVarsOfSheet(this._id, false);
     }
 
-    readyToShow() {
-        return !this._needToApplySettings;
-    }
-
     show() {
         this._settings.obj.createHTML();
         this._tableElement.classList.add('data__table_shown');
         this._footerElement.classList.add('footer__item_selected');
-        uiControls.footerChange();
     }
 
     hide() {
@@ -175,50 +177,51 @@ export default class Sheet {
             }
         }
 
-        uiControls.initNewSheetControls();
-        this.show();
     }
 
-    _parseDataInFile(isNewFile) {
-        const del = this._settings.props.decimalDelimiter.selected;
-        let regExpReadyDel = del;
-        if (RegExp.specialSymbols.includes(del)) {
-            regExpReadyDel = '\\' + del;
-        }
-        const regex = new RegExp(`^-?(?:\\d+(?:${regExpReadyDel}\\d+)?|\\d+(?:${regExpReadyDel}\\d+)?(?:e|E)(?:\\+|-)?\\d+)$`);
-
-        Papa.parse(this._file, {
-            encoding: this._settings.props.encoding.selected,
-            delimiter: this._settings.props.colDelimiter.selected,
-            transform: (val, col) => {
-                let valTrimmed = val.trim();
-
-                if (regex.test(valTrimmed)) {
-                    return Number(valTrimmed.replace(del, '.'));
-                }
-                else {
-                    return valTrimmed;
-                }
-            },
-            skipEmptyLines: true,
-            complete: (results) => {
-                const skip = this._settings.props.skip.value;
-                if (skip != 0) {
-                    results.data = results.data.slice(skip);
-                }
-                this._data = results.data;
-                this._initVars();
-                this._createHTML();
-                if (isNewFile) {
-                    moduleIntegrator.optionListAdd({
-                        name: this._name,
-                        id: this._id
-                    });
-                }
-                if (this._id === 0 || !isNewFile) {
-                    moduleIntegrator.updateVarsOfSheet(this._id, true);
-                }
+    _parseDataInFile() {
+        return new Promise((resolve, reject) => {
+            const del = this._settings.props.decimalDelimiter.selected;
+            let regExpReadyDel = del;
+            if (RegExp.specialSymbols.includes(del)) {
+                regExpReadyDel = '\\' + del;
             }
+            const regex = new RegExp(`^-?(?:\\d+(?:${regExpReadyDel}\\d+)?|\\d+(?:${regExpReadyDel}\\d+)?(?:e|E)(?:\\+|-)?\\d+)$`);
+
+            Papa.parse(this._file, {
+                encoding: this._settings.props.encoding.selected,
+                delimiter: this._settings.props.colDelimiter.selected,
+                transform: (val, col) => {
+                    let valTrimmed = val.trim();
+
+                    if (regex.test(valTrimmed)) {
+                        return Number(valTrimmed.replace(del, '.'));
+                    }
+                    else {
+                        return valTrimmed;
+                    }
+                },
+                skipEmptyLines: true,
+                complete: (results) => {
+                    const skip = this._settings.props.skip.value;
+                    if (skip != 0) {
+                        results.data = results.data.slice(skip);
+                    }
+                    this._data = results.data;
+                    resolve(results.data);
+                    // this._initVars();
+                    // this._createHTML();
+                    // if (isNewFile) {
+                    //     moduleIntegrator.optionListAdd({
+                    //         name: this._name,
+                    //         id: this._id
+                    //     });
+                    // }
+                    // if (this._id === 0 || !isNewFile) {
+                    //     moduleIntegrator.updateVarsOfSheet(this._id, true);
+                    // }
+                }
+            });
         });
     }
 

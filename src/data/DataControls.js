@@ -5,27 +5,29 @@ const dataControls = {
     _sheets: [],
     _currentSheet: undefined,
 
-    readSingleFile(file) {
+    async readSingleFile(file) {
         if (file) {
-            dataControls.addSheet(file);
+            await dataControls.addSheet(file);
         } else {
             uiControls.showError(uiControls.burgerMenu, 'Ошибка при загрузке файла');
         }
     },
 
-    submitSettings(event, formData) {
+    async submitSettings(event, formData) {
         event.preventDefault();
         const applyTo = formData.get('apply-to');
         const curSheet = dataControls._currentSheet;
 
         if (applyTo === 'this') {
-            curSheet.setSettings(formData);
+            await curSheet.setSettings(formData);
         }
         else if (applyTo === 'all') {
             Settings.setGlobalSettings(formData);
-            dataControls._sheets.forEach(sheet => sheet.setSettings(formData));
+            for (let sheet of this._sheets) {
+                await sheet.setSettings(formData)
+            }
         }
-        curSheet.applySettingsAndShow();
+        // curSheet.show();
     },
 
     createVarSettings(varId) {
@@ -36,28 +38,27 @@ const dataControls = {
         dataControls._currentSheet.setVarSettings(formData, newOrder, twoTables);
     },
 
-    addSheet(file) {
+    async addSheet(file) {
         const arrayLength = dataControls._sheets.length;
         dataControls._currentSheet?.hide();
         const name = file.name.split('.').slice(0, -1).join('');
-        const newSheet = new Sheet(name, file, arrayLength)
+        const newSheet = new Sheet(name, arrayLength)
+        await newSheet.importFile(file);
         dataControls._sheets.push(newSheet);
         dataControls._currentSheet = newSheet;
+
+        newSheet.show();
     },
 
-    selectSheet(sheetId) {
+    async selectSheet(sheetId) {
         const sheet = dataControls._sheets[sheetId];
         if (dataControls._currentSheet == sheet)
             return;
 
         dataControls._currentSheet?.hide();
         dataControls._currentSheet = sheet;
-        if (sheet.readyToShow()) {
-            sheet.show();
-        }
-        else {
-            sheet.applySettingsAndShow();
-        }
+
+        sheet.show();
     },
 
     getListOfSheets() {

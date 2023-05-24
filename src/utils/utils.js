@@ -86,7 +86,7 @@ Math.fisher = function (number) {
 }
 
 Number.resultForm = function (n, noRound) {
-    return typeof n === 'number' ? (noRound ? n : Math.roundGOST(n, 2)) : '-';
+    return typeof n === 'number' && !Number.isNaN(n) ? (noRound ? n : Math.roundGOST(n, 2)) : '-';
 }
 
 String.resultForm = function (s) {
