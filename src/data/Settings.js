@@ -1,5 +1,5 @@
 export default class Settings {
-    static #globalSettings = {
+    static _globalSettings = {
         skip: {
             value: "0"
         },
@@ -26,29 +26,29 @@ export default class Settings {
             selected: "."
         }
     };
-    #skip;
-    #encoding;
-    #colDelimiter;
-    #decimalDelimiter;
+    _skip;
+    _encoding;
+    _colDelimiter;
+    _decimalDelimiter;
 
     constructor() {
-        this.init(Settings.#globalSettings);
+        this.init(Settings._globalSettings);
     }
 
     init(settings) {
-        this.#skip = Object.deepCopy(settings.skip);
-        this.#encoding = Object.deepCopy(settings.encoding);
-        this.#colDelimiter = Object.deepCopy(settings.colDelimiter);
-        this.#decimalDelimiter = Object.deepCopy(settings.decimalDelimiter);
+        this._skip = Object.deepCopy(settings.skip);
+        this._encoding = Object.deepCopy(settings.encoding);
+        this._colDelimiter = Object.deepCopy(settings.colDelimiter);
+        this._decimalDelimiter = Object.deepCopy(settings.decimalDelimiter);
     }
 
     createHTML() {
-        uiControls.settingsSkipInput.setAttribute('value', `${this.#skip.value}`);
-        uiControls.settingsSkipInput.value = this.#skip.value;
+        uiControls.settingsSkipInput.setAttribute('value', `${this._skip.value}`);
+        uiControls.settingsSkipInput.value = this._skip.value;
 
-        createOptions(this.#encoding, uiControls.settingsEncodingInput);
-        createOptions(this.#colDelimiter, uiControls.settingsColDelimiterInput);
-        createOptions(this.#decimalDelimiter, uiControls.settingsDecimalDelimiterInput);
+        createOptions(this._encoding, uiControls.settingsEncodingInput);
+        createOptions(this._colDelimiter, uiControls.settingsColDelimiterInput);
+        createOptions(this._decimalDelimiter, uiControls.settingsDecimalDelimiterInput);
 
         function createOptions(settingName, settingElement) {
             settingElement.innerHTML = '';
@@ -60,24 +60,24 @@ export default class Settings {
 
     getSettings() {
         return {
-            skip: this.#skip,
-            encoding: this.#encoding,
-            colDelimiter: this.#colDelimiter,
-            decimalDelimiter: this.#decimalDelimiter,
+            skip: this._skip,
+            encoding: this._encoding,
+            colDelimiter: this._colDelimiter,
+            decimalDelimiter: this._decimalDelimiter,
         };
     }
 
     setSettings(formData) {
-        this.#skip.value = formData.get('skip');
-        this.#encoding.selected = formData.get('encoding');
-        this.#colDelimiter.selected = formData.get('col-delimiter');
-        this.#decimalDelimiter.selected = formData.get('decimal-delimiter');
+        this._skip.value = formData.get('skip');
+        this._encoding.selected = formData.get('encoding');
+        this._colDelimiter.selected = formData.get('col-delimiter');
+        this._decimalDelimiter.selected = formData.get('decimal-delimiter');
     }
 
     static setGlobalSettings(formData) {
-        Settings.#globalSettings.skip.value = formData.get('skip');
-        Settings.#globalSettings.encoding.selected = formData.get('encoding');
-        Settings.#globalSettings.colDelimiter.selected = formData.get('col-delimiter');
-        Settings.#globalSettings.decimalDelimiter.selected = formData.get('decimal-delimiter');
+        Settings._globalSettings.skip.value = formData.get('skip');
+        Settings._globalSettings.encoding.selected = formData.get('encoding');
+        Settings._globalSettings.colDelimiter.selected = formData.get('col-delimiter');
+        Settings._globalSettings.decimalDelimiter.selected = formData.get('decimal-delimiter');
     }
 }

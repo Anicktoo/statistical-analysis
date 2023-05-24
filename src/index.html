@@ -29,8 +29,12 @@
         <div class="sidebar__inner">
             <div class="sidebar__list">
                 <label class="sidebar__item main-button disabled">Новый проект</label>
-                <label class="sidebar__item main-button disabled">Открыть проект</label>
-                <label class="sidebar__item main-button disabled">Сохранить проект</label>
+                <label class="sidebar__item main-button">Открыть проект
+                    <input type="file" id="load-project" accept=".json">
+                </label>
+                <label class="sidebar__item main-button">Сохранить проект
+                    <input type="button" id="save-project">
+                </label>
                 <label class="sidebar__item main-button">Импорт данных (.csv)
                     <input type="file" id="csvUpload" accept=".csv">
                 </label>

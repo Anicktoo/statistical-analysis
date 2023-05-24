@@ -1,18 +1,15 @@
 import Sheet from '@data/Sheet';
 import Settings from '@data/Settings';
-import Var from '@data/Var';
-
 
 const dataControls = {
     _sheets: [],
     _currentSheet: undefined,
 
-    readSingleFile(event) {
-        const file = event.target.files[0];
+    readSingleFile(file) {
         if (file) {
             dataControls.addSheet(file);
         } else {
-            alert("Failed to load file");
+            uiControls.showError(uiControls.burgerMenu, 'Ошибка при загрузке файла');
         }
     },
 
@@ -95,6 +92,25 @@ const dataControls = {
             return dataControls._sheets[sheetId].getDataByVarId(varId);
         }
         return null;
+    },
+
+    async getData() {
+        const data = [];
+        for (let el of this._sheets) {
+            const sheetData = await el.getData();
+            data.push(sheetData);
+        }
+        return data;
+    },
+
+    async loadData(data) {
+        return new Promise((resolve, reject) => {
+            data.forEach(el => {
+                const blob = new Blob([el._file], { type: 'text/csv' });
+                const file = new File([blob], el._name + '.csv', { type: 'text/csv' });
+                dataControls.readSingleFile(file);
+            });
+        });
     },
 
     switchUnitedVar(id, checked) {

@@ -1,5 +1,6 @@
 import dataControls from '@data/dataControls';
 import moduleIntegrator from '@/moduleIntegrator';
+import { saveProject as saveProjectFunc, loadProject as loadProjectFunc } from './app';
 
 window.uiControls = {
 
@@ -16,6 +17,8 @@ window.uiControls = {
     menuBtns: [],
     csvUploadBtn: undefined,
     exportBtn: undefined,
+    saveProject: undefined,
+    loadProject: undefined,
     settingsForm: undefined,
     settingsSkipInput: undefined,
     settingsEncodingInput: undefined,
@@ -102,6 +105,8 @@ window.uiControls = {
 
         uiControls.csvUploadBtn = document.getElementById('csvUpload');
         uiControls.exportBtn = document.getElementById('export-results');
+        uiControls.saveProject = document.getElementById('save-project');
+        uiControls.loadProject = document.getElementById('load-project');
         uiControls.settingsForm = document.getElementById('settings-form');
         uiControls.settingsSkipInput = uiControls.settingsForm.querySelector('#skip-options');
         uiControls.settingsEncodingInput = uiControls.settingsForm.querySelector('#encoding-options');
@@ -154,6 +159,8 @@ window.uiControls = {
         uiControls.addWindowResizeListeners();
         uiControls.addModalSettingsListener();
         uiControls.addModalVarChooseListener();
+        uiControls.addSaveProjectListener();
+        uiControls.addLoadProjectListener();
         uiControls.addCsvUploadListeners();
         uiControls.addExportBtnListeners();
     },
@@ -188,7 +195,25 @@ window.uiControls = {
         });
 
         uiControls.csvUploadBtn.addEventListener('change', (event) => {
-            dataControls.readSingleFile(event);
+            dataControls.readSingleFile(event.target.files[0]);
+            uiControls.toggleMenu();
+        });
+    },
+
+    addSaveProjectListener() {
+        uiControls.saveProject.addEventListener('click', () => {
+            saveProjectFunc();
+            uiControls.toggleMenu();
+        });
+    },
+
+    addLoadProjectListener() {
+        uiControls.loadProject.addEventListener('click', function () {
+            this.value = null;
+        });
+
+        uiControls.loadProject.addEventListener('change', (event) => {
+            loadProjectFunc(event);
             uiControls.toggleMenu();
         });
     },

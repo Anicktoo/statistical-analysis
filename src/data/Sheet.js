@@ -1,90 +1,89 @@
 import * as Papa from 'papaparse';
 import Settings from './Settings';
-// import uiControls from '@/uiControls';
 import moduleIntegrator from '@/moduleIntegrator';
 import Var from './Var';
 
 export default class Sheet {
-    #name;
-    #id;
-    #data;
-    #dataVars = [];
-    #notNullDataVars = [];
-    #settings = {
+    _name;
+    _id;
+    _data;
+    _dataVars = [];
+    _notNullDataVars = [];
+    _settings = {
         obj: {},
         props: {}
     };
-    #tableElement;
-    #footerElement;
-    #file;
-    #needToApplySettings = false;
-    #openedVar;
+    _tableElement;
+    _footerElement;
+    _file;
+    _needToApplySettings = false;
+    _openedVar;
 
 
     constructor(name, file, id) {
-        this.#id = id;
-        this.#name = name;
-        this.#settings.obj = new Settings();
-        this.#settings.props = this.#settings.obj.getSettings();;
-        this.#createTableElement();
-        this.#createFooterElement();
+        this._id = id;
+        this._name = name;
+        this._settings.obj = new Settings();
+        this._settings.props = this._settings.obj.getSettings();;
+        this._createTableElement();
+        this._createFooterElement();
         this.importFile(file);
     }
 
     importFile(file) {
-        this.#file = file;
-        this.#parseDataInFile(true);
+        this._file = file;
+        this._parseDataInFile(true);
     }
 
     setSettings(settingsFormData) {
-        this.#needToApplySettings = true;
-        this.#settings.obj.setSettings(settingsFormData);
-        this.#settings.props = this.#settings.obj.getSettings();
+        this._needToApplySettings = true;
+        this._settings.obj.setSettings(settingsFormData);
+        this._settings.props = this._settings.obj.getSettings();
     }
 
     applySettingsAndShow() {
-        this.#needToApplySettings = false;
+        this._needToApplySettings = false;
         Var.clearUnited();
-        this.#parseDataInFile(false);
+        this._parseDataInFile(false);
     }
 
     createVarSettings(varID) {
-        const changedVar = this.#dataVars[Number(varID.split('_')[2])]
+        const changedVar = this._dataVars[Number(varID.split('_')[2])]
         changedVar.createHTML();
-        this.#openedVar = changedVar;
+        this._openedVar = changedVar;
     }
 
     setVarSettings(formData, order, twoTables) {
-        this.#openedVar.setSettings(formData, order, twoTables);
-        moduleIntegrator.updateVarsOfSheet(this.#id, false);
+        this._openedVar.setSettings(formData, order, twoTables);
+        moduleIntegrator.updateVarsOfSheet(this._id, false);
     }
 
     readyToShow() {
-        return !this.#needToApplySettings;
+        return !this._needToApplySettings;
     }
 
     show() {
-        this.#settings.obj.createHTML();
-        this.#tableElement.classList.add('data__table_shown');
-        this.#footerElement.classList.add('footer__item_selected');
+        this._settings.obj.createHTML();
+        this._tableElement.classList.add('data__table_shown');
+        this._footerElement.classList.add('footer__item_selected');
         uiControls.footerChange();
     }
 
     hide() {
-        this.#tableElement.classList.remove('data__table_shown');
-        this.#footerElement.classList.remove('footer__item_selected');
+        this._tableElement.classList.remove('data__table_shown');
+        this._footerElement.classList.remove('footer__item_selected');
     }
 
     setId(id) {
-        this.#id = id;
-        this.#footerElement.setAttribute('id', id);
+        this._id = id;
+        this._footerElement.setAttribute('id', id);
     }
 
-    #createTableElement() {
-        this.#tableElement = uiControls.dataContainer.insertBefore(document.createElement('table'), uiControls.dataContainer.firstChild);
-        this.#tableElement.classList.add('data__table');
-        this.#tableElement.setAttribute('id', this.#id);
-        this.#tableElement.innerHTML = `
+    _createTableElement() {
+        this._tableElement = uiControls.dataContainer.insertBefore(document.createElement('table'), uiControls.dataContainer.firstChild);
+        this._tableElement.classList.add('data__table');
+        this._tableElement.setAttribute('id', this._id);
+        this._tableElement.innerHTML = `
         <thead>
             <tr>
                 <th title="Настройки импортированных данных" id="dataSettingsBtn" class="dataSettingsBtn_new">
@@ -100,34 +99,34 @@ export default class Sheet {
         </tbody>`;
     }
 
-    #createFooterElement() {
-        this.#footerElement = uiControls.footerList.appendChild(document.createElement('li'));
-        this.#footerElement.classList.add('footer__item', 'footer__item_selected', 'footer__item_new');
-        this.#footerElement.setAttribute('id', this.#id);
-        this.#footerElement.innerHTML = `
+    _createFooterElement() {
+        this._footerElement = uiControls.footerList.appendChild(document.createElement('li'));
+        this._footerElement.classList.add('footer__item', 'footer__item_selected', 'footer__item_new');
+        this._footerElement.setAttribute('id', this._id);
+        this._footerElement.innerHTML = `
         <div class="footer__item-content">
             <span class="footer__item-text">
-                ${this.#name}
+                ${this._name}
             </span>
         </div>`;
     }
 
-    #createHTML() {
+    _createHTML() {
         const createThead = () => {
             const createTh = (name, index) => {
                 return `
                 <th>
                     <div class="data__column-header">
-                        ${this.#dataVars[index].getTypeName() === Var.Empty.name ? `` : `
-                        <div title="Сменить тип данных колонки" id=${this.#dataVars[index].getID()} class="data__var-icon data__var-icon_new">
-                            <img src="${this.#dataVars[index].getImg()}" alt="${this.#dataVars[index].getName()}">
+                        ${this._dataVars[index].getTypeName() === Var.Empty.name ? `` : `
+                        <div title="Сменить тип данных колонки" id=${this._dataVars[index].getID()} class="data__var-icon data__var-icon_new">
+                            <img src="${this._dataVars[index].getImg()}" alt="${this._dataVars[index].getName()}">
                         </div>`}
                         <span class="data__var-name">${name}</span>
                     </div>
                 </th>`;
             };
 
-            const headersArray = this.#data[0].map((el, index) => createTh(el, index));
+            const headersArray = this._data[0].map((el, index) => createTh(el, index));
             return headersArray.reduce((ths, element) => ths + element);
 
         };
@@ -143,7 +142,7 @@ export default class Sheet {
                 </tr>`;
             };
 
-            return this.#data.slice(1).map(row =>
+            return this._data.slice(1).map(row =>
                 createTr(row.map(val =>
                     `<td class='${typeof val == 'number' ? 'number' : ''}'>${val}</td>`
                 ))).join('');
@@ -151,9 +150,9 @@ export default class Sheet {
         };
 
         const createInnerHtml = (createHeader, createBody) => {
-            const head = this.#tableElement.querySelector('tr');
+            const head = this._tableElement.querySelector('tr');
             const btn = head.querySelector('#dataSettingsBtn');
-            const body = this.#tableElement.querySelector('tbody');
+            const body = this._tableElement.querySelector('tbody');
 
             head.innerHTML = createHeader ? createThead() : '';
             head.insertBefore(btn, head.firstElementChild);
@@ -162,7 +161,7 @@ export default class Sheet {
         };
 
 
-        switch (this.#data.length) {
+        switch (this._data.length) {
             case 0: {
                 createInnerHtml(false, false);
                 break;
@@ -180,17 +179,17 @@ export default class Sheet {
         this.show();
     }
 
-    #parseDataInFile(isNewFile) {
-        const del = this.#settings.props.decimalDelimiter.selected;
+    _parseDataInFile(isNewFile) {
+        const del = this._settings.props.decimalDelimiter.selected;
         let regExpReadyDel = del;
         if (RegExp.specialSymbols.includes(del)) {
             regExpReadyDel = '\\' + del;
         }
         const regex = new RegExp(`^-?(?:\\d+(?:${regExpReadyDel}\\d+)?|\\d+(?:${regExpReadyDel}\\d+)?(?:e|E)(?:\\+|-)?\\d+)$`);
 
-        Papa.parse(this.#file, {
-            encoding: this.#settings.props.encoding.selected,
-            delimiter: this.#settings.props.colDelimiter.selected,
+        Papa.parse(this._file, {
+            encoding: this._settings.props.encoding.selected,
+            delimiter: this._settings.props.colDelimiter.selected,
             transform: (val, col) => {
                 let valTrimmed = val.trim();
 
@@ -203,38 +202,38 @@ export default class Sheet {
             },
             skipEmptyLines: true,
             complete: (results) => {
-                const skip = this.#settings.props.skip.value;
+                const skip = this._settings.props.skip.value;
                 if (skip != 0) {
                     results.data = results.data.slice(skip);
                 }
-                this.#data = results.data;
-                this.#initVars();
-                this.#createHTML();
+                this._data = results.data;
+                this._initVars();
+                this._createHTML();
                 if (isNewFile) {
                     moduleIntegrator.optionListAdd({
-                        name: this.#name,
-                        id: this.#id
+                        name: this._name,
+                        id: this._id
                     });
                 }
-                if (this.#id === 0 || !isNewFile) {
-                    moduleIntegrator.updateVarsOfSheet(this.#id, true);
+                if (this._id === 0 || !isNewFile) {
+                    moduleIntegrator.updateVarsOfSheet(this._id, true);
                 }
             }
         });
     }
 
-    #initVars() {
-        if (this.#data.length === 0)
+    _initVars() {
+        if (this._data.length === 0)
             return;
 
         let i = 0;
-        const idName = () => 'var' + '_' + this.#id + '_' + (i++);
-        const dataVars = this.#data[0].map((_, colIndex) => getColumnVar(this.#data.map(row => row[colIndex])));
-        this.#dataVars = dataVars;
-        this.#notNullDataVars = [];
+        const idName = () => 'var' + '_' + this._id + '_' + (i++);
+        const dataVars = this._data[0].map((_, colIndex) => getColumnVar(this._data.map(row => row[colIndex])));
+        this._dataVars = dataVars;
+        this._notNullDataVars = [];
         dataVars.forEach(el => {
             if (el.getTypeName() !== Var.Empty.name) {
-                this.#notNullDataVars.push(el);
+                this._notNullDataVars.push(el);
             }
         })
 
@@ -262,23 +261,23 @@ export default class Sheet {
     }
 
     getName() {
-        return this.#name;
+        return this._name;
     }
 
     getID() {
-        return this.#id;
+        return this._id;
     }
 
     getVars() {
-        return this.#notNullDataVars;
+        return this._notNullDataVars;
     }
 
     getVarById(varId) {
-        return this.#dataVars[varId];
+        return this._dataVars[varId];
     }
 
     getDataByVarId(varId) {
-        const data = this.#data.map((arr) => arr[varId]).slice(1);
+        const data = this._data.map((arr) => arr[varId]).slice(1);
         const newData = trimDataEnd(data)
         return newData;
 
@@ -297,5 +296,13 @@ export default class Sheet {
             }
             return data;
         }
+    }
+
+    async getData() {
+        const data = Object.deepCopy(this);
+
+        data._file = await File.readUploadedFileAsText(this._file);
+
+        return data;
     }
 }

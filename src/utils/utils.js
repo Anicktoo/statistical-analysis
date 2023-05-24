@@ -203,3 +203,26 @@ Math.getU = function (array1, array2, getRungFunc) {
     }
     return U;
 }
+
+Object.getNameFromPath = function (path) {
+    return path.replace(/^.*(\\|\/|\:)/, '');
+}
+
+Object.getDirFromPath = function (path) {
+    return path.match(/^.*(\\|\/|\:)/, '')[0];
+}
+
+File.readUploadedFileAsText = (inputFile) => {
+    const fileReader = new FileReader();
+    return new Promise((resolve, reject) => {
+        fileReader.onerror = () => {
+            fileReader.abort();
+            reject(new DOMException("Ошибка при парсинге файла."));
+        };
+
+        fileReader.onload = () => {
+            resolve(fileReader.result);
+        };
+        fileReader.readAsText(inputFile);
+    });
+};

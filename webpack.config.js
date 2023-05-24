@@ -42,29 +42,29 @@ const cssLoader = extra => {
 }
 
 module.exports = {
-    context: path.resolve(__dirname, 'src'),
+    context: path.resolve(__dirname, 'src/'),
     entry: {
         main: './app.js',
     },
     output: {
         filename: filename('js'),
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'dist/'),
         clean: true,
     },
     resolve: {
         extensions: ['.js', '.json'],
         alias: {
-            '@': path.resolve(__dirname, 'src'),
-            '@styles': path.resolve(__dirname, 'src', 'styles'),
-            '@img': path.resolve(__dirname, 'src', 'img'),
-            '@modules': path.resolve(__dirname, 'src', 'modules'),
-            '@data': path.resolve(__dirname, 'src', 'data'),
+            '@': path.resolve(__dirname, 'src/'),
+            '@styles': path.resolve(__dirname, 'src', 'styles/'),
+            '@img': path.resolve(__dirname, 'src', 'img/'),
+            '@modules': path.resolve(__dirname, 'src', 'modules/'),
+            '@data': path.resolve(__dirname, 'src', 'data/'),
         }
     },
     optimization: optimization(),
     devServer: {
         static: {
-            directory: path.resolve(__dirname, 'src')
+            directory: path.resolve(__dirname, 'src/')
         },
         compress: true,
         port: 4200,
@@ -73,8 +73,8 @@ module.exports = {
         {
             app:
             {
-                // name: 'chrome'
-                name: 'firefox'
+                name: 'chrome'
+                // name: 'firefox'
             }
         }
     },

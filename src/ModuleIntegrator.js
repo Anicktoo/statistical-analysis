@@ -94,6 +94,10 @@ const moduleIntegrator = {
         moduleIntegrator.setSettings('glob', uiControls.parametersGlobItem.querySelector('form'));
     },
 
+    getData() {
+        return 'module';
+    },
+
     getHypElementById(id) {
         if (id || id === 0) {
             return moduleIntegrator._hypotheses[id].hyp.getElement();

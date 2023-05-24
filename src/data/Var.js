@@ -8,22 +8,23 @@ export default class Var {
     static Binary = {
         name: 'binary',
         ruName: 'дихотомический',
-        img: binaryImg,
+        img: Object.getNameFromPath(binaryImg),
     };
     static Nominal = {
         name: 'nominal',
         ruName: 'номинативный',
-        img: nominalImg,
+        img: Object.getNameFromPath(nominalImg),
     };
     static Continues = {
         name: 'continues',
         ruName: 'количественный',
-        img: continuesImg,
+        img: Object.getNameFromPath(continuesImg),
     };
     static Rang = {
         name: 'rang',
         ruName: 'ранговый',
-        img: rangImg,
+        img: Object.getNameFromPath(rangImg),
+        imgU: Object.getNameFromPath(rangUnitedImg),
     };
     static Empty = {
         name: 'empty',
@@ -31,46 +32,48 @@ export default class Var {
         img: null
     };
 
+    static imgDir = Object.getDirFromPath(rangImg);
+
     static unitedRangs = [];
     static unitedOrder = [];
     static unitedSet = [];
 
-    #typeName;
-    #ruTypeName;
-    #name;
-    #id;
-    #img;
-    #set = [];
-    #order = [];
-    #binaryGroups;
-    #onlyNumbers;
-    #united;
+    _typeName;
+    _ruTypeName;
+    _name;
+    _id;
+    _img;
+    _set = [];
+    _order = [];
+    _binaryGroups;
+    _onlyNumbers;
+    _united;
 
     constructor(type, id, set, name, onlyNumbers) {
-        this.#united = false;
+        this._united = false;
         if (type === Var.Empty) {
-            this.#typeName = type.name;
-            this.#ruTypeName = type.ruName;
-            this.#name = name;
+            this._typeName = type.name;
+            this._ruTypeName = type.ruName;
+            this._name = name;
             return;
         }
         if (type !== Var.Binary && type !== Var.Nominal &&
             type !== Var.Continues && type !== Var.Rang)
             throw new Error('Данный тип данных не поддерживается приложением');
-        this.#typeName = type.name;
-        this.#img = type.img;
-        this.#ruTypeName = type.ruName;
-        this.#id = id;
-        this.#name = name;
-        this.#onlyNumbers = onlyNumbers;
-        this.#set = [...set].customSort(this.#typeName === 'continues');
-        this.#order = new Array(set.size);
+        this._typeName = type.name;
+        this._img = type.img;
+        this._ruTypeName = type.ruName;
+        this._id = id;
+        this._name = name;
+        this._onlyNumbers = onlyNumbers;
+        this._set = [...set].customSort(this._typeName === 'continues');
+        this._order = new Array(set.size);
         for (let i = 0; i < set.size; i++) {
-            this.#order[i] = i;
+            this._order[i] = i;
         }
-        this.#binaryGroups = new Array(Math.ceil(set.size / 32)).fill(0);
-        if (this.#typeName === 'binary')
-            this.#binaryGroups[0] = (0x1 << 31);
+        this._binaryGroups = new Array(Math.ceil(set.size / 32)).fill(0);
+        if (this._typeName === 'binary')
+            this._binaryGroups[0] = (0x1 << 31);
     }
 
     static clearUnited() {
@@ -94,7 +97,7 @@ export default class Var {
             return;
         }
         const rangBody = uiControls.rangTable;
-        const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this.#set]);
+        const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this._set]);
         const curSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
         Var.tmpSet = curSet;
         const curOrder = curSet.map((el, ind) => ind);
@@ -111,8 +114,8 @@ export default class Var {
     showNormalOrder() {
         console.log('normal show');
         const rangBody = uiControls.rangTable;
-        const curOrder = this.#order;
-        const curSet = this.#set;
+        const curOrder = this._order;
+        const curSet = this._set;
         let str = '';
         for (let i = 0; i < curSet.length; i++) {
             str += `
@@ -126,16 +129,16 @@ export default class Var {
 
     addUnitedVar(order) {
         console.log('set united');
-        document.getElementById(this.#id).querySelector('img').setAttribute('src', rangUnitedImg);
+        document.getElementById(this._id).querySelector('img').setAttribute('src', Var.imgDir + Var.Rang.imgU);
         Var.unitedOrder = order;
-        this.#united = true;
+        this._united = true;
 
         if (Var.unitedRangs[0] === this || Var.unitedRangs[1] === this) {
             return;
         }
         console.log('add united');
         Var.unitedRangs.push(this);
-        const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this.#set]);
+        const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this._set]);
         Var.unitedSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
     }
     removeUnitedVar() {
@@ -157,27 +160,27 @@ export default class Var {
             Var.unitedOrder = [];
         }
         console.log('remove united');
-        this.#united = false;
+        this._united = false;
     }
 
     setSettings(formData, order, twoTables) {
-        const varHeader = document.getElementById(this.#id);
+        const varHeader = document.getElementById(this._id);
 
-        this.#name = formData.get('var-name');
-        varHeader.nextElementSibling.textContent = this.#name;
+        this._name = formData.get('var-name');
+        varHeader.nextElementSibling.textContent = this._name;
 
-        this.#typeName = formData.get('var-type');
-        this.#img = Object.entries(Var).find(item => item[1]['name'] === this.#typeName)[1]['img'];
-        varHeader.querySelector('img').setAttribute('src', this.#img);
+        this._typeName = formData.get('var-type');
+        this._img = Object.entries(Var).find(item => item[1]['name'] === this._typeName)[1]['img'];
+        varHeader.querySelector('img').setAttribute('src', Var.imgDir + this._img);
         const isUnited = formData.get('unite');
 
-        if (this.#typeName === 'rang') {
+        if (this._typeName === 'rang') {
             if (isUnited) {
                 this.addUnitedVar(order);
             }
             else {
                 this.removeUnitedVar();
-                this.#order = order;
+                this._order = order;
             }
             return;
         }
@@ -185,7 +188,7 @@ export default class Var {
         this.removeUnitedVar();
 
         if (!twoTables.group1[0]) {
-            this.#binaryGroups.fill(0);
+            this._binaryGroups.fill(0);
             return;
         }
 
@@ -194,7 +197,7 @@ export default class Var {
         let nextBit = twoTables.group1[curItem];
         let shift = curBit;
         let number;
-        for (let i = 0; i < this.#binaryGroups.length; i++) {
+        for (let i = 0; i < this._binaryGroups.length; i++) {
             number = 0x0;
 
             while (nextBit < 32 * (i + 1)) {
@@ -206,23 +209,22 @@ export default class Var {
             }
 
             number <<= (31 - (curBit % 32));
-            this.#binaryGroups[this.#binaryGroups.length - i - 1] = number;
+            this._binaryGroups[this._binaryGroups.length - i - 1] = number;
         }
     }
     createHTML() {
-        const modal = uiControls.modalVarType;
         const name = uiControls.modalVarType.querySelector('#modal-var-types__name');
         const continuesLabel = uiControls.modalVarType.querySelector('.modal-var-types__continues-container');
         const varChooseInputs = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__item-input')];
         const rangBody = uiControls.rangTable;
         const binBodies = uiControls.binTables;
-        uiControls.uniteCheckbox.dataset.id = this.#id;
+        uiControls.uniteCheckbox.dataset.id = this._id;
 
-        name.value = this.#name;
-        name.setAttribute('value', this.#name);
+        name.value = this._name;
+        name.setAttribute('value', this._name);
 
 
-        if (!this.#onlyNumbers) {
+        if (!this._onlyNumbers) {
             continuesLabel.classList.add('radio-line_disabled');
             continuesLabel.firstElementChild.disabled = true;
         }
@@ -234,7 +236,7 @@ export default class Var {
         let str = '';
         let curOrder, curSet;
 
-        if (this.#united) {
+        if (this._united) {
             curOrder = Var.unitedOrder;
             curSet = Var.unitedSet;
             uiControls.uniteCheckbox.parentElement.classList.remove('disabled');
@@ -242,8 +244,8 @@ export default class Var {
 
         }
         else {
-            curOrder = this.#order;
-            curSet = this.#set;
+            curOrder = this._order;
+            curSet = this._set;
             if (Var.unitedRangs.length === 2) {
                 uiControls.uniteCheckbox.parentElement.classList.add('disabled');
             }
@@ -265,22 +267,22 @@ export default class Var {
         let str1 = '';
         let str2 = '';
         let counter = 0;
-        let fin = this.#set.length - 1;
+        let fin = this._set.length - 1;
         const getLabel = (counter, value) => {
             return `<label class="var-table__item" data-anchor=${counter}>
                         <input type="radio" name="data_value">
                         <span>${value}</span>
                     </label>`};
         const getAnchor = (counter) => `<div class='var-table__anchor var-table__anchor_${counter}'></div>`;
-        for (let q = this.#binaryGroups.length - 1; q >= 0; q--) {
+        for (let q = this._binaryGroups.length - 1; q >= 0; q--) {
             let shift = 31;
             let binNumber = (0x1 << shift);
 
             for (let i = 0; i < 32; i++) {
-                if ((this.#binaryGroups[q] & binNumber) === 0x0) {
-                    str1 += getLabel(counter, this.#set[counter]);
+                if ((this._binaryGroups[q] & binNumber) === 0x0) {
+                    str1 += getLabel(counter, this._set[counter]);
                 } else {
-                    str2 += getLabel(counter, this.#set[counter]);
+                    str2 += getLabel(counter, this._set[counter]);
                 }
 
                 str1 += getAnchor(counter);
@@ -301,7 +303,7 @@ export default class Var {
         ));
 
         varChooseInputs.forEach(element => {
-            if (element.value === this.#typeName) {
+            if (element.value === this._typeName) {
                 element.click();
             }
         });
@@ -318,17 +320,17 @@ export default class Var {
 
     //returns 0 if zero group, 1 if in first, -1 if val is not in the set 
     isValInZeroGroup(val) {
-        const indexInSet = this.#set.indexOf(val);
+        const indexInSet = this._set.indexOf(val);
         if (indexInSet === -1)
             return -1;
-        const grLength = this.#binaryGroups.length;
+        const grLength = this._binaryGroups.length;
 
         const groupIndex = grLength - Math.floor(indexInSet / 32) - 1;
         if (groupIndex < 0) {
             return -1;
         }
         const bitIndex = indexInSet % 32;
-        const bit = this.#binaryGroups[groupIndex] >>> (31 - bitIndex);
+        const bit = this._binaryGroups[groupIndex] >>> (31 - bitIndex);
 
         if (bit & 0x1 === 1) {
             return 1;
@@ -340,10 +342,10 @@ export default class Var {
 
     //resturns rang of value strating with 1
     getOrderOfVal(val) {
-        const indexInSet = this.#set.indexOf(val);
+        const indexInSet = this._set.indexOf(val);
         if (indexInSet === -1)
             return -1;
-        const order = this.#order.indexOf(indexInSet);
+        const order = this._order.indexOf(indexInSet);
 
         return order !== undefined ? order + 1 : -1;
     }
@@ -358,38 +360,38 @@ export default class Var {
     }
 
     isOnlyNumbers() {
-        return this.#onlyNumbers;
+        return this._onlyNumbers;
     }
 
     isUnited() {
-        return this.#united;
+        return this._united;
     }
 
     getID() {
-        return this.#id;
+        return this._id;
     }
 
     getName() {
-        return this.#name;
+        return this._name;
     }
 
     getImg() {
-        return this.#img;
+        return this._img;
     }
 
     getSet() {
-        return this.#set;
+        return this._set;
     }
 
     getOrder() {
-        return this.#order;
+        return this._order;
     }
 
     getTypeName() {
-        return this.#typeName;
+        return this._typeName;
     }
 
     getRuTypeName() {
-        return this.#ruTypeName;
+        return this._ruTypeName;
     }
 }
