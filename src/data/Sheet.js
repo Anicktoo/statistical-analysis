@@ -1,6 +1,5 @@
 import * as Papa from 'papaparse';
 import Settings from './Settings';
-import moduleIntegrator from '@/moduleIntegrator';
 import Var from './Var';
 
 export default class Sheet {
@@ -9,10 +8,7 @@ export default class Sheet {
     _data;
     _dataVars = [];
     _notNullDataVars = [];
-    _settings = {
-        obj: {},
-        props: {}
-    };
+    _settings;
     _tableElement;
     _footerElement;
     _file;
@@ -22,8 +18,7 @@ export default class Sheet {
     constructor(name, id) {
         this._id = id;
         this._name = name;
-        this._settings.obj = new Settings();
-        this._settings.props = this._settings.obj.getSettings();;
+        this._settings = new Settings();
         this._createTableElement();
         this._createFooterElement();
     }
@@ -33,25 +28,25 @@ export default class Sheet {
         this._data = await this._parseDataInFile(true);
         this._initVars();
         this._createHTML();
-        uiControls.initNewSheetControls();
-        moduleIntegrator.optionListAdd({
-            name: this._name,
-            id: this._id
-        });
-        if (this._id === 0) {
-            moduleIntegrator.updateVarsOfSheet(this._id, true);
-        }
+
+
+
     }
 
     async setSettings(settingsFormData) {
         Var.clearUnited();
-        this._settings.obj.setSettings(settingsFormData);
-        this._settings.props = this._settings.obj.getSettings();
+        this._settings.setSettings(settingsFormData);
         this._data = await this._parseDataInFile(false);
         this._initVars();
         this._createHTML();
-        uiControls.initNewSheetControls();
-        moduleIntegrator.updateVarsOfSheet(this._id, true);
+
+    }
+    async setSettingsWithObject(settingsObject) {
+        this._settings.setSettingsWithObject(settingsObject);
+        this._data = await this._parseDataInFile(false);
+        this._initVars();
+        this._createHTML();
+
     }
 
     createVarSettings(varID) {
@@ -62,11 +57,26 @@ export default class Sheet {
 
     setVarSettings(formData, order, twoTables) {
         this._openedVar.setSettings(formData, order, twoTables);
-        moduleIntegrator.updateVarsOfSheet(this._id, false);
+    }
+
+    setVarSettingsWithArray(varsArray) {
+        this._dataVars.forEach((el, ind) => {
+            el.setSettingsWithObject(varsArray[ind]);
+        });
+    }
+
+    setName(name) {
+        this._name = name;
+        this._footerElement.querySelector('.footer__item-text').textContent = this._name;
+    }
+
+    setId(id) {
+        this._id = id;
+        this._footerElement.setAttribute('id', id);
     }
 
     show() {
-        this._settings.obj.createHTML();
+        this._settings.createHTML();
         this._tableElement.classList.add('data__table_shown');
         this._footerElement.classList.add('footer__item_selected');
     }
@@ -76,10 +86,6 @@ export default class Sheet {
         this._footerElement.classList.remove('footer__item_selected');
     }
 
-    setId(id) {
-        this._id = id;
-        this._footerElement.setAttribute('id', id);
-    }
 
     _createTableElement() {
         this._tableElement = uiControls.dataContainer.insertBefore(document.createElement('table'), uiControls.dataContainer.firstChild);
@@ -181,7 +187,8 @@ export default class Sheet {
 
     _parseDataInFile() {
         return new Promise((resolve, reject) => {
-            const del = this._settings.props.decimalDelimiter.selected;
+            const settingsProps = this._settings.getSettings();
+            const del = settingsProps.decimalDelimiter.selected;
             let regExpReadyDel = del;
             if (RegExp.specialSymbols.includes(del)) {
                 regExpReadyDel = '\\' + del;
@@ -189,8 +196,8 @@ export default class Sheet {
             const regex = new RegExp(`^-?(?:\\d+(?:${regExpReadyDel}\\d+)?|\\d+(?:${regExpReadyDel}\\d+)?(?:e|E)(?:\\+|-)?\\d+)$`);
 
             Papa.parse(this._file, {
-                encoding: this._settings.props.encoding.selected,
-                delimiter: this._settings.props.colDelimiter.selected,
+                encoding: settingsProps.encoding.selected,
+                delimiter: settingsProps.colDelimiter.selected,
                 transform: (val, col) => {
                     let valTrimmed = val.trim();
 
@@ -203,23 +210,12 @@ export default class Sheet {
                 },
                 skipEmptyLines: true,
                 complete: (results) => {
-                    const skip = this._settings.props.skip.value;
+                    const skip = settingsProps.skip.value;
                     if (skip != 0) {
                         results.data = results.data.slice(skip);
                     }
                     this._data = results.data;
                     resolve(results.data);
-                    // this._initVars();
-                    // this._createHTML();
-                    // if (isNewFile) {
-                    //     moduleIntegrator.optionListAdd({
-                    //         name: this._name,
-                    //         id: this._id
-                    //     });
-                    // }
-                    // if (this._id === 0 || !isNewFile) {
-                    //     moduleIntegrator.updateVarsOfSheet(this._id, true);
-                    // }
                 }
             });
         });
@@ -302,9 +298,13 @@ export default class Sheet {
     }
 
     async getData() {
-        const data = Object.deepCopy(this);
-
-        data._file = await File.readUploadedFileAsText(this._file);
+        const data = {
+            _id: this._id,
+            _name: this._name,
+            _dataVars: this._dataVars,
+            _settings: this._settings,
+            _file: await File.readUploadedFileAsText(this._file),
+        }
 
         return data;
     }

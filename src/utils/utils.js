@@ -64,7 +64,15 @@ Math.normdist = function (z) {
 }
 
 Math.mean = function (array) {
-    return array.reduce((el, c) => el + c) / array.length;
+    let mean = 0;
+    for (let i = 0; i < array.length; i++) {
+        if (i % 1000 === 0) {
+            console.log(mean);
+        }
+        mean += array[i] / array.length;
+    }
+    return mean;
+    // return array.reduce((el, c) => el / array.length + c, 0);
 }
 
 Math.stddev = {};

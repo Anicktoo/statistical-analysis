@@ -2,6 +2,8 @@
 
     &__sheet-select {
         width: 100%;
+        max-width: 225px;
+        overflow: hidden;
     }
 
     &__switch-container {

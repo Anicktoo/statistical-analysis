@@ -49,20 +49,13 @@ $varTableItemPadding: 2px;
     }
 }
 
+.loading {
+    cursor: progress;
+}
+
 .disabled {
     @include disabled();
 }
-
-// @mixin enabled {
-//     cursor: unset;
-//     pointer-events: auto;
-//     opacity: inherit;
-
-//     * {
-//         cursor: auto;
-//         pointer-events: auto;
-//     }
-// }
 
 @mixin custom-scrollbar {
     &::-webkit-scrollbar {

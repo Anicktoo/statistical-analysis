@@ -6,6 +6,9 @@
     position: absolute;
     z-index: 99999;
     visibility: hidden;
+    width: 1px;
+    height: 1px;
+    margin: 0;
 }
 
 @-moz-document url-prefix() {

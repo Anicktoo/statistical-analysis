@@ -17,6 +17,7 @@ window.uiControls = {
     menuBtns: [],
     csvUploadBtn: undefined,
     exportBtn: undefined,
+    newProject: undefined,
     saveProject: undefined,
     loadProject: undefined,
     settingsForm: undefined,
@@ -36,6 +37,7 @@ window.uiControls = {
     parameters: undefined,
     parametersContainer: undefined,
     parametersGlobItem: undefined,
+    globalSettingsForm: undefined,
     FWERInput: undefined,
     powerInput: undefined,
     mainHypSelect: undefined,
@@ -106,6 +108,7 @@ window.uiControls = {
         uiControls.csvUploadBtn = document.getElementById('csvUpload');
         uiControls.exportBtn = document.getElementById('export-results');
         uiControls.saveProject = document.getElementById('save-project');
+        uiControls.newProject = document.getElementById('new-project');
         uiControls.loadProject = document.getElementById('load-project');
         uiControls.settingsForm = document.getElementById('settings-form');
         uiControls.settingsSkipInput = uiControls.settingsForm.querySelector('#skip-options');
@@ -132,6 +135,7 @@ window.uiControls = {
         uiControls.parameters = uiControls.calculationWindow.querySelector('.parameters');
         uiControls.parametersContainer = uiControls.parameters.querySelector('.parameters__container');
         uiControls.parametersGlobItem = uiControls.parameters.querySelector('#parameters__item_glob');
+        uiControls.globalSettingsForm = uiControls.parameters.querySelector('#module-option-form_glob');
         uiControls.FWERInput = uiControls.parametersGlobItem.querySelector('#FWER-input');
         uiControls.powerInput = uiControls.parametersGlobItem.querySelector('#power-input');
         uiControls.mainHypSelect = uiControls.parametersContainer.querySelector('#main-hypothesis');
@@ -159,6 +163,7 @@ window.uiControls = {
         uiControls.addWindowResizeListeners();
         uiControls.addModalSettingsListener();
         uiControls.addModalVarChooseListener();
+        uiControls.addNewProjectListener();
         uiControls.addSaveProjectListener();
         uiControls.addLoadProjectListener();
         uiControls.addCsvUploadListeners();
@@ -189,6 +194,14 @@ window.uiControls = {
         uiControls.fadeScreen.addEventListener('click', uiControls.toggleMenu);
     },
 
+    addNewProjectListener() {
+        uiControls.newProject.addEventListener('click', (event) => {
+            const newTab = window.open('#', '_blank');
+            newTab.focus();
+            uiControls.toggleMenu();
+        });
+    },
+
     addCsvUploadListeners() {
         uiControls.csvUploadBtn.addEventListener('click', function () {
             this.value = null;
@@ -213,8 +226,24 @@ window.uiControls = {
         });
 
         uiControls.loadProject.addEventListener('change', (event) => {
-            loadProjectFunc(event);
-            uiControls.toggleMenu();
+            try {
+                const file = event.target.files[0];
+                if (!file) {
+                    throw new Error('Ошибка при загрузке файла');
+                }
+                if (file.name.split('.').pop() !== 'json') {
+                    throw new Error('Неверный тип файла');
+                }
+                const newTab = window.open('#', '_blank');
+                newTab.fileToLoad = file;
+                newTab.focus();
+
+                uiControls.toggleMenu();
+            }
+            catch (err) {
+                uiControls.showError(uiControls.burgerMenu, 'Ошибка при загрузке файла');
+                console.error(err);
+            }
         });
     },
 
@@ -232,7 +261,6 @@ window.uiControls = {
 
         function mousedown(e) {
             e.preventDefault();
-            uiControls.footerSetMaxWidth();
             window.addEventListener('mousemove', mousemove);
             window.addEventListener('mouseup', mouseup);
 
@@ -617,20 +645,19 @@ window.uiControls = {
         }
     },
 
-    async footerChange() {
+    // async footerChange() {
 
-        const dataTable = uiControls.dataContainer.querySelector('.data__table_shown');
-        const dataFooter = uiControls.dataFooter;
+    //     const dataTable = uiControls.dataContainer.querySelector('.data__table_shown');
+    //     const dataFooter = uiControls.dataFooter;
 
-        if (!dataTable) {
-            dataFooter.style.width = 0;
-            return;
-        }
-    },
+    //     if (!dataTable) {
+    //         dataFooter.style.width = 0;
+    //         return;
+    //     }
+    // },
 
     footerSetMaxWidth() {
-        const dataFooter = uiControls.dataFooter;
-        dataFooter.style.width = '100%';
+        uiControls.dataFooter.style.width = '100%';
     },
 
     openModal(event, modalWindow, createModalFunc) {
@@ -692,7 +719,7 @@ window.uiControls = {
         const rect = el.getBoundingClientRect();
         const x = countCoord((rect.x + rect.width / 2), window.innerWidth);
         const y = countCoord((rect.y + rect.height), window.innerHeight);
-        function countCoord(c, max, gap = 10) {
+        function countCoord(c, max, gap = 20) {
             if (c > gap) {
                 const realMax = max - gap;
                 if (c < realMax) {

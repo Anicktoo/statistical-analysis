@@ -7,7 +7,6 @@ const moduleIntegrator = {
     _timerId: undefined,
     _hypotheses: [],
     _globalSettings: {
-        form: document.querySelector('#module-option-form_glob'),
         name: undefined,
         FWER: undefined,
         mainHypId: undefined,
@@ -58,7 +57,24 @@ const moduleIntegrator = {
                     el.classList.replace('main-hypothesis__option_' + i, 'main-hypothesis__option_' + (i - 1));
                 }
             }
-        }
+        },
+        getData() {
+            return Object.assign(this);
+        },
+        setData(data) {
+            const keys = Object.keys(data);
+            for (let key of keys) {
+                this[key] = data[key];
+            }
+            const nameEl = uiControls.parametersGlobItem.querySelector('#name-input-glob');
+            nameEl.value = this.name;
+            const FWEREl = uiControls.parametersGlobItem.querySelector('#FWER-input');
+            FWEREl.value = this.FWER;
+            const powerEl = uiControls.parametersGlobItem.querySelector('#power-input');
+            powerEl.value = this.power;
+            const mainHypEl = uiControls.parametersGlobItem.querySelector('#main-hypothesis');
+            mainHypEl.querySelector('.main-hypothesis__option_' + this.mainHypId).selected = true;
+        },
     },
 
     async createModuleButtons() {
@@ -95,7 +111,46 @@ const moduleIntegrator = {
     },
 
     getData() {
-        return 'module';
+        const data = {
+            hypotheses: [],
+            globalSettings: this._globalSettings.getData()
+        };
+        for (let el of this._hypotheses) {
+            const hypData = {
+                hyp: el.hyp.getAllData(true),
+                update: el.update,
+                hidden: el.hidden
+            }
+            data.hypotheses.push(hypData);
+        }
+
+        return data;
+    },
+
+    loadData(data) {
+        for (let i = 0; i < data.hypotheses.length; i++) {
+            const el = data.hypotheses[i];
+            this.addHypothesis(el.hyp.moduleTypeId);
+            const thisEl = this._hypotheses[i];
+            thisEl.hyp.updateResultsHtml(false);
+            this.nameChange(i, el.hyp.hypName);
+            thisEl.hyp.setLoadingData(
+                el.hyp.inputType,
+                el.hyp.testType,
+                el.hyp.altHypTest,
+                el.hyp.resultsTableData,
+                el.hyp.varIds,
+            );
+            if (el.hidden) {
+                thisEl.hyp.getElement().querySelector('.parameters__hide-button').click();
+            }
+        }
+        this._globalSettings.setData(data.globalSettings);
+        this.setSettings('glob');
+    },
+
+    getGlobalName() {
+        return this._globalSettings.name;
     },
 
     getHypElementById(id) {
@@ -146,6 +201,7 @@ const moduleIntegrator = {
         }
     },
 
+    //updates vars in all tables of particular hypothesis with hypID id. el is for sheet-form element. if added updates only that table
     refreshVarsOfHyp(hypID, el = null) {
         let formElements;
         if (el) {
@@ -160,6 +216,7 @@ const moduleIntegrator = {
         })
     },
 
+    //updates all vars in all tables in all hypotheses of a particular sheet. if clearSelected === true -> it removes seleteced vars
     updateVarsOfSheet(sheetId, clearSelected) {
         moduleIntegrator._hypotheses.forEach(el => {
             if (clearSelected) {
@@ -247,7 +304,7 @@ const moduleIntegrator = {
 
     setGlobalSettings() {
         const globalSettings = moduleIntegrator._globalSettings;
-        const formData = new FormData(globalSettings.form);
+        const formData = new FormData(uiControls.globalSettingsForm);
         globalSettings.name = formData.get('name');
         globalSettings.FWER = Number(formData.get('FWER'));
         if (globalSettings.FWER <= 0 || globalSettings.FWER >= 100) {

@@ -73,11 +73,25 @@ export default class Settings {
         this._colDelimiter.selected = formData.get('col-delimiter');
         this._decimalDelimiter.selected = formData.get('decimal-delimiter');
     }
+    setSettingsWithObject(settingsObject) {
+        this._skip.value = settingsObject._skip.value;
+        this._encoding.selected = settingsObject._encoding.selected;
+        this._colDelimiter.selected = settingsObject._colDelimiter.selected;
+        this._decimalDelimiter.selected = settingsObject._decimalDelimiter.selected;
+    }
 
     static setGlobalSettings(formData) {
         Settings._globalSettings.skip.value = formData.get('skip');
         Settings._globalSettings.encoding.selected = formData.get('encoding');
         Settings._globalSettings.colDelimiter.selected = formData.get('col-delimiter');
         Settings._globalSettings.decimalDelimiter.selected = formData.get('decimal-delimiter');
+    }
+
+    static setGlobalSettingsWithObject(settingsObj) {
+        Settings._globalSettings = settingsObj;
+    }
+
+    static getGlobalSettings() {
+        return Settings._globalSettings;
     }
 }

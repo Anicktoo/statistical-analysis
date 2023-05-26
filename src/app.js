@@ -4,11 +4,18 @@ import '@/uiControls';
 import moduleIntegrator from '@/moduleIntegrator';
 import dataControls from '@data/dataControls';
 
-uiControls.initConstuiControls();
-moduleIntegrator.createModuleButtons();
+(async function start() {
+    uiControls.initConstuiControls();
+    await moduleIntegrator.createModuleButtons();
+
+    if (window.fileToLoad) {
+        loadProject(window.fileToLoad);
+    }
+})();
 
 export async function saveProject() {
     try {
+        document.body.classList.add('laoding');
         const dataControlsData = await dataControls.getData();
         const moduleIntegratorData = moduleIntegrator.getData();
         const data = {
@@ -21,7 +28,8 @@ export async function saveProject() {
         const url = URL.createObjectURL(blob);
 
         const link = document.createElement('a');
-        link.download = `Hey.json`;
+        const fileName = moduleIntegrator.getGlobalName();
+        link.download = `${fileName ? fileName : 'results'}.json`;
         link.href = url;
         link.click();
         URL.revokeObjectURL(url);
@@ -30,21 +38,25 @@ export async function saveProject() {
         uiControls.showError(uiControls.burgerMenu, 'Ошибка при сохранении');
         console.error(err);
     }
+    finally {
+        document.body.classList.remove('loading');
+    }
 }
 
-export async function loadProject(event) {
+export async function loadProject(file) {
     try {
-        const file = event.target.files[0];
-        if (!file) {
-            throw new Error('Ошибка при загрузке файла');
-        }
+        document.body.classList.add('loading');
         const json = await File.readUploadedFileAsText(file);
         const data = JSON.parse(json);
         await dataControls.loadData(data.dataControlsData);
-        // await moduleIntegrator.loadData(data.moduleIntegratorData);
+        moduleIntegrator.loadData(data.moduleIntegratorData);
     }
     catch (err) {
         uiControls.showError(uiControls.burgerMenu, 'Ошибка при загрузке файла');
         console.error(err);
+    }
+    finally {
+        console.log('removed');
+        document.body.classList.remove('loading');
     }
 }

@@ -28,7 +28,9 @@
     <aside class="sidebar">
         <div class="sidebar__inner">
             <div class="sidebar__list">
-                <label class="sidebar__item main-button disabled">Новый проект</label>
+                <label class="sidebar__item main-button">Новый проект
+                    <input type="button" id="new-project">
+                </label>
                 <label class="sidebar__item main-button">Открыть проект
                     <input type="file" id="load-project" accept=".json">
                 </label>
@@ -70,8 +72,9 @@
                                 <div class="option-block">
                                     <label class="input-line">
                                         Название проекта
-                                        <input type="text" class="main-input main-input_text form-change-trigger"
-                                            name="name" value="Результаты" form="module-option-form_glob">
+                                        <input type="text" id="name-input-glob"
+                                            class="main-input main-input_text form-change-trigger" name="name"
+                                            value="Результаты" form="module-option-form_glob">
                                     </label>
                                     <label class="input-line">
                                         FWER

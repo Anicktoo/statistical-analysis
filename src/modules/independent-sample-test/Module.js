@@ -63,6 +63,8 @@ export default class Module extends AbstractModule {
         indepTable: undefined,
         depTable: undefined
     };
+    #tableTwoEl;
+    #tableGroupEl;
     #resultBlock;
     #switch;
     #switch1;
@@ -126,19 +128,24 @@ export default class Module extends AbstractModule {
         uiControls.resultsContainer.insertBefore(this.#resultBlock, refData.resultBlock.nextElementSibling);
     }
 
-    getAllData() {
+    getAllData(forSaving) {
         const data = {};
-        data.id = this.#id;
-        data.data = Object.assign({}, this.#data);
-        data.power = this.#power;
-        data.resultsTableData = Object.deepCopy(this.#resultsTableData);
-        data.testType = this.#testType;
-        data.inputType = this.#inputType;
-        data.altHypTest = this.#altHypTest;
-        data.vars = Object.assign({}, this.#vars);
         data.hypName = this.#hypName;
+        data.inputType = this.#inputType;
+        data.testType = this.#testType;
+        data.altHypTest = this.#altHypTest;
+        data.resultsTableData = Object.deepCopy(this.#resultsTableData);
+        if (forSaving) {
+            data.moduleTypeId = Module.#moduleTypeId;
+            data.varIds = [this.#vars.first?.getID(), this.#vars.second?.getID()];
+            return data;
+        }
         data.element = this.#element;
         data.resultBlock = this.#resultBlock;
+        data.vars = Object.assign({}, this.#vars);
+        data.power = this.#power;
+        data.data = Object.assign({}, this.#data);
+        data.id = this.#id;
         return data;
     }
 
@@ -158,6 +165,64 @@ export default class Module extends AbstractModule {
             el.setAttribute('form', 'module-option-form_' + id);
         });
         this.#id = id;
+    }
+
+    setLoadingData(inputType, testType, altHypTest, resultsTableData, selectedVars) {
+
+        const manualCheck = (blockClass, chosenValue) => {
+            const inputs = [...this.#element.querySelector('.option-block__' + blockClass).querySelectorAll(`input`)];
+            inputs.forEach(el => {
+                if (el.value == chosenValue) {
+                    el.click();
+                }
+            });
+        };
+
+        const manualInput = (testName, values) => {
+            const block = this.#element.querySelector('.option-block__' + testName);
+            values.forEach(el => {
+                const name = `input[name='${el[0]}']`;
+                const input = block.querySelector(name);
+                if (input && el[1] !== null && el[1] !== undefined) {
+                    input.value = el[1];
+                }
+            });
+        };
+
+        this.#inputType = inputType;
+        this.#testType = testType;
+        this.#altHypTest = altHypTest;
+        this.#resultsTableData = resultsTableData;
+
+        manualCheck('input-type', inputType);
+        manualCheck('test-type', testType);
+        manualCheck('hyp-check', altHypTest);
+
+        for (let key in this.#resultsTableData) {
+            if (key === 'z')
+                continue;
+            manualInput(key, Object.entries(this.#resultsTableData[key]));
+        }
+
+        if (this.#inputType === 'manual' || (!selectedVars[0] && !selectedVars[1])) {
+            return;
+        }
+        const ids1 = selectedVars[0].split('_');
+        const ids2 = selectedVars[1].split('_');
+        const switchVar = (sheetId, typeName, tableEl, varFullId, switchEl) => {
+            this.displayVarsOfSheet(sheetId, typeName);
+            const element = tableEl.querySelector('.var-table__item_' + varFullId);
+            element.click();
+            switchEl.click();
+        };
+        if (this.#inputType === 'data-input-two') {
+            switchVar(ids1[1], 'two-column-var', this.#tableTwoEl, selectedVars[0], this.#switch);
+            switchVar(ids2[1], 'two-column-var', this.#tableTwoEl, selectedVars[1], this.#switch);
+        }
+        else {
+            switchVar(ids1[1], 'grouping-var', this.#tableGroupEl, selectedVars[0], this.#switch1);
+            switchVar(ids2[1], 'grouping-var', this.#tableGroupEl, selectedVars[1], this.#switch2);
+        }
     }
 
     getName() {
@@ -204,19 +269,19 @@ export default class Module extends AbstractModule {
             }
         }
 
-        const arrOfOptions2 = arrOfOptions.map(el => el.cloneNode(true));
-
-        this.#sheetSelects[0].append(...arrOfOptions);
-        this.#sheetSelects[1].append(...arrOfOptions2);
+        this.#sheetSelects.forEach(el => {
+            const arrOfOptionsClone = arrOfOptions.map(el => el.cloneNode(true));
+            el.append(...arrOfOptionsClone);
+        });
     }
 
     addListeners(element) {
-        const tableTwo = element.querySelector('.two-column-var');
+        const tableTwo = this.#tableTwoEl;
         const switch0 = tableTwo.querySelector('.switch-button');
         const firstTable = tableTwo.querySelector('.two-column-var__table-body');
         const tableData = tableTwo.querySelector('.target-table-data');
 
-        const tableGroup = element.querySelector('.grouping-var');
+        const tableGroup = this.#tableGroupEl;
         const [switch1, switch2] = [...tableGroup.querySelectorAll('.switch-button')];
         const leftTable = element.querySelector('.grouping-var__table-body');
         const depTable = element.querySelector('.grouping-var__dependent-table-body');
@@ -325,7 +390,7 @@ export default class Module extends AbstractModule {
             vars.forEach(element => {
                 const curVarID = element.getID();
                 let stringElement = `
-                <label title="${element.getName()}" class="var-table__item" data-var-id=${curVarID}>
+                <label title="${element.getName()}" class="var-table__item var-table__item_${curVarID}" data-var-id=${curVarID}>
                     <input type="radio" name="data_value">
                     <img src=${element.getImg()} alt="${element.getTypeName()}" class="var-table__img">
                     <span>${element.getName()}</span>
@@ -341,6 +406,26 @@ export default class Module extends AbstractModule {
     }
 
     updateSelectedVarsVisual(sheetId) {
+
+        const curVarsUpdate = (curVars) => {
+            curVars.forEach((el => {
+                if (el) {
+                    const ids = el.dataset.varId.split('_');
+                    if (ids[1] == sheetId) {
+                        const v = dataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
+                        if (!v) {
+                            this.#tableData.pair.removeChild(el);
+                            return;
+                        }
+                        const elImg = el.querySelector('img');
+                        el.querySelector('span').innerHTML = v.getName();
+                        elImg.setAttribute('src', v.getImg());
+                        elImg.setAttribute('alt', v.getTypeName());
+                    }
+                }
+            }));
+        }
+
         let tableData = this.#tableData.pair;
         let curVars = [...tableData.querySelectorAll('label')];
         curVarsUpdate(curVars);
@@ -350,20 +435,6 @@ export default class Module extends AbstractModule {
         curVarsUpdate(curVars);
 
 
-        function curVarsUpdate(curVars) {
-            curVars.forEach((el => {
-                if (el) {
-                    const ids = el.dataset.varId.split('_');
-                    if (ids[1] == sheetId) {
-                        const v = dataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
-                        const elImg = el.querySelector('img');
-                        el.querySelector('span').innerHTML = v.getName();
-                        elImg.setAttribute('src', v.getImg());
-                        elImg.setAttribute('alt', v.getTypeName());
-                    }
-                }
-            }));
-        }
     }
 
     clearSelectedVars() {
@@ -410,7 +481,7 @@ export default class Module extends AbstractModule {
                     <p>Метод проверки: Сравнение независимых выборок</p>
                     <div class="option-block__sub">
                         Тип ввода
-                        <div class="option-block__list">
+                        <div class="option-block__list option-block__input-type">
                             <label class="radio-line">
                                 <input class="main-radio form-change-trigger form-change-trigger_${this.#id} data-input-two" type="radio" name="input-type" value="data-input-two" form="module-option-form_${this.#id}"
                                     checked>
@@ -444,7 +515,7 @@ export default class Module extends AbstractModule {
                                             form="module-option-form_${this.#id}">
                                         <span>Манна-Уитни</span>
                                     </label>
-                                    <label class="radio-line disabled">
+                                    <label class="radio-line">
                                         <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="test-type" value="student"
                                             form="module-option-form_${this.#id}">
@@ -456,7 +527,7 @@ export default class Module extends AbstractModule {
                         <div class="option-block">
                             <div class="option-block__sub">
                                 Проверка альтернативной гипотезы
-                                <div class="option-block__list">
+                                <div class="option-block__list option-block__hyp-check">
                                     <label class="radio-line">
                                         <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio"
                                             name="hyp-check" value="both"
@@ -617,6 +688,8 @@ export default class Module extends AbstractModule {
         this.#tableData.pair = newHyp.querySelector('.target-table-data');
         this.#tableData.indepTable = newHyp.querySelector('.grouping-var__independent-table-body');
         this.#tableData.depTable = newHyp.querySelector('.grouping-var__dependent-table-body');
+        this.#tableTwoEl = newHyp.querySelector('.two-column-var');
+        this.#tableGroupEl = newHyp.querySelector('.grouping-var');
         this.#resultBlock = newRes;
     }
 

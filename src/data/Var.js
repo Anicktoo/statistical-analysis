@@ -45,26 +45,24 @@ export default class Var {
     _img;
     _set = [];
     _order = [];
-    _binaryGroups;
+    _binaryGroups = [];
     _onlyNumbers;
     _united;
 
     constructor(type, id, set, name, onlyNumbers) {
         this._united = false;
+        if (type !== Var.Binary && type !== Var.Nominal &&
+            type !== Var.Continues && type !== Var.Rang && type !== Var.Empty) {
+            throw new Error('Данный тип данных не поддерживается приложением');
+        }
+        this._id = id;
+        this._typeName = type.name;
+        this._ruTypeName = type.ruName;
+        this._name = name;
         if (type === Var.Empty) {
-            this._typeName = type.name;
-            this._ruTypeName = type.ruName;
-            this._name = name;
             return;
         }
-        if (type !== Var.Binary && type !== Var.Nominal &&
-            type !== Var.Continues && type !== Var.Rang)
-            throw new Error('Данный тип данных не поддерживается приложением');
-        this._typeName = type.name;
         this._img = type.img;
-        this._ruTypeName = type.ruName;
-        this._id = id;
-        this._name = name;
         this._onlyNumbers = onlyNumbers;
         this._set = [...set].customSort(this._typeName === 'continues');
         this._order = new Array(set.size);
@@ -82,6 +80,23 @@ export default class Var {
         Var.unitedSet = [];
     }
 
+    static getGlobalSettings() {
+        const unitedRangsIds = Var.unitedRangs.map(el => el.getID());
+
+        return {
+            unitedRangsIds,
+            unitedOrder: Var.unitedOrder,
+            unitedSet: Var.unitedSet,
+        };
+    }
+
+    //CHECK IT
+    static setGlobalSettingsWithObject(settingsObject, unitedVars) {
+        Var.unitedRangs = unitedVars;
+        Var.unitedOrder = settingsObject.unitedOrder;
+        Var.unitedSet = settingsObject.unitedSet;
+    }
+
     switchUnitedVar(on) {
         if (on) {
             this.showUnitedOrder();
@@ -92,7 +107,6 @@ export default class Var {
     }
 
     showUnitedOrder() {
-        console.log('united show');
         if (!Var.unitedRangs[0]) {
             return;
         }
@@ -111,8 +125,8 @@ export default class Var {
         }
         rangBody.innerHTML = str;
     }
+
     showNormalOrder() {
-        console.log('normal show');
         const rangBody = uiControls.rangTable;
         const curOrder = this._order;
         const curSet = this._set;
@@ -128,7 +142,6 @@ export default class Var {
     }
 
     addUnitedVar(order) {
-        console.log('set united');
         document.getElementById(this._id).querySelector('img').setAttribute('src', Var.imgDir + Var.Rang.imgU);
         Var.unitedOrder = order;
         this._united = true;
@@ -136,11 +149,11 @@ export default class Var {
         if (Var.unitedRangs[0] === this || Var.unitedRangs[1] === this) {
             return;
         }
-        console.log('add united');
         Var.unitedRangs.push(this);
         const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this._set]);
         Var.unitedSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
     }
+
     removeUnitedVar() {
         if (Var.unitedRangs[0] === this) {
             Var.unitedRangs.shift();
@@ -159,8 +172,24 @@ export default class Var {
             Var.unitedSet = [];
             Var.unitedOrder = [];
         }
-        console.log('remove united');
         this._united = false;
+    }
+
+    setSettingsWithObject(settingsObject) {
+        const keys = Object.keys(settingsObject);
+        for (let key of keys) {
+            this[key] = settingsObject[key];
+        }
+        if (this._typeName === 'empty')
+            return;
+        const varHeader = document.getElementById(this._id);
+        varHeader.nextElementSibling.textContent = this._name;
+        if (this._united) {
+            varHeader.querySelector('img').setAttribute('src', Var.imgDir + this._img);
+        }
+        else {
+            varHeader.querySelector('img').setAttribute('src', Var.imgDir + this._img);
+        }
     }
 
     setSettings(formData, order, twoTables) {
@@ -176,6 +205,7 @@ export default class Var {
 
         if (this._typeName === 'rang') {
             if (isUnited) {
+                this._img = Var.Rang.imgU;
                 this.addUnitedVar(order);
             }
             else {
@@ -212,6 +242,7 @@ export default class Var {
             this._binaryGroups[this._binaryGroups.length - i - 1] = number;
         }
     }
+
     createHTML() {
         const name = uiControls.modalVarType.querySelector('#modal-var-types__name');
         const continuesLabel = uiControls.modalVarType.querySelector('.modal-var-types__continues-container');

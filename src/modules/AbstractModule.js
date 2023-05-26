@@ -32,7 +32,6 @@ export default class AbstractModule {
 
     getAllData() {
         throw new Error('This method must be implemented');
-
     }
 
     setName(name) {
@@ -40,6 +39,10 @@ export default class AbstractModule {
     }
 
     setId(id) {
+        throw new Error('This method must be implemented');
+    }
+
+    setLoadingData() {
         throw new Error('This method must be implemented');
     }
 
