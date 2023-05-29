@@ -1111,7 +1111,7 @@ export default class Module extends AbstractModule {
             n1 = this.#resultsTableData.mann.n;
         }
         else {
-            const U1 = Math.getU(data1, data2, Var.getUnitedRang);
+            const U1 = Math.getU(data1, data2, Var.getOrderOfValUnited);
             n1 = data1.length;
             m = data2.length;
             const U2 = n1 * m - U1;
@@ -1152,7 +1152,7 @@ export default class Module extends AbstractModule {
             n1 = this.#resultsTableData.mann.n;
         }
         else {
-            const U1 = Math.getU(data1, data2, Var.getUnitedRang);
+            const U1 = Math.getU(data1, data2, Var.getOrderOfValUnited);
             n1 = data1.length;
             m = data2.length;
             const U2 = n1 * m - U1;

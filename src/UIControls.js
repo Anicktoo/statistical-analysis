@@ -196,9 +196,18 @@ window.uiControls = {
 
     addNewProjectListener() {
         uiControls.newProject.addEventListener('click', (event) => {
-            const newTab = window.open('#', '_blank');
-            newTab.focus();
-            uiControls.toggleMenu();
+            try {
+                const newTab = window.open('#', '_blank');
+                if (!newTab) {
+                    throw new Error('Браузер заблокировал всплывающие окна. Чтобы открыть новый проект - разрешите браузеру показывать всплывающие окна.');
+                }
+                newTab.focus();
+                uiControls.toggleMenu();
+            }
+            catch (err) {
+                uiControls.showError(uiControls.burgerMenu, 'Ошибка при загрузке файла');
+                console.error(err);
+            }
         });
     },
 
@@ -235,6 +244,9 @@ window.uiControls = {
                     throw new Error('Неверный тип файла');
                 }
                 const newTab = window.open('#', '_blank');
+                if (!newTab) {
+                    throw new Error('Браузер заблокировал всплывающие окна. Чтобы загрузить проект - разрешите браузеру показывать всплывающие окна.');
+                }
                 newTab.fileToLoad = file;
                 newTab.focus();
 

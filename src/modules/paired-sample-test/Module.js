@@ -24,27 +24,32 @@ export default class Module extends AbstractModule {
     #id;
     #data = {
         first: undefined,
-        second: undefined
+        second: undefined,
     }
     #power;
     #resultsTableData = {
         z: undefined,
-        student: {
-            d: undefined,
-            sd: undefined,
-        },
         sign: {
             p0: undefined,
             p1: undefined,
             p2: undefined,
-        }
+        },
+        wilcoxon: {
+            W: undefined,
+            nn: undefined,
+        },
+        student: {
+            d: undefined,
+            sd: undefined,
+        },
+
     }
     #testType;
     #inputType;
     #altHypTest;
     #vars = {
         first: undefined,
-        second: undefined
+        second: undefined,
     }
 
     #hypName;
@@ -445,7 +450,7 @@ export default class Module extends AbstractModule {
                                             value="sign" form="module-option-form_${this.#id}" checked>
                                         <span>Тест знаков</span>
                                     </label>
-                                    <label class="radio-line disabled">
+                                    <label class="radio-line">
                                         <input class="main-radio form-change-trigger form-change-trigger_${this.#id}" type="radio" name="test-type"
                                             value="wilcoxon" form="module-option-form_${this.#id}">
                                         <span>Уилкоксона</span>
@@ -486,12 +491,25 @@ export default class Module extends AbstractModule {
                         Введите параметры:
                         <div class="option-block__list">
                             <label class="input-line">
-                                <span>Средняя разность (d&#772;):</span>
+                                <span>Средняя разность ( d&#772; ):</span>
                                 <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="d" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
                             </label>
                             <label class="input-line">
-                                <span>Стандартное отклонение разностей (s<sub>d</sub>):</span>
+                                <span>Стандартное отклонение разностей ( s<sub>d</sub> ):</span>
                                 <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="sd" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="option-block__sub option-block__manual-input option-block__wilcoxon option-block_hidden">
+                        Введите параметры:
+                        <div class="option-block__list">
+                            <label class="input-line">
+                                <span>W-критерий ( W ):</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="W" value="1" step="1" form="module-option-form_${this.#id}">
+                            </label>
+                            <label class="input-line">
+                                <span>Число ненулевых разностей ( n ):</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="nn" value="0" step="1" min="0" form="module-option-form_${this.#id}">
                             </label>
                         </div>
                     </div>
@@ -499,11 +517,11 @@ export default class Module extends AbstractModule {
                         Введите параметры:
                         <div class="option-block__list">
                             <label class="input-line">
-                                <span>Доля нулевых разностей (&#961;<sub>&#965;</sub>):</span>
+                                <span>Доля нулевых разностей ( &#961;<sub>&#965;</sub> ):</span>
                                 <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="p0" value="0" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
                             </label>
                             <label class="input-line">
-                                <span>Доля положительных разностей (&#961;<sub>1</sub>):</span>
+                                <span>Доля положительных разностей ( &#961;<sub>1</sub> ):</span>
                                 <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="p1" value="0.5" step="0.01" min="0" max="1" form="module-option-form_${this.#id}">
                             </label>
                         </div>
@@ -570,6 +588,17 @@ export default class Module extends AbstractModule {
                 else {
                     this.#resultsTableData.student.d = null;
                     this.#resultsTableData.student.sd = null;
+                }
+                break;
+            }
+            case 'wilcoxon': {
+                if (this.#inputType === 'manual') {
+                    this.#resultsTableData.wilcoxon.W = Number(formData.get('W'));
+                    this.#resultsTableData.wilcoxon.nn = Number(formData.get('nn'));
+                }
+                else {
+                    this.#resultsTableData.wilcoxon.W = null;
+                    this.#resultsTableData.wilcoxon.nn = null;
                 }
                 break;
             }
@@ -698,9 +727,27 @@ export default class Module extends AbstractModule {
                     }
                     break;
                 }
+                case 'wilcoxon': {
+                    if (this.#inputType !== 'manual' && firstVarName !== Var.Continues.name && firstVarName !== Var.Rang.name) {
+                        throw new Error(errorText([Var.Continues.ruName, Var.Rang.name]));
+                    }
+                    if (firstVarName === Var.Rang.name && (!this.#vars.first.isUnited() || !this.#vars.second.isUnited())) {
+                        throw new Error('Для данного теста и способа ввода данных необходимо сперва объеденить значения выборок в окне настроек столбца');
+                    }
+                    if (isInv) {
+                        returnValue = this.#wilcoxonTestInv(alpha, arg, data1, data2);
+                    }
+                    else {
+                        returnValue = this.#wilcoxonTest(alpha, arg, data1, data2);
+                    }
+                    break;
+                }
                 case 'sign': {
                     if (this.#inputType !== 'manual' && firstVarName === Var.Nominal.name) {
                         throw new Error(errorText([Var.Continues.ruName, Var.Rang.ruName, Var.Binary.ruName]));
+                    }
+                    if (firstVarName === Var.Rang.name && (!this.#vars.first.isUnited() || !this.#vars.second.isUnited())) {
+                        throw new Error('Для данного теста и способа ввода данных необходимо сперва объеденить значения выборок в окне настроек столбца');
                     }
                     if (isInv) {
                         returnValue = this.#signTestInv(alpha, arg, data1, data2);
@@ -722,67 +769,6 @@ export default class Module extends AbstractModule {
         function errorText(varTypeNameArray) {
             return `Выбранный тест поддерживает следующий тип данных: ${varTypeNameArray.join(', ')}`;
         }
-    }
-
-    #studentTest(alpha, power, data1, data2) {
-        let d, sd;
-        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
-        const z = Math.getZ(zAlpha, power);
-        if (this.#inputType === 'manual') {
-            d = this.#resultsTableData.student.d;
-            sd = this.#resultsTableData.student.sd;
-        }
-        else {
-            const differences = data1.map((el, i) => el - data2[i]);
-            d = Math.abs(Math.mean(differences));
-            sd = Math.stddev.s(differences);
-
-            this.#resultsTableData.student.d = d;
-            this.#resultsTableData.student.sd = sd;
-        }
-
-        this.#resultsTableData.z = z;
-
-        const n = (z * sd / d) ** 2 + ((zAlpha ** 2) / 2);
-
-        if (n === undefined || typeof n !== 'number') {
-            throw new Error('Ошибка расчета данных');
-        }
-
-        return n;
-    }
-
-    #studentTestInv(alpha, n, data1, data2) {
-        let d, sd, z;
-        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
-
-        if (this.#inputType === 'manual') {
-            d = this.#resultsTableData.student.d;
-            sd = this.#resultsTableData.student.sd;
-        }
-        else {
-            const differences = data1.map((el, i) => el - data2[i]);
-            d = Math.abs(Math.mean(differences));
-            sd = Math.stddev.s(differences);
-
-            this.#resultsTableData.student.d = d;
-            this.#resultsTableData.student.sd = sd;
-        }
-
-
-        z = (Math.sqrt(n - ((zAlpha ** 2) / 2)) * d) / sd;
-        if (z > 0) {
-            z *= -1;
-        }
-        this.#resultsTableData.z = z;
-        const zB = z - zAlpha;
-        const power = 100 - Math.normdist(zB);
-
-        if (power === undefined || typeof power !== 'number') {
-            throw new Error('Ошибка расчета данных');
-        }
-
-        return power;
     }
 
     #signTest(alpha, power, data1, data2) {
@@ -856,6 +842,132 @@ export default class Module extends AbstractModule {
         return power;
     }
 
+    #wilcoxonTest(alpha, power, data1, data2) {
+        let W, nn;
+        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
+        const z = Math.getZ(zAlpha, power);
+        if (this.#inputType === 'manual') {
+            W = this.#resultsTableData.wilcoxon.W;
+            nn = this.#resultsTableData.wilcoxon.nn;
+        }
+        else {
+            const varGetRangFunc = Var.getOrderOfValUnited;
+            let res = Math.getW(data1, data2, this.#vars.first.getTypeName() === Var.Rang.name ? varGetRangFunc : null);
+            W = res.W;
+            nn = res.nn;
+            this.#resultsTableData.wilcoxon.W = W;
+            this.#resultsTableData.wilcoxon.nn = nn;
+        }
+
+        this.#resultsTableData.z = z;
+
+        const v = W / (nn ** 2);
+
+        const n = (z ** 2) / (6 * (v ** 2));
+
+        if (n === undefined || typeof n !== 'number') {
+            throw new Error('Ошибка расчета данных');
+        }
+
+        return n;
+    }
+
+    #wilcoxonTestInv(alpha, n, data1, data2) {
+        let W, nn;
+        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
+
+        if (this.#inputType === 'manual') {
+            W = this.#resultsTableData.wilcoxon.W;
+            nn = this.#resultsTableData.wilcoxon.nn;
+        }
+        else {
+            const varGetRangFunc = Var.getOrderOfValUnited;
+            let res = Math.getW(data1, data2, this.#vars.first.getTypeName() === Var.Rang.name ? varGetRangFunc : null);
+            W = res.W;
+            nn = res.nn;
+            this.#resultsTableData.wilcoxon.W = W;
+            this.#resultsTableData.wilcoxon.nn = nn;
+        }
+
+        // const p = 0.5 * (this.#altHypTest === 'both' ? -Math.sign(W) : (this.#altHypTest === 'right' ? -1 : 1));
+        // let z = (W + p) / Math.sqrt((nn * (nn + 1) * (2 * nn + 1)) / 6);
+
+        const v = W / (nn ** 2);
+        const z = -Math.sqrt(v ** 2 * 6 * n);
+
+        this.#resultsTableData.z = z;
+        const zB = z - zAlpha;
+        const power = 100 - Math.normdist(zB);
+
+        if (power === undefined || typeof power !== 'number') {
+            throw new Error('Ошибка расчета данных');
+        }
+        return power;
+    }
+
+    #studentTest(alpha, power, data1, data2) {
+        let d, sd;
+        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
+        const z = Math.getZ(zAlpha, power);
+        if (this.#inputType === 'manual') {
+            d = this.#resultsTableData.student.d;
+            sd = this.#resultsTableData.student.sd;
+        }
+        else {
+            const differences = data1.map((el, i) => el - data2[i]);
+            d = Math.abs(Math.mean(differences));
+            sd = Math.stddev.s(differences);
+
+            this.#resultsTableData.student.d = d;
+            this.#resultsTableData.student.sd = sd;
+        }
+
+        this.#resultsTableData.z = z;
+
+        const n = (z * sd / d) ** 2 + ((zAlpha ** 2) / 2);
+
+        if (n === undefined || typeof n !== 'number') {
+            throw new Error('Ошибка расчета данных');
+        }
+
+        return n;
+    }
+
+    #studentTestInv(alpha, n, data1, data2) {
+        let d, sd, z;
+        const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
+
+        if (this.#inputType === 'manual') {
+            d = this.#resultsTableData.student.d;
+            sd = this.#resultsTableData.student.sd;
+        }
+        else {
+            const differences = data1.map((el, i) => el - data2[i]);
+            d = Math.abs(Math.mean(differences));
+            sd = Math.stddev.s(differences);
+
+            this.#resultsTableData.student.d = d;
+            this.#resultsTableData.student.sd = sd;
+        }
+
+
+        z = (Math.sqrt(n - ((zAlpha ** 2) / 2)) * d) / sd;
+        if (z > 0) {
+            z *= -1;
+        }
+        this.#resultsTableData.z = z;
+        const zB = z - zAlpha;
+        const power = 100 - Math.normdist(zB);
+
+        if (power === undefined || typeof power !== 'number') {
+            throw new Error('Ошибка расчета данных');
+        }
+
+        return power;
+    }
+
+
+
     // returns list of number of 0-s, positive and negative differences
     #signTestGetListOfNumberOfSigns(type, data1, data2, var1, var2) {
         const list = [0, 0, 0];
@@ -867,7 +979,7 @@ export default class Module extends AbstractModule {
             callback = var1.isValInZeroGroup;
         }
         else if (type === 'rang') {
-            callback = var1.getOrderOfVal;
+            callback = Var.getOrderOfValUnited;
         }
 
         if (type === 'continues') {
@@ -996,6 +1108,41 @@ export default class Module extends AbstractModule {
                             </td>
                             <td>
                                 ${Number.resultForm(this.#resultsTableData.sign.p2)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.z)}
+                            </td>
+                        </tr >
+                    </tbody >`;
+        }
+        else if (this.#testType === 'wilcoxon') {
+            table = `<thead>
+                        <tr>
+                            ${inputTypeHeader}
+                            <th>
+                                W
+                            </th>
+                            <th>
+                                n
+                            </th>
+                            <th>
+                                z
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                ${String.resultForm(this.#vars.first?.getName())}
+                            </td>
+                            <td>
+                                ${String.resultForm(this.#vars.second?.getName())}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.wilcoxon.W)}
+                            </td>
+                            <td>
+                                ${Number.resultForm(this.#resultsTableData.wilcoxon.nn)}
                             </td>
                             <td>
                                 ${Number.resultForm(this.#resultsTableData.z)}

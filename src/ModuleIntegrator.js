@@ -73,7 +73,8 @@ const moduleIntegrator = {
             const powerEl = uiControls.parametersGlobItem.querySelector('#power-input');
             powerEl.value = this.power;
             const mainHypEl = uiControls.parametersGlobItem.querySelector('#main-hypothesis');
-            mainHypEl.querySelector('.main-hypothesis__option_' + this.mainHypId).selected = true;
+            const optionEl = mainHypEl.querySelector('.main-hypothesis__option_' + this.mainHypId);
+            optionEl && (optionEl.selected = true);
         },
     },
 
@@ -293,7 +294,7 @@ const moduleIntegrator = {
         for (let i = 0; i < moduleIntegrator._globalSettings.hypCounter; i++) {
             const { hyp, update, hidden } = hypotheses[i];
 
-            if ((updateAllResults || update) && hyp !== mainHyp.hyp && !hidden) {
+            if ((updateAllResults || update) && !hidden && hyp !== mainHyp.hyp) {
                 hyp.setSettings();
                 hyp.setStatPower(alpha, globalSettings.sampleSize);
                 hypotheses[i].update = false;
@@ -310,7 +311,8 @@ const moduleIntegrator = {
         if (globalSettings.FWER <= 0 || globalSettings.FWER >= 100) {
             uiControls.showError(uiControls.FWERInput, 'Значение FWER должно быть больше, чем 0% и меньше, чем 100%');
         }
-        globalSettings.mainHypId = Number(formData.get('mainHypothesis'));
+        const mainHypVal = formData.get('mainHypothesis');
+        globalSettings.mainHypId = mainHypVal === 'null' ? '-' : Number(mainHypVal);
         globalSettings.power = Number(formData.get('power'));
         if (globalSettings.power <= 0 || globalSettings.power >= 100) {
             uiControls.showError(uiControls.powerInput, 'Значение мощности должно быть больше, чем 0% и меньше, чем 100%');

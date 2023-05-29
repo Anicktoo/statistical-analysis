@@ -136,15 +136,20 @@ Math.roundGOST = function (num) {
 }
 
 Math.rank = {};
-Math.rank.avg = function (array, getRungFunc) {
+Math.rank.avg = function (array, getRangFunc) {
     const obj = {};
+    let getRang = getRangFunc;
+    if (!getRangFunc) {
+        const sorted = [...array].customSort(true);
+        getRang = (el) => sorted.indexOf(el) + 1;
+    }
     for (let el of array) {
         if (obj[el]) {
             obj[el].count++;
         }
         else {
             obj[el] = {
-                rank: getRungFunc(el),
+                rank: getRang(el),
                 avg: 0,
                 count: 1,
                 val: el
@@ -188,12 +193,12 @@ Array.prototype.customSort = function (isContinues) {
 }
 
 //returns U1
-Math.getU = function (array1, array2, getRungFunc) {
+Math.getU = function (array1, array2, getRangFunc) {
     let U = 0;
 
-    if (getRungFunc) {
+    if (getRangFunc) {
         const unitedArr = [...array1, ...array2];
-        const rangArray = Math.rank.avg(unitedArr, getRungFunc);
+        const rangArray = Math.rank.avg(unitedArr, getRangFunc);
         const m = array1.length;
         const n = array2.length;
         let T = 0;
@@ -210,6 +215,44 @@ Math.getU = function (array1, array2, getRungFunc) {
         });
     }
     return U;
+}
+
+Math.getW = function (array1, array2, getRangFunc) {
+    let xArray, yArray;
+    if (getRangFunc) {
+        xArray = array2.map(el => getRangFunc(el));
+        yArray = array1.map(el => getRangFunc(el));
+    }
+    else {
+        xArray = array2;
+        yArray = array1;
+    }
+
+    const difArr = [];
+    const difModArr = [];
+    for (let i = 0; i < xArray.length; i++) {
+        const dif = xArray[i] - yArray[i];
+        if (dif === 0) {
+            continue;
+        }
+        const difMod = Math.abs(dif);
+        difArr.push(dif);
+        difModArr.push(difMod);
+    }
+    const rangArr = Math.rank.avg(difModArr);
+
+    const W = difArr.reduce((c, el, ind) => {
+        console.log('dif sign ', Math.sign(el));
+        console.log('dif ', el);
+        console.log('dif abs ', difModArr[ind]);
+        console.log('rang ', rangArr.get(difModArr[ind]));
+        console.log('rang with sign ', Math.sign(el) * rangArr.get(difModArr[ind]));
+        console.log('c ', c);
+        console.log('----------------------------------------------------');
+        return c + (Math.sign(el) * rangArr.get(difModArr[ind]))
+    }, 0);
+
+    return { W, nn: difArr.length };
 }
 
 Object.getNameFromPath = function (path) {

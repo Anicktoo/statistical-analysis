@@ -479,7 +479,7 @@ export default class Module extends AbstractModule {
                         Введите параметры:
                         <div class="option-block__list">
                             <label class="input-line">
-                                <span>Коэффициент корреляции Пирсона (r):</span>
+                                <span>Коэффициент корреляции Пирсона ( r ):</span>
                                 <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="r" value="0.5" step="0.01" max="1" min="-1" form="module-option-form_${this.#id}">
                             </label>
                         </div>
@@ -488,7 +488,7 @@ export default class Module extends AbstractModule {
                         Введите параметры:
                         <div class="option-block__list">
                             <label class="input-line">
-                                <span>Коэффициент корреляции Спримена (&#961;):</span>
+                                <span>Коэффициент корреляции Спирмена ( &#961; ):</span>
                                 <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="p" value="0.5" step="0.01" max="1" min="-1" form="module-option-form_${this.#id}">
                             </label>
                         </div>
