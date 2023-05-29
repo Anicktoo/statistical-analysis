@@ -194,7 +194,6 @@ export default class Var {
 
     setSettings(formData, order, twoTables) {
         const varHeader = document.getElementById(this._id);
-        console.log(formData.get('var-name'));
         this._name = formData.get('var-name');
         varHeader.nextElementSibling.textContent = this._name;
 

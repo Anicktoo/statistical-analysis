@@ -64,29 +64,28 @@ Math.normdist = function (z) {
 }
 
 Math.mean = function (array) {
-    let mean = 0;
-    for (let i = 0; i < array.length; i++) {
-        if (i % 1000 === 0) {
-            console.log(mean);
-        }
-        mean += array[i] / array.length;
-    }
-    return mean;
-    // return array.reduce((el, c) => el / array.length + c, 0);
+    // let mean = 0;
+    // for (let i = 0; i < array.length; i++) {
+    //     mean += array[i] / array.length;
+    // }
+    // return mean;
+    return array.reduce((c, el) => el / array.length + c, 0);
 }
 
 Math.stddev = {};
 Math.stddev.s = function (array) {
     const n = array.length;
-    const mean = array.reduce((a, b) => a + b) / n;
-    return Math.sqrt(array.map(x => ((x - mean) ** 2)).reduce((a, b) => a + b) / (n - 1));
+    const mean = array.reduce((c, el) => c + el / n, 0);
+    const nS = n - 1;
+    return Math.sqrt(array.map(x => ((x - mean) ** 2)).reduce((c, el) => c + el / nS, 0));
 }
 
 Math.var = {};
 Math.var.s = function (array) {
     const n = array.length;
-    const mean = array.reduce((a, b) => a + b) / n;
-    return array.map(x => ((x - mean) ** 2)).reduce((a, b) => a + b) / (n - 1);
+    const mean = array.reduce((c, el) => c + el / n, 0);
+    const nS = n - 1;
+    return array.map(x => ((x - mean) ** 2)).reduce((c, el) => c + el / nS, 0);
 }
 
 Math.fisher = function (number) {
@@ -242,13 +241,6 @@ Math.getW = function (array1, array2, getRangFunc) {
     const rangArr = Math.rank.avg(difModArr);
 
     const W = difArr.reduce((c, el, ind) => {
-        console.log('dif sign ', Math.sign(el));
-        console.log('dif ', el);
-        console.log('dif abs ', difModArr[ind]);
-        console.log('rang ', rangArr.get(difModArr[ind]));
-        console.log('rang with sign ', Math.sign(el) * rangArr.get(difModArr[ind]));
-        console.log('c ', c);
-        console.log('----------------------------------------------------');
         return c + (Math.sign(el) * rangArr.get(difModArr[ind]))
     }, 0);
 
