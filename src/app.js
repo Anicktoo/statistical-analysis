@@ -23,7 +23,6 @@ export async function saveProject() {
             moduleIntegratorData
         };
         const json = JSON.stringify(data);
-        console.log(json);
         const blob = new Blob([json], { type: "application/json" });
         const url = URL.createObjectURL(blob);
 
@@ -56,7 +55,6 @@ export async function loadProject(file) {
         console.error(err);
     }
     finally {
-        console.log('removed');
         document.body.classList.remove('loading');
     }
 }

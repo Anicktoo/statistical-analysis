@@ -863,7 +863,7 @@ export default class Module extends AbstractModule {
 
         const v = W / (nn ** 2);
 
-        const n = (z ** 2) / (6 * (v ** 2));
+        const n = (z ** 2) / (3 * (v ** 2));
 
         if (n === undefined || typeof n !== 'number') {
             throw new Error('Ошибка расчета данных');
@@ -893,7 +893,7 @@ export default class Module extends AbstractModule {
         // let z = (W + p) / Math.sqrt((nn * (nn + 1) * (2 * nn + 1)) / 6);
 
         const v = W / (nn ** 2);
-        const z = -Math.sqrt(v ** 2 * 6 * n);
+        const z = -Math.sqrt(v ** 2 * 3 * n);
 
         this.#resultsTableData.z = z;
         const zB = z - zAlpha;
