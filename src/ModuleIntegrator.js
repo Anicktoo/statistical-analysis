@@ -143,7 +143,7 @@ const moduleIntegrator = {
                 el.hyp.varIds,
             );
             if (el.hidden) {
-                thisEl.hyp.getElement().querySelector('.parameters__hide-button').click();
+                thisEl.hyp.getElement().querySelector('.extra_hide-button').click();
             }
         }
         this._globalSettings.setData(data.globalSettings);

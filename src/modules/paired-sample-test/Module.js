@@ -35,8 +35,7 @@ export default class Module extends AbstractModule {
             p2: undefined,
         },
         wilcoxon: {
-            W: undefined,
-            nn: undefined,
+            v: undefined,
         },
         student: {
             d: undefined,
@@ -504,12 +503,8 @@ export default class Module extends AbstractModule {
                         Введите параметры:
                         <div class="option-block__list">
                             <label class="input-line">
-                                <span>W-критерий ( W ):</span>
-                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="W" value="1" step="1" form="module-option-form_${this.#id}">
-                            </label>
-                            <label class="input-line">
-                                <span>Число ненулевых разностей ( n ):</span>
-                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="nn" value="0" step="1" min="0" form="module-option-form_${this.#id}">
+                                <span>Величина эффекта ( v ):</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="v" value="0.01" step="0.01" form="module-option-form_${this.#id}">
                             </label>
                         </div>
                     </div>
@@ -593,12 +588,10 @@ export default class Module extends AbstractModule {
             }
             case 'wilcoxon': {
                 if (this.#inputType === 'manual') {
-                    this.#resultsTableData.wilcoxon.W = Number(formData.get('W'));
-                    this.#resultsTableData.wilcoxon.nn = Number(formData.get('nn'));
+                    this.#resultsTableData.wilcoxon.v = Number(formData.get('v'));
                 }
                 else {
-                    this.#resultsTableData.wilcoxon.W = null;
-                    this.#resultsTableData.wilcoxon.nn = null;
+                    this.#resultsTableData.wilcoxon.v = null;
                 }
                 break;
             }
@@ -731,7 +724,7 @@ export default class Module extends AbstractModule {
                     if (this.#inputType !== 'manual' && firstVarName !== Var.Continues.name && firstVarName !== Var.Rang.name) {
                         throw new Error(errorText([Var.Continues.ruName, Var.Rang.name]));
                     }
-                    if (firstVarName === Var.Rang.name && (!this.#vars.first.isUnitedWith(this.#vars.second))) {
+                    if (this.#inputType !== 'manual' && firstVarName === Var.Rang.name && (!this.#vars.first.isUnitedWith(this.#vars.second))) {
                         throw new Error('Для данного теста и способа ввода данных необходимо сперва объеденить значения выборок в окне настроек столбца');
                     }
                     if (isInv) {
@@ -746,7 +739,7 @@ export default class Module extends AbstractModule {
                     if (this.#inputType !== 'manual' && firstVarName === Var.Nominal.name) {
                         throw new Error(errorText([Var.Continues.ruName, Var.Rang.ruName, Var.Binary.ruName]));
                     }
-                    if (firstVarName === Var.Rang.name && (!this.#vars.first.isUnitedWith(this.#vars.second))) {
+                    if (this.#inputType !== 'manual' && firstVarName === Var.Rang.name && (!this.#vars.first.isUnitedWith(this.#vars.second))) {
                         throw new Error('Для данного теста и способа ввода данных необходимо сперва объеденить значения выборок в окне настроек столбца');
                     }
                     if (isInv) {
@@ -843,25 +836,23 @@ export default class Module extends AbstractModule {
     }
 
     #wilcoxonTest(alpha, power, data1, data2) {
-        let W, nn;
+        let v;
         const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
         const z = Math.getZ(zAlpha, power);
         if (this.#inputType === 'manual') {
-            W = this.#resultsTableData.wilcoxon.W;
-            nn = this.#resultsTableData.wilcoxon.nn;
+            v = this.#resultsTableData.wilcoxon.v;
         }
         else {
             const varGetRangFunc = Var.prototype.getOrderOfValUnited.bind(this.#vars.first);
             let res = Math.getW(data1, data2, this.#vars.first.getTypeName() === Var.Rang.name ? varGetRangFunc : null);
-            W = res.W;
-            nn = res.nn;
-            this.#resultsTableData.wilcoxon.W = W;
-            this.#resultsTableData.wilcoxon.nn = nn;
+            const W = res.W;
+            const nn = res.nn;
+            v = W / (nn ** 2);
+            this.#resultsTableData.wilcoxon.v = v;
         }
 
         this.#resultsTableData.z = z;
 
-        const v = W / (nn ** 2);
 
         const n = (z ** 2) / (3 * (v ** 2));
 
@@ -873,23 +864,21 @@ export default class Module extends AbstractModule {
     }
 
     #wilcoxonTestInv(alpha, n, data1, data2) {
-        let W, nn;
+        let v;
         const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
 
         if (this.#inputType === 'manual') {
-            W = this.#resultsTableData.wilcoxon.W;
-            nn = this.#resultsTableData.wilcoxon.nn;
+            v = this.#resultsTableData.wilcoxon.v;
         }
         else {
             const varGetRangFunc = Var.prototype.getOrderOfValUnited.bind(this.#vars.first);
             let res = Math.getW(data1, data2, this.#vars.first.getTypeName() === Var.Rang.name ? varGetRangFunc : null);
-            W = res.W;
-            nn = res.nn;
-            this.#resultsTableData.wilcoxon.W = W;
-            this.#resultsTableData.wilcoxon.nn = nn;
+            const W = res.W;
+            const nn = res.nn;
+            v = W / (nn ** 2);
+            this.#resultsTableData.wilcoxon.v = v;
         }
 
-        const v = W / (nn ** 2);
         const z = -Math.sqrt(v ** 2 * 3 * n);
 
         this.#resultsTableData.z = z;
@@ -1117,10 +1106,7 @@ export default class Module extends AbstractModule {
                         <tr>
                             ${inputTypeHeader}
                             <th>
-                                W
-                            </th>
-                            <th>
-                                n
+                                v
                             </th>
                             <th>
                                 z
@@ -1136,10 +1122,7 @@ export default class Module extends AbstractModule {
                                 ${String.resultForm(this.#vars.second?.getName())}
                             </td>
                             <td>
-                                ${Number.resultForm(this.#resultsTableData.wilcoxon.W)}
-                            </td>
-                            <td>
-                                ${Number.resultForm(this.#resultsTableData.wilcoxon.nn)}
+                                ${Number.resultForm(this.#resultsTableData.wilcoxon.v)}
                             </td>
                             <td>
                                 ${Number.resultForm(this.#resultsTableData.z)}

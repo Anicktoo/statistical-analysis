@@ -64,11 +64,6 @@ Math.normdist = function (z) {
 }
 
 Math.mean = function (array) {
-    // let mean = 0;
-    // for (let i = 0; i < array.length; i++) {
-    //     mean += array[i] / array.length;
-    // }
-    // return mean;
     return array.reduce((c, el) => el / array.length + c, 0);
 }
 
@@ -255,7 +250,7 @@ Object.getDirFromPath = function (path) {
     return path.match(/^.*(\\|\/|\:)/, '')[0];
 }
 
-File.readUploadedFileAsText = (inputFile) => {
+File.readUploadedFileAsText = (inputFile, encoding) => {
     const fileReader = new FileReader();
     return new Promise((resolve, reject) => {
         fileReader.onerror = () => {
@@ -266,6 +261,11 @@ File.readUploadedFileAsText = (inputFile) => {
         fileReader.onload = () => {
             resolve(fileReader.result);
         };
-        fileReader.readAsText(inputFile);
+        fileReader.readAsText(inputFile, encoding);
     });
 };
+
+Blob.createBlobWithEncoding = (content, encoding, type) => {
+    const uint8array = new TextEncoder(encoding, { NONSTANDARD_allowLegacyEncoding: true }).encode(content);
+    return new Blob([uint8array], { type: type });
+}

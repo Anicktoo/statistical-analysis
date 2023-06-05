@@ -680,7 +680,7 @@ export default class Module extends AbstractModule {
                     if (this.#inputType !== 'manual' && firstVarName !== Var.Rang.name) {
                         throw new Error(errorText([Var.Rang.ruName]));
                     }
-                    if (this.#vars.first.isUnited() || this.#vars.second.isUnited()) {
+                    if (this.#inputType !== 'manual' && (this.#vars.first.isUnited() || this.#vars.second.isUnited())) {
                         throw new Error('Для данного теста переменные не должны находится в объединении с другими переменными');
                     }
                     if (isInv) {

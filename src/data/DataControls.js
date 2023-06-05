@@ -155,7 +155,6 @@ const dataControls = {
         const data = {
             sheets: [],
             globalSettings: Settings.getGlobalSettings(),
-            globalVarSettings: Var.getGlobalSettings()
         };
         for (let el of this._sheets) {
             const sheetData = await el.getData();
@@ -179,15 +178,13 @@ const dataControls = {
             this._sheets[i].setId(el._id);
             this._sheets[i].setName(el._name);
             await this._sheets[i].setSettingsWithObject(el._settings);
-            this._sheets[i].setVarSettingsWithArray(el._dataVars);
-            uiControls.initNewSheetControls();
+        }
+
+        for (let i = 0; i < data.sheets.length; i++) {
+            this._sheets[i].setVarSettingsWithArray(data.sheets[i]._dataVars);
             moduleIntegrator.updateVarsOfSheet(this._sheets[i].getID(), false);
         }
-        const unitedVars = data.globalVarSettings.unitedRangsIds.map(el => {
-            const ids = el.split('_');
-            return this.getVarBySheetIdAndVarId(Number(ids[1]), Number(ids[2]));
-        });
-        Var.setGlobalSettingsWithObject(data.globalVarSettings, unitedVars);
+        uiControls.initNewSheetControls();
 
         await this.selectSheet(this._sheets[0].getID());
     },

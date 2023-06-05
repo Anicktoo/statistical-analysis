@@ -3,6 +3,7 @@ import continuesImg from '@img/table/scaleContinues.png';
 import binaryImg from '@img/table/scaleBinary.png';
 import rangImg from '@img/table/scaleRang.png';
 import rangUnitedImg from '@img/table/scaleRangUnited.png';
+import dataControls from '@data/dataControls';
 
 export default class Var {
     static Binary = {
@@ -34,6 +35,8 @@ export default class Var {
 
     static imgDir = Object.getDirFromPath(rangImg);
 
+    _unionLoaded = false;
+    _unionSaved = false;
     _toRemoveUnion = false;
     _tmpUnitedPair = undefined;
     _tmpUnitedObj = {
@@ -142,100 +145,6 @@ export default class Var {
         this._unitedObj = {};
     }
 
-    // static getGlobalSettings() {
-    //     const unitedRangsIds = Var.unitedRangs.map(el => el.getID());
-
-    //     return {
-    //         unitedRangsIds,
-    //         unitedOrder: Var.unitedOrder,
-    //         unitedSet: Var.unitedSet,
-    //     };
-    // }
-
-    //CHECK IT
-    // static setGlobalSettingsWithObject(settingsObject, unitedVars) {
-    //     Var.unitedRangs = unitedVars;
-    //     Var.unitedOrder = settingsObject.unitedOrder;
-    //     Var.unitedSet = settingsObject.unitedSet;
-    // }
-
-    // switchUnitedVar(on) {
-    //     if (on) {
-    //         this.showUnitedOrder();
-    //     }
-    //     else {
-    //         this.showNormalOrder();
-    //     }
-    // }
-
-    // showUnitedOrder() {
-    //     if (!Var.unitedRangs[0]) {
-    //         return;
-    //     }
-    //     const rangBody = uiControls.rangTable;
-    //     const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this._set]);
-    //     const curSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
-    //     Var.tmpSet = curSet;
-    //     const curOrder = curSet.map((el, ind) => ind);
-    //     let str = '';
-    //     for (let i = 0; i < curSet.length; i++) {
-    //         str += `
-    //         <label class="var-table__item" data-order="${curOrder[i]}">
-    //             <input type="radio" name="data_value">
-    //             <span>${curSet[curOrder[i]]}</span>
-    //         </label>`;
-    //     }
-    //     rangBody.innerHTML = str;
-    // }
-
-    // showNormalOrder() {
-    //     const rangBody = uiControls.rangTable;
-    //     const curOrder = this._order;
-    //     const curSet = this._set;
-    //     let str = '';
-    //     for (let i = 0; i < curSet.length; i++) {
-    //         str += `
-    //         <label class="var-table__item" data-order="${curOrder[i]}">
-    //             <input type="radio" name="data_value">
-    //             <span>${curSet[curOrder[i]]}</span>
-    //         </label>`;
-    //     }
-    //     rangBody.innerHTML = str;
-    // }
-
-    // addUnitedVar(order) {
-    //     document.getElementById(this._id).querySelector('img').setAttribute('src', Var.imgDir + Var.Rang.imgU);
-    //     Var.unitedOrder = order;
-    //     this._united = true;
-
-    //     if (Var.unitedRangs[0] === this || Var.unitedRangs[1] === this) {
-    //         return;
-    //     }
-    //     Var.unitedRangs.push(this);
-    //     const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this._set]);
-    //     Var.unitedSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
-    // }
-
-    // removeUnitedVar() {
-    //     if (Var.unitedRangs[0] === this) {
-    //         Var.unitedRangs.shift();
-    //     }
-    //     else if (Var.unitedRangs[1] === this) {
-    //         Var.unitedRangs.pop();
-    //     }
-    //     else {
-    //         return;
-    //     }
-    //     if (Var.unitedRangs[0]) {
-    //         Var.unitedSet = Var.unitedRangs[0].getSet();
-    //         Var.unitedOrder = Var.unitedRangs[0].getOrder();
-    //     }
-    //     else {
-    //         Var.unitedSet = [];
-    //         Var.unitedOrder = [];
-    //     }
-    //     this._united = false;
-    // }
     static refreshVarsOfUniteModal(vars, curId) {
 
         const tableBody = uiControls.uniteTableBody;
@@ -287,13 +196,18 @@ export default class Var {
             return;
         const varHeader = document.getElementById(this._id);
         varHeader.nextElementSibling.textContent = this._name;
-        //!!!!!!
-        if (this._united) {
-            varHeader.querySelector('img').setAttribute('src', Var.imgDir + this._img);
+        varHeader.querySelector('img').setAttribute('src', Var.imgDir + this._img);
+
+        if (this._unitedPair && !this._unionLoaded) {
+            const ids = this._unitedPair.split('_');
+            const pair = dataControls.getVarBySheetIdAndVarId(ids[1], ids[2]);
+            pair.setPair(this);
+            pair.setUnitedObject(this._unitedObj);
+            pair.setUnionLoaded();
+            this._unitedPair = pair;
         }
-        else {
-            varHeader.querySelector('img').setAttribute('src', Var.imgDir + this._img);
-        }
+
+        this._unionLoaded = false;
     }
 
     setSettings(formData, order, twoTables) {
@@ -522,6 +436,53 @@ export default class Var {
 
     isUnitedWith(varObj) {
         return this._unitedPair === varObj;
+    }
+
+    getData() {
+        const pairObj = this._unitedPair;
+        this._unitedPair = null;
+        this._tmpUnitedPair = null;
+        const obj = Object.deepCopy(this);
+        this._unitedPair = pairObj;
+        delete obj._toRemoveUnion;
+        delete obj._tmpUnitedPair;
+        delete obj._tmpUnitedObj;
+        delete obj._unionLoaded;
+        delete obj._unionSaved;
+
+        if (this.isUnited()) {
+            if (this._unionSaved) {
+                delete obj._unitedPair;
+                delete obj._unitedObj;
+                this._unionSaved = false;
+            }
+            else {
+                this._unitedPair.setUnionSaved();
+                obj._unitedPair = this._unitedPair.getID();
+            }
+        }
+        else {
+            delete obj._unitedPair;
+            delete obj._unitedObj;
+        }
+
+        return obj;
+    }
+
+    setPair(varObj) {
+        this._unitedPair = varObj;
+    }
+
+    setUnitedObject(varObj) {
+        this._unitedObj = varObj;
+    }
+
+    setUnionLoaded() {
+        this._unionLoaded = true;
+    }
+
+    setUnionSaved() {
+        this._unionSaved = true;
     }
 
     getID() {

@@ -43,7 +43,6 @@ export default class Sheet {
         this._data = await this._parseDataInFile(false);
         this._initVars();
         this._createHTML();
-
     }
 
     createVarSettings(varID) {
@@ -300,12 +299,13 @@ export default class Sheet {
     }
 
     async getData() {
+        const settings = this._settings.getSettings();
         const data = {
             _id: this._id,
             _name: this._name,
-            _dataVars: this._dataVars,
+            _dataVars: this._dataVars.map(el => el.getData()),
             _settings: this._settings,
-            _file: await File.readUploadedFileAsText(this._file),
+            _file: await File.readUploadedFileAsText(this._file, settings.encoding.selected),
         }
 
         return data;

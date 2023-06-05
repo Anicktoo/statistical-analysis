@@ -18,7 +18,6 @@ export default class Module extends AbstractModule {
         'both': 'Двусторонняя проверка альтернативной гипотезы (M2 ≠ M1)',
         'right': 'Правосторонняя проверка альтернативной гипотезы (M2 &#62; M1)',
         'left': 'Левосторонняя проверка альтернативной гипотезы (M2 &#60; M1)',
-
     }
     #id;
     #data = {
@@ -40,9 +39,7 @@ export default class Module extends AbstractModule {
             p2: undefined,
         },
         mann: {
-            U: undefined,
-            m: undefined,
-            n: undefined
+            p: undefined,
         }
     }
     #testType;
@@ -588,16 +585,8 @@ export default class Module extends AbstractModule {
                         Введите параметры:
                         <div class="option-block__list">
                             <label class="input-line">
-                                <span>U-критерий Манна-Уитни ( U ):</span>
-                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="U" value="1" step="0.1" min="0" form="module-option-form_${this.#id}">
-                            </label>
-                            <label class="input-line">
-                                <span>Размер первой пилотной выборки ( n<sub>p</sub> ):</span>
-                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="n" value="1" step="1" min="1" form="module-option-form_${this.#id}">
-                            </label>
-                            <label class="input-line">
-                                <span>Размер второй пилотной выборки ( m<sub>p</sub> ):</span>
-                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="m" value="1" step="1" min="1" form="module-option-form_${this.#id}">
+                                <span>Величина эффекта ( p ):</span>
+                                <input type="number" class="main-input main-input_number form-change-trigger form-change-trigger_${this.#id}" name="p" value="0.01" step="0.01" form="module-option-form_${this.#id}">
                             </label>
                         </div>
                     </div>
@@ -729,14 +718,10 @@ export default class Module extends AbstractModule {
             }
             case 'mann': {
                 if (this.#inputType === 'manual') {
-                    this.#resultsTableData.mann.U = Number(formData.get('U'));
-                    this.#resultsTableData.mann.n = Number(formData.get('n'));
-                    this.#resultsTableData.mann.m = Number(formData.get('m'));
+                    this.#resultsTableData.mann.p = Number(formData.get('p'));
                 }
                 else {
-                    this.#resultsTableData.mann.U = null;
-                    this.#resultsTableData.mann.n = null;
-                    this.#resultsTableData.mann.m = null;
+                    this.#resultsTableData.mann.p = null;
                 }
                 break;
             }
@@ -898,7 +883,7 @@ export default class Module extends AbstractModule {
                     if (this.#inputType !== 'manual' && firstVarName !== Var.Continues.name && firstVarName !== Var.Rang.name) {
                         throw new Error(errorText([Var.Continues.ruName, Var.Rang.ruName]));
                     }
-                    if (firstVarName === Var.Rang.name && this.#inputType === 'data-input-two' && (!this.#vars.first.isUnitedWith(this.#vars.second))) {
+                    if (this.#inputType === 'data-input-two' && firstVarName === Var.Rang.name && (!this.#vars.first.isUnitedWith(this.#vars.second))) {
                         throw new Error('Для данного теста и способа ввода данных необходимо сперва объеденить значения выборок в окне настроек столбца');
                     }
                     if (isInv) {
@@ -1102,18 +1087,17 @@ export default class Module extends AbstractModule {
     }
 
     #mannTest(alpha, power, data1, data2) {
-        let U, m, n1;
+        let p;
         const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
         const z = Math.getZ(zAlpha, power);
         if (this.#inputType === 'manual') {
-            U = this.#resultsTableData.mann.U;
-            m = this.#resultsTableData.mann.m;
-            n1 = this.#resultsTableData.mann.n;
+            p = this.#resultsTableData.mann.p;
         }
         else {
+            let U;
             const U1 = Math.getU(data1, data2, Var.prototype.getOrderOfValUnited.bind(this.#vars.first));
-            n1 = data1.length;
-            m = data2.length;
+            const n1 = data1.length;
+            const m = data2.length;
             const U2 = n1 * m - U1;
             if (this.#altHypTest == 'left') {
                 U = U2;
@@ -1124,14 +1108,12 @@ export default class Module extends AbstractModule {
             else {
                 U = Math.min(U1, U2);
             }
-            this.#resultsTableData.mann.U = U;
-            this.#resultsTableData.mann.m = m;
-            this.#resultsTableData.mann.n = n1;
+            p = U / (m * n1);
+            this.#resultsTableData.mann.p = p;
         }
 
         this.#resultsTableData.z = z;
 
-        const p = U / (m * n1);
         const n = z ** 2 / (6 * (p - 0.5) ** 2);
         const N = Math.ceil(n) * 2;
 
@@ -1143,18 +1125,17 @@ export default class Module extends AbstractModule {
     }
 
     #mannTestInv(alpha, n, data1, data2) {
-        let U, m, n1;
+        let p;
         const zAlpha = Math.getZAlpha(this.#altHypTest, alpha);
 
         if (this.#inputType === 'manual') {
-            U = this.#resultsTableData.mann.U;
-            m = this.#resultsTableData.mann.m;
-            n1 = this.#resultsTableData.mann.n;
+            p = this.#resultsTableData.mann.p;
         }
         else {
+            let U;
             const U1 = Math.getU(data1, data2, Var.prototype.getOrderOfValUnited.bind(this.#vars.first));
-            n1 = data1.length;
-            m = data2.length;
+            const n1 = data1.length;
+            const m = data2.length;
             const U2 = n1 * m - U1;
             if (this.#altHypTest == 'left') {
                 U = U2;
@@ -1165,12 +1146,10 @@ export default class Module extends AbstractModule {
             else {
                 U = Math.min(U1, U2);
             }
-            this.#resultsTableData.mann.U = U;
-            this.#resultsTableData.mann.m = m;
-            this.#resultsTableData.mann.n = n1;
+            p = U / (m * n1);
+            this.#resultsTableData.mann.p = p;
         }
 
-        const p = U / (m * n1);
         const smallN = n / 2;
         let z = smallN ** 2 * (p - 0.5) / Math.sqrt(smallN ** 3 / 6);
 
@@ -1311,13 +1290,7 @@ export default class Module extends AbstractModule {
                         <tr>
                             ${inputTypeHeader}
                             <th>
-                                U
-                            </th>
-                            <th>
-                                n<sub>p</sub>
-                            </th>
-                            <th>
-                               m<sub>p</sub>
+                                p
                             </th>
                             <th>
                                 z
@@ -1333,13 +1306,7 @@ export default class Module extends AbstractModule {
                                 ${String.resultForm(this.#vars.second?.getName())}
                             </td>
                             <td>
-                                ${Number.resultForm(this.#resultsTableData.mann.U)}
-                            </td>
-                            <td>
-                                ${Number.resultForm(this.#resultsTableData.mann.n)}
-                            </td>
-                            <td>
-                                ${Number.resultForm(this.#resultsTableData.mann.m)}
+                                ${Number.resultForm(this.#resultsTableData.mann.p)}
                             </td>
                             <td>
                                 ${Number.resultForm(this.#resultsTableData.z)}
