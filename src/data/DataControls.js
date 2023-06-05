@@ -76,7 +76,7 @@ const dataControls = {
         newSheet.show();
     },
 
-    async selectSheet(sheetId) {
+    selectSheet(sheetId) {
         const sheet = dataControls._sheets[sheetId];
         if (dataControls._currentSheet == sheet)
             return;
@@ -186,7 +186,9 @@ const dataControls = {
         }
         uiControls.initNewSheetControls();
 
-        await this.selectSheet(this._sheets[0].getID());
+        dataControls._currentSheet?.hide();
+        dataControls._currentSheet = this._sheets[0];
+        dataControls._currentSheet.show();
     },
 
     switchUnitedVar(id, checked) {
