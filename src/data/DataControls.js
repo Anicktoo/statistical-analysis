@@ -64,10 +64,9 @@ const dataControls = {
         await newSheet.importFile(file);
         dataControls._sheets.push(newSheet);
         dataControls._currentSheet = newSheet;
-        moduleIntegrator.optionListAdd({
-            name: dataControls._currentSheet.getName(),
-            id: dataControls._currentSheet.getID()
-        });
+        dataControls.optionListAdd();
+
+
         uiControls.initNewSheetControls();
         if (dataControls._sheets.length === 1) {
             moduleIntegrator.updateVarsOfSheet(0, true);
@@ -86,6 +85,36 @@ const dataControls = {
         dataControls._currentSheet = sheet;
 
         sheet.show();
+    },
+
+    refreshVarsOfUniteModal(formData) {
+        const curSheetId = Number(formData.get('sheet-select'));
+        const openedVar = dataControls._currentSheet.getOpenedVar()
+        const openedVarID = openedVar.getID();
+        const vars = dataControls.getVarsBySheetId(curSheetId);
+        Var.refreshVarsOfUniteModal(vars, openedVarID);
+    },
+
+    setUnitedVars(formData) {
+        const openedVar = dataControls._currentSheet.getOpenedVar();
+        const chosenVarID = formData.get('unite_data_value');
+        const ids = chosenVarID.split('_');
+        const chosenVar = this.getVarBySheetIdAndVarId(ids[1], ids[2]);
+        openedVar.setUnionWithAnotherVar(chosenVar);
+    },
+
+    removeUnion() {
+        const openedVar = dataControls._currentSheet.getOpenedVar();
+        openedVar.removeUnion();
+    },
+
+    optionListAdd() {
+        const curSheetInfo = {
+            name: dataControls._currentSheet.getName(),
+            id: dataControls._currentSheet.getID()
+        };
+        moduleIntegrator.optionListAdd(curSheetInfo);
+        Var.addSheetOptions([curSheetInfo]);
     },
 
     getListOfSheets() {

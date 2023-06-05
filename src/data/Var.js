@@ -34,9 +34,17 @@ export default class Var {
 
     static imgDir = Object.getDirFromPath(rangImg);
 
-    static unitedRangs = [];
-    static unitedOrder = [];
-    static unitedSet = [];
+    _toRemoveUnion = false;
+    _tmpUnitedPair = undefined;
+    _tmpUnitedObj = {
+        unitedOrder: [],
+        unitedSet: [],
+    };
+    _unitedPair = undefined;
+    _unitedObj = {
+        unitedOrder: [],
+        unitedSet: [],
+    };
 
     _typeName;
     _ruTypeName;
@@ -47,10 +55,8 @@ export default class Var {
     _order = [];
     _binaryGroups = [];
     _onlyNumbers;
-    _united;
 
     constructor(type, id, set, name, onlyNumbers) {
-        this._united = false;
         if (type !== Var.Binary && type !== Var.Nominal &&
             type !== Var.Continues && type !== Var.Rang && type !== Var.Empty) {
             throw new Error('Данный тип данных не поддерживается приложением');
@@ -74,105 +80,202 @@ export default class Var {
             this._binaryGroups[0] = (0x1 << 31);
     }
 
-    static clearUnited() {
-        Var.unitedRangs = [];
-        Var.unitedOrder = [];
-        Var.unitedSet = [];
+    removeUnion() {
+        const rangBody = uiControls.rangTable;
+        let str = '';
+        for (let i = 0; i < this._set.length; i++) {
+            str += `
+            <label class="var-table__item" data-order="${this._order[i]}">
+            <input type="radio" name="data_value">
+            <span>${this._set[this._order[i]]}</span>
+            </label>`;
+        }
+        rangBody.innerHTML = str;
+        this._tmpUnitedObj = {};
+        this._tmpUnitedPair = null;
+        this._toRemoveUnion = true;
+        uiControls.varTypesUniteBtn.parentElement.classList.remove('hidden');
+        uiControls.varTypesUnitedContainer.classList.add('hidden');
     }
 
-    static getGlobalSettings() {
-        const unitedRangsIds = Var.unitedRangs.map(el => el.getID());
+    setUnionWithAnotherVar(varObj) {
+        const varSet = varObj.getSet();
+        const newSet = new Set([...this._set, ...varSet])
+        const newSetArray = [...newSet].customSort(this.isOnlyNumbers() && varObj.isOnlyNumbers());
+        const newOrder = newSetArray.map((el, ind) => ind);
+        this._tmpUnitedObj.unitedOrder = newOrder;
+        this._tmpUnitedObj.unitedSet = newSetArray;
+        this._tmpUnitedPair = varObj;
+        this._toRemoveUnion = false;
 
-        return {
-            unitedRangsIds,
-            unitedOrder: Var.unitedOrder,
-            unitedSet: Var.unitedSet,
-        };
+        const rangBody = uiControls.rangTable;
+        let str = '';
+        for (let i = 0; i < newSetArray.length; i++) {
+            str += `
+            <label class="var-table__item" data-order="${newOrder[i]}">
+            <input type="radio" name="data_value">
+            <span>${newSetArray[newOrder[i]]}</span>
+            </label>`;
+        }
+        rangBody.innerHTML = str;
+
+        uiControls.varTypesUniteBtn.parentElement.classList.add('hidden');
+        uiControls.varTypesUnitedContainer.classList.remove('hidden');
+        const name = this._tmpUnitedPair.getName();
+        uiControls.varTypesUnitedName.textContent = name;
+        uiControls.varTypesUnitedName.parentElement.setAttribute('title', name);
     }
+
+    setUnionWithObject(varObj, unitedObj) {
+        this._unitedPair = varObj;
+        this._unitedObj = unitedObj;
+    }
+
+    clearUnited(fromVar) {
+        if (!fromVar && this._unitedPair) {
+            this._unitedPair.setType(Var.Rang);
+            this._unitedPair.clearUnited(true);
+        }
+        this._tmpUnitedPair = null;
+        this._tmpUnitedObj = {};
+        this._unitedPair = null;
+        this._unitedObj = {};
+    }
+
+    // static getGlobalSettings() {
+    //     const unitedRangsIds = Var.unitedRangs.map(el => el.getID());
+
+    //     return {
+    //         unitedRangsIds,
+    //         unitedOrder: Var.unitedOrder,
+    //         unitedSet: Var.unitedSet,
+    //     };
+    // }
 
     //CHECK IT
-    static setGlobalSettingsWithObject(settingsObject, unitedVars) {
-        Var.unitedRangs = unitedVars;
-        Var.unitedOrder = settingsObject.unitedOrder;
-        Var.unitedSet = settingsObject.unitedSet;
+    // static setGlobalSettingsWithObject(settingsObject, unitedVars) {
+    //     Var.unitedRangs = unitedVars;
+    //     Var.unitedOrder = settingsObject.unitedOrder;
+    //     Var.unitedSet = settingsObject.unitedSet;
+    // }
+
+    // switchUnitedVar(on) {
+    //     if (on) {
+    //         this.showUnitedOrder();
+    //     }
+    //     else {
+    //         this.showNormalOrder();
+    //     }
+    // }
+
+    // showUnitedOrder() {
+    //     if (!Var.unitedRangs[0]) {
+    //         return;
+    //     }
+    //     const rangBody = uiControls.rangTable;
+    //     const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this._set]);
+    //     const curSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
+    //     Var.tmpSet = curSet;
+    //     const curOrder = curSet.map((el, ind) => ind);
+    //     let str = '';
+    //     for (let i = 0; i < curSet.length; i++) {
+    //         str += `
+    //         <label class="var-table__item" data-order="${curOrder[i]}">
+    //             <input type="radio" name="data_value">
+    //             <span>${curSet[curOrder[i]]}</span>
+    //         </label>`;
+    //     }
+    //     rangBody.innerHTML = str;
+    // }
+
+    // showNormalOrder() {
+    //     const rangBody = uiControls.rangTable;
+    //     const curOrder = this._order;
+    //     const curSet = this._set;
+    //     let str = '';
+    //     for (let i = 0; i < curSet.length; i++) {
+    //         str += `
+    //         <label class="var-table__item" data-order="${curOrder[i]}">
+    //             <input type="radio" name="data_value">
+    //             <span>${curSet[curOrder[i]]}</span>
+    //         </label>`;
+    //     }
+    //     rangBody.innerHTML = str;
+    // }
+
+    // addUnitedVar(order) {
+    //     document.getElementById(this._id).querySelector('img').setAttribute('src', Var.imgDir + Var.Rang.imgU);
+    //     Var.unitedOrder = order;
+    //     this._united = true;
+
+    //     if (Var.unitedRangs[0] === this || Var.unitedRangs[1] === this) {
+    //         return;
+    //     }
+    //     Var.unitedRangs.push(this);
+    //     const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this._set]);
+    //     Var.unitedSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
+    // }
+
+    // removeUnitedVar() {
+    //     if (Var.unitedRangs[0] === this) {
+    //         Var.unitedRangs.shift();
+    //     }
+    //     else if (Var.unitedRangs[1] === this) {
+    //         Var.unitedRangs.pop();
+    //     }
+    //     else {
+    //         return;
+    //     }
+    //     if (Var.unitedRangs[0]) {
+    //         Var.unitedSet = Var.unitedRangs[0].getSet();
+    //         Var.unitedOrder = Var.unitedRangs[0].getOrder();
+    //     }
+    //     else {
+    //         Var.unitedSet = [];
+    //         Var.unitedOrder = [];
+    //     }
+    //     this._united = false;
+    // }
+    static refreshVarsOfUniteModal(vars, curId) {
+
+        const tableBody = uiControls.uniteTableBody;
+
+        const createElementsStr = () => {
+            let strBody = '';
+            vars.forEach(element => {
+                const curVarID = element.getID();
+                if (curVarID === curId || element.isUnited()) {
+                    return;
+                }
+                let stringElement = `
+                <label title="${element.getName()}" class="var-table__item var-table__item_${curVarID}" data-var-id=${curVarID}>
+                <input type="radio" name="unite_data_value" form="unite-form" value="${curVarID}">
+                <img src=${element.getImg()} alt="${element.getTypeName()}" class="var-table__img">
+                <span>${element.getName()}</span>
+                </label>
+                <div class='var-table__anchor var-table__anchor_${curVarID}'></div>`;
+
+                strBody += stringElement;
+            });
+            return strBody;
+        }
+
+        tableBody.innerHTML = createElementsStr();
     }
 
-    switchUnitedVar(on) {
-        if (on) {
-            this.showUnitedOrder();
+    static addSheetOptions(listOfSheets) {
+        const arrOfOptions = [];
+        for (let el of listOfSheets) {
+            if (!uiControls.sheetSelectUnite.querySelector(`.select-option-${el.id}`)) {
+                const option = document.createElement('option');
+                option.classList.add(`select-option-${el.id}`);
+                option.value = el.id;
+                option.textContent = el.name;
+                arrOfOptions.push(option);
+            }
         }
-        else {
-            this.showNormalOrder();
-        }
-    }
 
-    showUnitedOrder() {
-        if (!Var.unitedRangs[0]) {
-            return;
-        }
-        const rangBody = uiControls.rangTable;
-        const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this._set]);
-        const curSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
-        Var.tmpSet = curSet;
-        const curOrder = curSet.map((el, ind) => ind);
-        let str = '';
-        for (let i = 0; i < curSet.length; i++) {
-            str += `
-            <label class="var-table__item" data-order="${curOrder[i]}">
-                <input type="radio" name="data_value">
-                <span>${curSet[curOrder[i]]}</span>
-            </label>`;
-        }
-        rangBody.innerHTML = str;
-    }
-
-    showNormalOrder() {
-        const rangBody = uiControls.rangTable;
-        const curOrder = this._order;
-        const curSet = this._set;
-        let str = '';
-        for (let i = 0; i < curSet.length; i++) {
-            str += `
-            <label class="var-table__item" data-order="${curOrder[i]}">
-                <input type="radio" name="data_value">
-                <span>${curSet[curOrder[i]]}</span>
-            </label>`;
-        }
-        rangBody.innerHTML = str;
-    }
-
-    addUnitedVar(order) {
-        document.getElementById(this._id).querySelector('img').setAttribute('src', Var.imgDir + Var.Rang.imgU);
-        Var.unitedOrder = order;
-        this._united = true;
-
-        if (Var.unitedRangs[0] === this || Var.unitedRangs[1] === this) {
-            return;
-        }
-        Var.unitedRangs.push(this);
-        const newSet = new Set([...Var.unitedRangs[0].getSet(), ...this._set]);
-        Var.unitedSet = [...newSet].customSort(this.isOnlyNumbers() && Var.unitedRangs[0].isOnlyNumbers());
-    }
-
-    removeUnitedVar() {
-        if (Var.unitedRangs[0] === this) {
-            Var.unitedRangs.shift();
-        }
-        else if (Var.unitedRangs[1] === this) {
-            Var.unitedRangs.pop();
-        }
-        else {
-            return;
-        }
-        if (Var.unitedRangs[0]) {
-            Var.unitedSet = Var.unitedRangs[0].getSet();
-            Var.unitedOrder = Var.unitedRangs[0].getOrder();
-        }
-        else {
-            Var.unitedSet = [];
-            Var.unitedOrder = [];
-        }
-        this._united = false;
+        uiControls.sheetSelectUnite.append(...arrOfOptions);
     }
 
     setSettingsWithObject(settingsObject) {
@@ -184,6 +287,7 @@ export default class Var {
             return;
         const varHeader = document.getElementById(this._id);
         varHeader.nextElementSibling.textContent = this._name;
+        //!!!!!!
         if (this._united) {
             varHeader.querySelector('img').setAttribute('src', Var.imgDir + this._img);
         }
@@ -197,24 +301,45 @@ export default class Var {
         this._name = formData.get('var-name');
         varHeader.nextElementSibling.textContent = this._name;
 
-        this._typeName = formData.get('var-type');
-        this._img = Object.entries(Var).find(item => item[1]['name'] === this._typeName)[1]['img'];
-        varHeader.querySelector('img').setAttribute('src', Var.imgDir + this._img);
-        const isUnited = formData.get('unite');
+        const typeName = formData.get('var-type');
+        const type = Object.entries(Var).find(item => item[1]['name'] === typeName)[1];
+        this.setType(type);
 
         if (this._typeName === 'rang') {
-            if (isUnited) {
-                this._img = Var.Rang.imgU;
-                this.addUnitedVar(order);
+            //add union
+            if (this._tmpUnitedPair && this._tmpUnitedPair !== this._unitedPair) {
+                if (this._unitedPair) {
+                    this._unitedPair.clearUnited(true);
+                    this._unitedPair.setType(Var.Rang);
+                }
+                this._unitedObj.unitedOrder = order;
+                this._unitedObj.unitedSet = this._tmpUnitedObj.unitedSet;
+                this._unitedPair = this._tmpUnitedPair;
+                this._unitedPair.setUnionWithObject(this, this._unitedObj);
+                this.setImg(Var.Rang.imgU)
+                this._unitedPair.setType(Var.Rang);
+                this._unitedPair.setImg(Var.Rang.imgU);
+                const pairVarEl = document.getElementById(this._unitedPair.getID());
+                pairVarEl.querySelector('img').setAttribute('src', Var.imgDir + Var.Rang.imgU);
             }
+            //remove union
+            else if (this._toRemoveUnion) {
+                this._order = order;
+                this.clearUnited();
+            }
+            //keep union
+            else if (this._unitedPair) {
+                this._unitedObj.unitedOrder = order;
+                this.setImg(Var.Rang.imgU);
+            }
+            //keep ordinary
             else {
-                this.removeUnitedVar();
                 this._order = order;
             }
             return;
         }
 
-        this.removeUnitedVar();
+        this.clearUnited();
 
         if (!twoTables.group1[0]) {
             this._binaryGroups.fill(0);
@@ -248,7 +373,6 @@ export default class Var {
         const varChooseInputs = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__item-input')];
         const rangBody = uiControls.rangTable;
         const binBodies = uiControls.binTables;
-        uiControls.uniteCheckbox.dataset.id = this._id;
 
         name.value = this._name;
         name.setAttribute('value', this._name);
@@ -265,24 +389,23 @@ export default class Var {
 
         let str = '';
         let curOrder, curSet;
+        const uni = this._unitedObj;
+        this._toRemoveUnion = false;
+        this._tmpUnitedPair = null;
+        this._tmpUnitedObj = {};
 
-        if (this._united) {
-            curOrder = Var.unitedOrder;
-            curSet = Var.unitedSet;
-            uiControls.uniteCheckbox.parentElement.classList.remove('disabled');
-            uiControls.uniteCheckbox.checked = true;
-
+        if (this.isUnited()) {
+            curOrder = uni.unitedOrder;
+            curSet = uni.unitedSet;
+            uiControls.varTypesUniteBtn.parentElement.classList.add('hidden');
+            uiControls.varTypesUnitedContainer.classList.remove('hidden');
+            uiControls.varTypesUnitedName.textContent = this._unitedPair.getName();
         }
         else {
             curOrder = this._order;
             curSet = this._set;
-            if (Var.unitedRangs.length === 2) {
-                uiControls.uniteCheckbox.parentElement.classList.add('disabled');
-            }
-            else {
-                uiControls.uniteCheckbox.parentElement.classList.remove('disabled');
-            }
-            uiControls.uniteCheckbox.checked = false;
+            uiControls.varTypesUnitedContainer.classList.add('hidden');
+            uiControls.varTypesUniteBtn.parentElement.classList.remove('hidden');
         }
 
         for (let i = 0; i < curSet.length; i++) {
@@ -380,11 +503,11 @@ export default class Var {
         return order !== undefined ? order + 1 : -1;
     }
 
-    static getOrderOfValUnited(val) {
-        const indexInSet = Var.unitedSet.indexOf(val);
+    getOrderOfValUnited(val) {
+        const indexInSet = this._unitedObj.unitedSet.indexOf(val);
         if (indexInSet === -1)
             return -1;
-        const order = Var.unitedOrder.indexOf(indexInSet);
+        const order = this._unitedObj.unitedOrder.indexOf(indexInSet);
 
         return order !== undefined ? order + 1 : -1;
     }
@@ -394,7 +517,11 @@ export default class Var {
     }
 
     isUnited() {
-        return this._united;
+        return !!this._unitedPair;
+    }
+
+    isUnitedWith(varObj) {
+        return this._unitedPair === varObj;
     }
 
     getID() {
@@ -415,6 +542,17 @@ export default class Var {
 
     getOrder() {
         return this._order;
+    }
+
+    setType(type) {
+        this._typeName = type.name;
+        this._ruTypeName = type.ruName;
+        this.setImg(type.img);
+    }
+
+    setImg(img) {
+        this._img = img;
+        document.getElementById(this._id).querySelector('img').setAttribute('src', Var.imgDir + this._img);
     }
 
     getTypeName() {

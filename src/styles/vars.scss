@@ -26,8 +26,10 @@ $varTableBodyPadding: 4px;
 $varTableItemPadding: 2px;
 
 @mixin single-image($width, $height) {
-    width: $width;
-    height: $height;
+    min-width: $width;
+    min-height: $height;
+    max-width: $width;
+    max-height: $height;
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
@@ -55,6 +57,10 @@ $varTableItemPadding: 2px;
 
 .disabled {
     @include disabled();
+}
+
+.hidden {
+    display: none !important;
 }
 
 @mixin custom-scrollbar {

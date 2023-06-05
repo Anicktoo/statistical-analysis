@@ -63,7 +63,8 @@ window.uiControls = {
         old: [],
         new: []
     },
-    varTypesBtns: [],
+    varTypesUniteBtn: undefined,
+    varTypesUnitedContainer: undefined,
     varTypesForm: undefined,
     rangTable: undefined,
     binSettings: undefined,
@@ -72,9 +73,9 @@ window.uiControls = {
         up: undefined,
         down: undefined
     },
-    uniteCheckbox: undefined,
     varTypesSwitchBtn: undefined,
     modalVarTypeBtns: undefined,
+    varTypesRemoveBtn: undefined,
     curIcon: undefined,
     modalSettings: undefined,
     dataSettingsBtns: {
@@ -82,6 +83,13 @@ window.uiControls = {
         new: []
     },
     modalSettingsBtns: undefined,
+
+    modalUnite: undefined,
+    modalUniteForm: undefined,
+    sheetSelectUnite: undefined,
+    modalUniteBtns: undefined,
+    uniteTableBody: undefined,
+
     errorElement: undefined,
 
     initConstuiControls() {
@@ -148,11 +156,22 @@ window.uiControls = {
         uiControls.binTables = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__binary-table-body')];
         uiControls.varTypesLevelControls.up = uiControls.modalVarType.querySelector('.switch-button_up');
         uiControls.varTypesLevelControls.down = uiControls.modalVarType.querySelector('.switch-button_down');
-        uiControls.uniteCheckbox = uiControls.modalVarType.querySelector('#unite-checkbox');
-        uiControls.modalVarTypeBtns = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__btn')];
+        uiControls.modalVarTypeBtns = [...uiControls.modalVarType.querySelectorAll('.modal-window__btn')];
         uiControls.varTypesSwitchBtn = uiControls.binSettings.querySelector('.switch-button');
+        uiControls.varTypesUniteBtn = document.getElementById('var-types-unite-btn');
+        uiControls.varTypesUnitedContainer = uiControls.modalVarType.querySelector('.modal-var-types__united-container');
+        uiControls.varTypesUnitedName = uiControls.modalVarType.querySelector('.modal-var-types__united-name');
+        uiControls.varTypesRemoveBtn = uiControls.modalVarType.querySelector('#modal-var-types__united-delete-btn');
         uiControls.modalSettings = document.querySelector('.modal-settings');
-        uiControls.modalSettingsBtns = [...uiControls.modalSettings.querySelectorAll('.modal-settings__btn')];
+        uiControls.modalSettingsBtns = [...uiControls.modalSettings.querySelectorAll('.modal-window__btn')];
+
+        uiControls.modalUnite = document.querySelector('.modal-unite');
+        uiControls.modalUniteForm = uiControls.modalUnite.querySelector('#unite-form');
+        uiControls.modalUniteBtns = [...uiControls.modalUnite.querySelectorAll('.modal-window__btn')];
+        uiControls.sheetFormUnite = uiControls.modalUnite.querySelector('.sheet-form');
+        uiControls.sheetSelectUnite = uiControls.sheetFormUnite.querySelector('.sheet-select');
+        uiControls.uniteTableBody = uiControls.modalUnite.querySelector('.modal-unite__table-body');
+
 
         uiControls.errorElement = document.querySelector('#error-show');
     },
@@ -163,6 +182,7 @@ window.uiControls = {
         uiControls.addWindowResizeListeners();
         uiControls.addModalSettingsListener();
         uiControls.addModalVarChooseListener();
+        uiControls.addModalUniteListener();
         uiControls.addNewProjectListener();
         uiControls.addSaveProjectListener();
         uiControls.addLoadProjectListener();
@@ -311,7 +331,7 @@ window.uiControls = {
         uiControls.varIcons.new.forEach(el => {
             el.addEventListener('click', (event) => {
                 const create = dataControls.createVarSettings.bind(null, event.currentTarget.getAttribute('id'));
-                uiControls.openModal(event, uiControls.modalVarType, create);
+                uiControls.openModal(event, uiControls.modalVarType, create, [uiControls.modalVarType, uiControls.modalUnite]);
             });
             el.classList.remove('data__var-icon_new');
         });
@@ -321,7 +341,7 @@ window.uiControls = {
     addDataSettingsListener() {
         uiControls.dataSettingsBtns.new.forEach(el => {
             el.addEventListener('click', (event) => {
-                uiControls.openModal(event, uiControls.modalSettings);
+                uiControls.openModal(event, uiControls.modalSettings, null, [uiControls.modalSettings]);
             });
             el.classList.remove('dataSettingsBtn_new');
             uiControls.dataSettingsBtns.old.push(el);
@@ -330,16 +350,14 @@ window.uiControls = {
     },
 
     addModalSettingsListener() {
-        uiControls.modalSettings.addEventListener('click', (event) => {
-            event.stopPropagation();
-        });
-
         uiControls.settingsForm.addEventListener('submit', (event) => {
             dataControls.submitSettings(event, new FormData(uiControls.settingsForm));
         });
 
         uiControls.modalSettingsBtns.forEach(btn => {
-            btn.addEventListener('click', () => uiControls.modalSettings.style.display = 'none');
+            btn.addEventListener('click', () => {
+                uiControls.modalSettings.classList.add('hidden');
+            });
         });
 
         uiControls.modalSettings.querySelector('.modal-window__header').addEventListener('mousedown', (event) => {
@@ -347,11 +365,29 @@ window.uiControls = {
         });
     },
 
-    addModalVarChooseListener() {
-        uiControls.modalVarType.addEventListener('click', (event) => {
-            event.stopPropagation();
+    addModalUniteListener() {
+        uiControls.modalUniteForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            dataControls.setUnitedVars(new FormData(uiControls.modalUniteForm));
         });
 
+        uiControls.modalUniteBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                uiControls.modalUnite.classList.add('hidden');
+            });
+        });
+
+        uiControls.sheetFormUnite.addEventListener('change', () => {
+            dataControls.refreshVarsOfUniteModal(new FormData(uiControls.sheetFormUnite));
+        });
+
+
+        uiControls.modalUnite.querySelector('.modal-window__header').addEventListener('mousedown', (event) => {
+            uiControls.dragMouseDown(event, uiControls.modalUnite);
+        });
+    },
+
+    addModalVarChooseListener() {
         const varTypeInputs = [...uiControls.modalVarType.querySelectorAll('.modal-var-types__item-input')];
         const rangInput = uiControls.modalVarType.querySelector('.modal-var-types__rang');
         const rangSettings = uiControls.modalVarType.querySelector('.modal-var-types__rang-settings');
@@ -360,23 +396,29 @@ window.uiControls = {
 
         varTypeInputs.forEach(el => el.addEventListener('click', () => {
             if (el.isSameNode(binInput)) {
-                binSettings.style.display = 'block';
+                binSettings.classList.remove('hidden');
             }
             else {
-                binSettings.style.display = 'none';
+                binSettings.classList.add('hidden');
             }
             if (el.isSameNode(rangInput)) {
-                rangSettings.style.display = 'block';
+                rangSettings.classList.remove('hidden');
             }
             else {
-                rangSettings.style.display = 'none';
+                rangSettings.classList.add('hidden');
             }
         }));
 
         uiControls.varTypesLevelControls.up.addEventListener('click', () => { moveLabel(false) });
         uiControls.varTypesLevelControls.down.addEventListener('click', () => { moveLabel(true) });
         uiControls.varTypesSwitchBtn.addEventListener('click', switchLabel);
-        uiControls.uniteCheckbox.addEventListener('change', unite);
+        uiControls.varTypesUniteBtn.addEventListener('click', (event) => {
+            const createFunc = dataControls.refreshVarsOfUniteModal.bind(dataControls, new FormData(uiControls.sheetFormUnite));
+            uiControls.openModal(event, uiControls.modalUnite, createFunc, [uiControls.modalUnite], { x: '10%', y: '10%' });
+        });
+        uiControls.varTypesRemoveBtn.addEventListener('click', () => {
+            dataControls.removeUnion();
+        });
 
         uiControls.varTypesForm.addEventListener('submit', (event) => {
             event.preventDefault();
@@ -389,7 +431,9 @@ window.uiControls = {
         });
 
         uiControls.modalVarTypeBtns.forEach(btn => {
-            btn.addEventListener('click', () => uiControls.modalVarType.style.display = 'none');
+            btn.addEventListener('click', () => {
+                uiControls.modalVarType.classList.add('hidden');
+            });
         });
 
         uiControls.modalVarType.querySelector('.modal-window__header').addEventListener('mousedown', (event) => {
@@ -398,7 +442,9 @@ window.uiControls = {
 
 
         function switchLabel() {
-            const curLabel = uiControls.binSettings.querySelector('input[type="radio"]:checked').parentElement;
+            const curLabel = uiControls.binSettings.querySelector('input[type="radio"]:checked')?.parentElement;
+            if (!curLabel)
+                return;
             const curTableBody = curLabel.parentElement;
 
             curTableBody.removeChild(curLabel);
@@ -418,7 +464,7 @@ window.uiControls = {
         }
         function moveLabel(isDown) {
             const rangTable = uiControls.rangTable;
-            const curLabel = rangTable.querySelector('input[type="radio"]:checked').parentElement;
+            const curLabel = rangTable.querySelector('input[type="radio"]:checked')?.parentElement;
             if (!curLabel)
                 return;
 
@@ -434,9 +480,7 @@ window.uiControls = {
                 rangTable.insertBefore(curLabel, sibling);
             }
         }
-        function unite(event) {
-            dataControls.switchUnitedVar(event.target.dataset.id, event.target.checked);
-        }
+
     },
 
     // MODULE LISTENERS //
@@ -549,14 +593,14 @@ window.uiControls = {
 
         //hide
 
-        const hideBtn = element.querySelector('.parameters__hide-button');
+        const hideBtn = element.querySelector('.extra_hide-button');
         const hideInput = hideBtn.querySelector('input');
         const content = element.querySelector('.parameters__content');
         const titleContainer = element.querySelector('.parameters__title-container');
         hideInput.addEventListener('click', () => {
             content.classList.toggle('parameters__content_hidden');
             titleContainer.classList.toggle('parameters__title-container_hidden');
-            hideBtn.classList.toggle('parameters__hide-button_hidden');
+            hideBtn.classList.toggle('extra_hide-button_hidden');
             moduleIntegrator.hideUnhideHyp(getId(element));
         });
 
@@ -564,7 +608,7 @@ window.uiControls = {
 
         //rename
 
-        const renamebtn = element.querySelector('.parameters__edit-button');
+        const renamebtn = element.querySelector('.extra_edit-button');
         const elementHeader = element.querySelector('.parameters__title');
         const elementHeaderInput = element.querySelector('.parameters__title-input');
         elementHeaderInput.value = elementHeader.textContent;
@@ -577,8 +621,8 @@ window.uiControls = {
         }
 
         renamebtn.addEventListener('click', () => {
-            elementHeader.style.display = 'none';
-            elementHeaderInput.style.display = 'block';
+            elementHeader.classList.add('hidden');
+            elementHeaderInput.classList.remove('hidden');
             elementHeaderInput.focus();
             elementHeaderInput.addEventListener('focusout', focusListener);
             elementHeaderInput.addEventListener('keypress', enterListener);
@@ -591,21 +635,21 @@ window.uiControls = {
             }
             elementHeaderInput.removeEventListener('focusout', focusListener);
             elementHeaderInput.removeEventListener('keypress', enterListener);
-            elementHeader.style.display = 'inline';
-            elementHeaderInput.style.display = 'none';
+            elementHeader.classList.remove('hidden');
+            elementHeaderInput.classList.add('hidden');
             moduleIntegrator.nameChange(getId(element), elementHeaderInput.value);
         }
 
         //dublicate
 
-        const dupbtn = element.querySelector('.parameters__duplicate-button');
+        const dupbtn = element.querySelector('.extra_duplicate-button');
         dupbtn.addEventListener('click', () => {
             moduleIntegrator.duplicateHyp(getId(element));
         });
 
         //delete 
 
-        const deleteBtn = element.querySelector('.parameters__delete-button');
+        const deleteBtn = element.querySelector('.extra_delete-button');
         deleteBtn.addEventListener('click', () => {
             moduleIntegrator.deleteHyp(getId(element));
         });
@@ -657,38 +701,40 @@ window.uiControls = {
         }
     },
 
-    // async footerChange() {
-
-    //     const dataTable = uiControls.dataContainer.querySelector('.data__table_shown');
-    //     const dataFooter = uiControls.dataFooter;
-
-    //     if (!dataTable) {
-    //         dataFooter.style.width = 0;
-    //         return;
-    //     }
-    // },
-
     footerSetMaxWidth() {
         uiControls.dataFooter.style.width = '100%';
     },
 
-    openModal(event, modalWindow, createModalFunc) {
-        const curIcon = event.currentTarget;
-        event.preventDefault();
-        event.stopPropagation();
-        modalWindow.style.left = curIcon.getBoundingClientRect().right + 'px';
-        modalWindow.style.top = curIcon.getBoundingClientRect().bottom + 'px';
-        if (createModalFunc) {
-            createModalFunc();
-        }
-        modalWindow.style.display = 'block';
+    openModal(event, modalWindow, createModalFunc, containingElements, coordsObj) {
 
-        // Убрать окно по клику снаружи
-
-        window.addEventListener('click', closeModal, { once: true });
-        function closeModal() {
-            modalWindow.style.display = 'none';
+        let coords = {};
+        if (coordsObj) {
+            Object.assign(coords, coordsObj);
         }
+        else {
+            const curIcon = event.currentTarget;
+            coords.x = curIcon.getBoundingClientRect().right + 'px';
+            coords.y = curIcon.getBoundingClientRect().bottom + 'px';
+        }
+
+        setTimeout(() => {
+            modalWindow.style.left = coords.x;
+            modalWindow.style.top = coords.y;
+
+            if (createModalFunc) {
+                createModalFunc();
+            }
+            modalWindow.classList.remove('hidden');
+
+            window.addEventListener('click', closeModal);
+            function closeModal(event) {
+                const clickIsOut = containingElements.every((el) => !el.contains(event.target));
+                if (clickIsOut) {
+                    modalWindow.classList.add('hidden');
+                    window.removeEventListener('click', closeModal);
+                }
+            }
+        });
     },
 
     dragMouseDown(e, elmnt) {
@@ -719,12 +765,12 @@ window.uiControls = {
 
     resultsLoadingShow() {
         uiControls.resultsContainer.style.opacity = '0.1';
-        uiControls.resultsLoader.style.display = 'block';
+        uiControls.resultsLoader.classList.remove('hidden');
     },
 
     resultsLoadingHide() {
         uiControls.resultsContainer.style.opacity = '1';
-        uiControls.resultsLoader.style.display = 'none';
+        uiControls.resultsLoader.classList.add('hidden');
     },
 
     showError(el, errorText) {

@@ -1,0 +1,37 @@
+.modal-unite {
+    $modal-width: 300px;
+    $padding-width: 16px;
+    display: block;
+    top: 100px;
+    left: 200px;
+    background-color: $white;
+    width: $modal-width;
+    max-width: $modal-width;
+    z-index: 1003;
+
+    &__fieldset {
+        padding: $padding-width;
+        min-width: $modal-width;
+        width: $modal-width;
+        max-width: $modal-width;
+    }
+
+    &__select-container {
+        min-width: $modal-width - 2 * $padding-width;
+        max-width: $modal-width - 2 * $padding-width;
+    }
+
+    &__sheet-select {
+        min-width: $modal-width - 2 * $padding-width;
+        max-width: $modal-width - 2 * $padding-width;
+        overflow: hidden;
+    }
+
+    &__table-body {
+        position: relative;
+        min-width: $modal-width - 2 * $padding-width;
+        max-width: $modal-width - 2 * $padding-width;
+        min-height: 170px;
+        max-height: 170px;
+    }
+}

@@ -28,13 +28,10 @@ export default class Sheet {
         this._data = await this._parseDataInFile(true);
         this._initVars();
         this._createHTML();
-
-
-
     }
 
     async setSettings(settingsFormData) {
-        Var.clearUnited();
+        this._dataVars.forEach(el => el.clearUnited());
         this._settings.setSettings(settingsFormData);
         this._data = await this._parseDataInFile(false);
         this._initVars();
@@ -240,6 +237,7 @@ export default class Sheet {
             const columnData = column.slice(1);
             const uniqueValues = new Set(columnData);
             uniqueValues.delete('');
+            uniqueValues.delete(undefined);
             const notANumber = columnData.find(val => typeof val !== 'number' && val !== '');
 
             const newVar = (type) => new Var(type, idName(), uniqueValues, column[0], (notANumber == undefined));
@@ -265,6 +263,10 @@ export default class Sheet {
 
     getID() {
         return this._id;
+    }
+
+    getOpenedVar() {
+        return this._openedVar;
     }
 
     getVars() {

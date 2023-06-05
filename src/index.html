@@ -149,7 +149,7 @@
     </main>
 
     <!-- Modal window - var type -->
-    <div class="modal-var-types modal-window">
+    <div class="modal-var-types modal-window hidden">
         <div class="modal-window__header">
             <div class="modal-window__header-icon draggable-icon">
                 <div class="draggable-icon__element"></div>
@@ -191,7 +191,7 @@
                         </label>
                     </div>
                 </div>
-                <div class="modal-var-types__rang-settings">
+                <div class="modal-var-types__rang-settings hidden">
                     <div class="modal-var-types__rang-settings-inner">
                         <div class="var-table modal-var-types__rang-table">
                             <div class="var-table__header">Уровни</div>
@@ -206,12 +206,27 @@
                             </div>
                         </div>
                     </div>
-                    <label class="radio-line modal-var-types__unite">
-                        <input id="unite-checkbox" class="main-checkbox" type="checkbox" name="unite">
-                        <span>Включить в объединение значений по рангам</span>
-                    </label>
+                    <div class="modal-var-types__unite ">
+                        <label class="main-button modal-var-types__unite-btn">
+                            <input id="var-types-unite-btn" type="button">
+                            Объединить значения
+                        </label>
+                        <div class="modal-var-types__united-container hidden">
+                            <span class="option-block__sub">Объединено с переменной:</span>
+                            <div class="option-block__sub modal-var-types__united-inner">
+                                <div class="modal-var-types__united-var">
+                                    <div class="modal-var-types__img modal-var-types__img_rang-united"></div>
+                                    <span class="modal-var-types__united-name"></span>
+                                </div>
+                                <label title="Удалить объединение"
+                                    class="extra extra_delete-button main-button modal-var-types__united-delete">
+                                    <input type="button" id="modal-var-types__united-delete-btn"></input>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-var-types__binary-settings">
+                <div class="modal-var-types__binary-settings hidden">
                     <div class="modal-var-types__binary-settings-inner">
                         <div class="var-table modal-var-types__binary-table">
                             <div class="var-table__header">Группа 1</div>
@@ -230,17 +245,48 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-var-types__btn-container">
-                    <button id="var-types-apply-btn" class="main-button modal-var-types__btn"
+                <div class="modal-window__btn-container">
+                    <button id="var-types-apply-btn" class="main-button modal-window__btn"
                         type="submit">Применить</button>
-                    <button class="main-button modal-var-types__btn" type="reset">Отмена</button>
+                    <button class="main-button modal-window__btn" type="reset">Отмена</button>
                 </div>
             </fieldset>
         </form>
     </div>
 
+    <!-- Modal window - unite -->
+    <div class="modal-unite modal-window hidden">
+        <div class="modal-window__header">
+            <div class="modal-window__header-icon draggable-icon">
+                <div class="draggable-icon__element"></div>
+            </div>
+        </div>
+        <form id="unite-form" class="modal-unite__form">
+        </form>
+        <div class="modal-unite__fieldset option-block">
+            <h2>Выбрать объединение</h2>
+            <div class="var-table">
+                <div class="var-table__header">
+                    <form class="sheet-form ">
+                        <div class="main-select modal-unite__select-container">
+                            <select class="main-input sheet-select  modal-unite__sheet-select"
+                                name="sheet-select"></select>
+                        </div>
+                    </form>
+                </div>
+                <div class="var-table__body modal-unite__table-body"></div>
+            </div>
+            <div class="modal-window__btn-container">
+                <button id="modal-unite-apply-btn" class="main-button modal-window__btn" type="submit"
+                    form="unite-form">Применить</button>
+                <button class="main-button modal-window__btn" type="reset" form="unite-form">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Modal window - settings -->
-    <div class="modal-settings modal-window">
+    <div class="modal-settings modal-window hidden">
         <div class="modal-window__header">
             <div class="modal-window__header-icon draggable-icon">
                 <div class="draggable-icon__element"></div>
@@ -292,10 +338,10 @@
                         </label>
                     </div>
                 </div>
-                <div class="modal-settings__btn-container">
-                    <button id="settings-apply-btn" class="main-button modal-settings__btn"
+                <div class="modal-window__btn-container">
+                    <button id="settings-apply-btn" class="main-button modal-window__btn"
                         type="submit">Применить</button>
-                    <button class="main-button modal-settings__btn" type="reset">Отмена</button>
+                    <button class="main-button modal-window__btn" type="reset">Отмена</button>
                 </div>
 
             </fieldset>

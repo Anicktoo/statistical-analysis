@@ -1,5 +1,4 @@
 .modal-var-types {
-    display: none;
     $modal-width: 400px;
     $padding-width: 16px;
     top: 100px;
@@ -40,13 +39,47 @@
     }
 
     &__rang-settings {
-        display: none;
+        display: block;
         width: 100%;
         max-width: 100%;
     }
 
     &__unite {
         margin-top: 20px;
+        width: $modal-width - $padding-width * 2;
+    }
+
+    &__united-inner {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        margin-top: 8px;
+        padding-left: 16px;
+    }
+
+    &__united-var {
+        flex: 0 1 auto;
+        display: flex;
+        min-width: $modal-width * 0.3;
+        // max-width: 100%;
+        align-items: center;
+        gap: 4px;
+        overflow: hidden;
+        white-space: nowrap;
+        padding: 4px 10px 4px 4px;
+        border: 1px solid $main-blue;
+        // background-color: $main-grey;
+        border-radius: 5px;
+    }
+
+    &__united-delete {
+        flex: 0 0 auto;
+
+        input {
+            display: none;
+        }
     }
 
     &__rang-settings-inner {
@@ -86,6 +119,10 @@
             background-image: url("../img/table/scaleRang.png");
         }
 
+        &_rang-united {
+            background-image: url("../img/table/scaleRangUnited.png");
+        }
+
         &_binary {
             background-image: url("../img/table/scaleBinary.png");
         }
@@ -100,7 +137,7 @@
     }
 
     &__binary-settings {
-        display: none;
+        display: block;
         width: 100%;
         max-width: 100%;
     }
@@ -137,13 +174,12 @@
         order: 2;
     }
 
-    &__btn-container {
-        display: flex;
-        gap: 16px;
-    }
-
-    &__btn {
+    &__unite-btn {
         padding: 8px 10px;
         background-color: $main-grey;
+
+        input {
+            display: none;
+        }
     }
 }

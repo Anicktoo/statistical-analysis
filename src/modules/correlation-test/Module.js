@@ -394,19 +394,19 @@ export default class Module extends AbstractModule {
                 <div class="parameters__title-container">
                     <div class="collapsible__symbol collapsible__symbol_checked"></div>
                     <h2 class="parameters__title">${name}</h2>
-                    <input class="parameters__title-input" type='text'>
+                    <input class="parameters__title-input hidden" type='text'>
                 </div>
                 <div class="parameters__extra-container">
                     <button title="Изменить название гипотезы"
-                        class="parameters__extra-item parameters__edit-button main-button"></button>
+                        class="extra extra_edit-button main-button"></button>
                     <label title="Убрать гипотезу из вычислений"
-                        class="parameters__extra-item parameters__hide-button main-button">
+                        class="extra extra_hide-button main-button">
                         <input type="checkbox">
                     </label>
                     <button title="Дублировать гипотезу"
-                        class="parameters__extra-item parameters__duplicate-button main-button"></button>
+                        class="extra extra_duplicate-button main-button"></button>
                     <button title="Удалить гипотезу"
-                        class="parameters__extra-item parameters__delete-button main-button"></button>
+                        class="extra extra_delete-button main-button"></button>
                 </div>
             </div>
         </label>
@@ -679,6 +679,9 @@ export default class Module extends AbstractModule {
                 case 'spearman': {
                     if (this.#inputType !== 'manual' && firstVarName !== Var.Rang.name) {
                         throw new Error(errorText([Var.Rang.ruName]));
+                    }
+                    if (this.#vars.first.isUnited() || this.#vars.second.isUnited()) {
+                        throw new Error('Для данного теста переменные не должны находится в объединении с другими переменными');
                     }
                     if (isInv) {
                         returnValue = this.#spearmanTestInv(alpha, arg, data1, data2);

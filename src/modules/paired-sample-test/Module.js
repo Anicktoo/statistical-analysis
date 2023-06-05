@@ -405,19 +405,19 @@ export default class Module extends AbstractModule {
                 <div class="parameters__title-container">
                     <div class="collapsible__symbol collapsible__symbol_checked"></div>
                     <h2 class="parameters__title">${name}</h2>
-                    <input class="parameters__title-input" type='text'>
+                    <input class="parameters__title-input hidden" type='text'>
                 </div>
                 <div class="parameters__extra-container">
                     <button title="Изменить название гипотезы"
-                        class="parameters__extra-item parameters__edit-button main-button"></button>
+                        class="extra extra_edit-button main-button"></button>
                     <label title="Убрать гипотезу из вычислений"
-                        class="parameters__extra-item parameters__hide-button main-button">
+                        class="extra extra_hide-button main-button">
                         <input type="checkbox">
                     </label>
                     <button title="Дублировать гипотезу"
-                        class="parameters__extra-item parameters__duplicate-button main-button"></button>
+                        class="extra extra_duplicate-button main-button"></button>
                     <button title="Удалить гипотезу"
-                        class="parameters__extra-item parameters__delete-button main-button"></button>
+                        class="extra extra_delete-button main-button"></button>
                 </div>
             </div>
         </label>
@@ -731,7 +731,7 @@ export default class Module extends AbstractModule {
                     if (this.#inputType !== 'manual' && firstVarName !== Var.Continues.name && firstVarName !== Var.Rang.name) {
                         throw new Error(errorText([Var.Continues.ruName, Var.Rang.name]));
                     }
-                    if (firstVarName === Var.Rang.name && (!this.#vars.first.isUnited() || !this.#vars.second.isUnited())) {
+                    if (firstVarName === Var.Rang.name && (!this.#vars.first.isUnitedWith(this.#vars.second))) {
                         throw new Error('Для данного теста и способа ввода данных необходимо сперва объеденить значения выборок в окне настроек столбца');
                     }
                     if (isInv) {
@@ -746,7 +746,7 @@ export default class Module extends AbstractModule {
                     if (this.#inputType !== 'manual' && firstVarName === Var.Nominal.name) {
                         throw new Error(errorText([Var.Continues.ruName, Var.Rang.ruName, Var.Binary.ruName]));
                     }
-                    if (firstVarName === Var.Rang.name && (!this.#vars.first.isUnited() || !this.#vars.second.isUnited())) {
+                    if (firstVarName === Var.Rang.name && (!this.#vars.first.isUnitedWith(this.#vars.second))) {
                         throw new Error('Для данного теста и способа ввода данных необходимо сперва объеденить значения выборок в окне настроек столбца');
                     }
                     if (isInv) {
@@ -782,7 +782,7 @@ export default class Module extends AbstractModule {
         else {
             const var1 = this.#vars.first;
             const var2 = this.#inputType === 'data-input-two' ? this.#vars.second : var1;
-            const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName(), data1, data2, var1, var2);
+            const signs = this.#signTestGetListOfNumberOfSigns(var1.getTypeName(), data1, data2, var1, var2);
             const dataLength = signs[1] + signs[2];
             p0 = signs[0] / data1.length;
             p1 = signs[1] / dataLength;
@@ -816,7 +816,7 @@ export default class Module extends AbstractModule {
         else {
             const var1 = this.#vars.first;
             const var2 = this.#inputType === 'data-input-two' ? this.#vars.second : var1;
-            const signs = this.#signTestGetListOfNumberOfSigns(this.#vars.first.getTypeName(), data1, data2, var1, var2);
+            const signs = this.#signTestGetListOfNumberOfSigns(var1.getTypeName(), data1, data2, var1, var2);
             const dataLength = signs[1] + signs[2];
             p0 = signs[0] / data1.length;
             p1 = signs[1] / dataLength;
@@ -851,7 +851,7 @@ export default class Module extends AbstractModule {
             nn = this.#resultsTableData.wilcoxon.nn;
         }
         else {
-            const varGetRangFunc = Var.getOrderOfValUnited;
+            const varGetRangFunc = Var.prototype.getOrderOfValUnited.bind(this.#vars.first);
             let res = Math.getW(data1, data2, this.#vars.first.getTypeName() === Var.Rang.name ? varGetRangFunc : null);
             W = res.W;
             nn = res.nn;
@@ -881,16 +881,13 @@ export default class Module extends AbstractModule {
             nn = this.#resultsTableData.wilcoxon.nn;
         }
         else {
-            const varGetRangFunc = Var.getOrderOfValUnited;
+            const varGetRangFunc = Var.prototype.getOrderOfValUnited.bind(this.#vars.first);
             let res = Math.getW(data1, data2, this.#vars.first.getTypeName() === Var.Rang.name ? varGetRangFunc : null);
             W = res.W;
             nn = res.nn;
             this.#resultsTableData.wilcoxon.W = W;
             this.#resultsTableData.wilcoxon.nn = nn;
         }
-
-        // const p = 0.5 * (this.#altHypTest === 'both' ? -Math.sign(W) : (this.#altHypTest === 'right' ? -1 : 1));
-        // let z = (W + p) / Math.sqrt((nn * (nn + 1) * (2 * nn + 1)) / 6);
 
         const v = W / (nn ** 2);
         const z = -Math.sqrt(v ** 2 * 3 * n);
@@ -979,7 +976,7 @@ export default class Module extends AbstractModule {
             callback = var1.isValInZeroGroup;
         }
         else if (type === 'rang') {
-            callback = Var.getOrderOfValUnited;
+            callback = Var.prototype.getOrderOfValUnited.bind(var1);
         }
 
         if (type === 'continues') {

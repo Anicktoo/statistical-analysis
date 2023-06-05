@@ -1,6 +1,5 @@
 .parameters {
-    $extra-img-size: 18px;
-    $extra-size: 24px;
+
     min-width: $parameters-width;
     max-width: $parameters-width;
     background-color: $main-grey;
@@ -47,7 +46,7 @@
     }
 
     &__title-input {
-        display: none;
+        display: inline-block;
         border: none;
         border-radius: 5px;
         background-color: inherit;
@@ -62,49 +61,6 @@
 
     &__extra-container {
         display: flex;
-    }
-
-    &__extra-item {
-        border: none;
-        @include single-image($extra-size, $extra-size);
-        background-size: $extra-img-size;
-        border-radius: 999px;
-    }
-
-    &__edit-button {
-        background-image: url("../img/extra/edit.png");
-    }
-
-    &__hide-button {
-        background-image: url("../img/extra/hide.png");
-
-        input {
-            display: none;
-        }
-
-        &_hidden {
-            background-image: url("../img/extra/unhide.png");
-        }
-    }
-
-    &__duplicate-button {
-        background-image: url("../img/extra/duplicate.png");
-    }
-
-    &__delete-button {
-        position: relative;
-
-        &::after {
-            content: "";
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: url("../img/extra/delete.png");
-            @include single-image(100%, 100%);
-            background-size: $extra-img-size;
-            transform: rotate(45deg);
-        }
     }
 
     &__content {

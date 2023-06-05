@@ -1,6 +1,5 @@
 .modal-settings {
     z-index: 1001;
-    display: none;
     position: absolute;
     top: 100px;
     left: 10px;
@@ -9,15 +8,5 @@
 
     &__fieldset {
         padding: 16px;
-    }
-
-    &__btn-container {
-        display: flex;
-        gap: 16px;
-    }
-
-    &__btn {
-        padding: 8px 10px;
-        background-color: $main-grey;
     }
 }
