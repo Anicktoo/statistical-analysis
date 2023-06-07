@@ -430,14 +430,19 @@ const moduleIntegrator = {
 
         moduleIntegrator._hypotheses = moduleIntegrator._hypotheses.slice(0, -1);
 
-        optionEl.selected = false;
-        if (globalSettings.unhiddenCounter === 0) {
-            globalSettings.mainHypId = null;
-            uiControls.mainHypSelectNullOption.selected = true;
+        if (id === globalSettings.mainHypId) {
+            optionEl.selected = false;
+            if (globalSettings.unhiddenCounter === 0) {
+                globalSettings.mainHypId = null;
+                uiControls.mainHypSelectNullOption.selected = true;
+            }
+            else {
+                globalSettings.mainHypId = moduleIntegrator._hypotheses.findIndex((el) => !el.hidden);
+                uiControls.mainHypSelect.querySelector('.main-hypothesis__option_' + globalSettings.mainHypId).selected = true;
+            }
         }
-        else {
-            globalSettings.mainHypId = moduleIntegrator._hypotheses.findIndex((el) => !el.hidden);
-            uiControls.mainHypSelect.querySelector('.main-hypothesis__option_' + globalSettings.mainHypId).selected = true;
+        else if (globalSettings.mainHypId > id) {
+            globalSettings.mainHypId--;
         }
 
         moduleIntegrator.setSettings('glob');
